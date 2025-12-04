@@ -8,6 +8,8 @@ import 'package:vaidya/widgets/my_text_form_field.dart';
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
+  final _formKey = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -16,123 +18,159 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
 
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Form(
+            key: _formKey,
 
-            children: [
-              Image.asset('assets/images/logo.png', height: 100),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
 
-              const SizedBox(height: 4),
+              children: [
+                Image.asset('assets/images/logo.png', height: 90),
 
-              const Text(
-                "Sign in",
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-              ),
+                const SizedBox(height: 8),
 
-              const SizedBox(height: 2),
-
-              const Text(
-                "Enter your credentials to continue",
-                style: TextStyle(fontSize: 18, color: Color(0xFF313131)),
-              ),
-
-              const SizedBox(height: 18),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Email",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                const Text(
+                  "Sign In",
+                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
                 ),
-              ),
 
-              const SizedBox(height: 5),
+                const SizedBox(height: 6),
 
-              MyTextFormField(
-                text: "Enter your email",
-                controller: _emailController,
-              ),
-
-              const SizedBox(height: 14),
-
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Password",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                const Text(
+                  "Enter your credentials to continue",
+                  style: TextStyle(fontSize: 17, color: Color(0xFF313131)),
                 ),
-              ),
 
-              const SizedBox(height: 5),
+                const SizedBox(height: 24),
 
-              MyTextFormField(
-                text: "********",
-                controller: _passwordController,
-              ),
-
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    "Forgot Password?",
-                    style: TextStyle(
-                      color: Color(0xFF2D8CFF),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Email",
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                  ),
+
+                    const SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: _emailController,
+                      text: "Enter your email",
+                      keyboardType: TextInputType.emailAddress,
+                      prefixIcon: const Icon(
+                        Icons.mail,
+                        size: 22,
+                        color: Colors.grey,
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "Password",
+                        style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: _passwordController,
+                      text: "*********",
+                      keyboardType: TextInputType.visiblePassword,
+                      obscureText: true,
+                      prefixIcon: const Icon(
+                        Icons.key_rounded,
+                        size: 22,
+                        color: Colors.grey,
+                      ),
+                    ),
+
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                      child: const Text(
+                        "Forgot Password?",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF2D8CFF),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
 
-              const SizedBox(height: 2),
+                const SizedBox(height: 8),
 
-              // Login Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: MyButton(
+                MyButton(
                   text: "Login",
                   onPressed: () {
-                    showMySnackBar(context: context, message: "Login clicked");
+                    if (_formKey.currentState!.validate()) {
+                      showMySnackBar(
+                        context: context,
+                        message: "Login clicked",
+                      );
+                    }
                   },
                 ),
-              ),
 
-              const SizedBox(height: 2),
+                const SizedBox(height: 8),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Don't have an account?",
-                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
-                  ),
-                  TextButton(
-                    onPressed: () {},
-                    child: const Text(
-                      "Sign up",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don't have an account?",
                       style: TextStyle(
-                        color: Color(0xFF2D8CFF),
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         fontSize: 15,
                       ),
                     ),
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 2),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Sign up",
+                        style: TextStyle(
+                          color: Color(0xFF2D8CFF),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
 
-              DividerWithText(text: "Or login with"),
+                const SizedBox(height: 4),
 
-              const SizedBox(height: 16),
+                const DividerWithText(text: "Or login with"),
 
-              GoogleLoginButton(onPressed: () {}),
-            ],
+                const SizedBox(height: 16),
+
+                GoogleLoginButton(
+                  onPressed: () {
+                    showMySnackBar(
+                      context: context,
+                      message: "Google Login clicked",
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
