@@ -9,7 +9,7 @@ class GoogleLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 44,
+      height: 46,
       child: OutlinedButton.icon(
         onPressed: onPressed,
         icon: Image.asset("assets/images/logo_google.png", height: 20),

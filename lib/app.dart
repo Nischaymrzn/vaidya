@@ -9,10 +9,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Vaidya.ai',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: ThemeData(fontFamily: 'Poppins'),
       home: SplashScreen(),
     );
   }
