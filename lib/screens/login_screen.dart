@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vaidya/common/my_snackbar.dart';
+import 'package:vaidya/screens/signup_screen.dart';
 import 'package:vaidya/widgets/divider_with_text.dart';
 import 'package:vaidya/widgets/google_login_button.dart';
 import 'package:vaidya/widgets/my_button.dart';
@@ -18,7 +19,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
 
           child: Form(
             key: _formKey,
@@ -30,26 +31,26 @@ class LoginScreen extends StatelessWidget {
               children: [
                 Image.asset('assets/images/logo.png', height: 90),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
-                const Text(
+                Text(
                   "Sign In",
-                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                 ),
 
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
 
-                const Text(
+                Text(
                   "Enter your credentials to continue",
-                  style: TextStyle(fontSize: 17, color: Color(0xFF313131)),
+                  style: TextStyle(fontSize: 18, color: Color(0xFF313131)),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Email",
@@ -60,22 +61,23 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
 
                     MyTextFormField(
                       controller: _emailController,
                       text: "Enter your email",
+                      validationMessage: "Email is required",
                       keyboardType: TextInputType.emailAddress,
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.mail,
                         size: 22,
                         color: Colors.grey,
                       ),
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Password",
@@ -86,14 +88,15 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
 
                     MyTextFormField(
                       controller: _passwordController,
-                      text: "*********",
+                      text: "Enter your password",
+                      validationMessage: "Password is required",
                       keyboardType: TextInputType.visiblePassword,
                       obscureText: true,
-                      prefixIcon: const Icon(
+                      prefixIcon: Icon(
                         Icons.key_rounded,
                         size: 22,
                         color: Colors.grey,
@@ -103,7 +106,7 @@ class LoginScreen extends StatelessWidget {
                     TextButton(
                       onPressed: () {},
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                      child: const Text(
+                      child: Text(
                         "Forgot Password?",
                         style: TextStyle(
                           fontSize: 14,
@@ -114,7 +117,7 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
                 MyButton(
                   text: "Login",
@@ -128,12 +131,12 @@ class LoginScreen extends StatelessWidget {
                   },
                 ),
 
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don't have an account?",
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -142,8 +145,15 @@ class LoginScreen extends StatelessWidget {
                     ),
 
                     TextButton(
-                      onPressed: () {},
-                      child: const Text(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SignupScreen(),
+                          ),
+                        );
+                      },
+                      child: Text(
                         "Sign up",
                         style: TextStyle(
                           color: Color(0xFF2D8CFF),
@@ -155,11 +165,11 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
 
-                const DividerWithText(text: "Or login with"),
+                DividerWithText(text: "Or"),
 
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 GoogleLoginButton(
                   onPressed: () {
