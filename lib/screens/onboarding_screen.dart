@@ -90,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(data["image"]!, height: 400),
+                        Image.asset(data["image"]!, height: 320),
 
                         SizedBox(height: 32),
 

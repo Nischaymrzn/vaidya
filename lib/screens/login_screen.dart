@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vaidya/common/my_snackbar.dart';
+import 'package:vaidya/screens/home_screen.dart';
 import 'package:vaidya/screens/signup_screen.dart';
 import 'package:vaidya/widgets/divider_with_text.dart';
 import 'package:vaidya/widgets/google_login_button.dart';
@@ -123,9 +124,9 @@ class LoginScreen extends StatelessWidget {
                   text: "Login",
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      showMySnackBar(
-                        context: context,
-                        message: "Login clicked",
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
                       );
                     }
                   },
