@@ -7,6 +7,7 @@ class MyTextFormField extends StatefulWidget {
     this.controller,
     this.onChanged,
     this.keyboardType = TextInputType.text,
+    this.validationMessage = "Please enter some value",
     this.prefixIcon,
     this.obscureText = false,
     this.validator,
@@ -15,6 +16,7 @@ class MyTextFormField extends StatefulWidget {
   final String text;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+  final String validationMessage;
 
   final TextInputType keyboardType;
   final Widget? prefixIcon;
@@ -40,7 +42,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
           widget.validator ??
           (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter ${widget.text}';
+              return widget.validationMessage;
             }
             return null;
           },
@@ -65,8 +67,8 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
             : null,
 
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 14,
+          horizontal: 12,
+          vertical: 12,
         ),
 
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
