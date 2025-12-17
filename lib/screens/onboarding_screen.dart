@@ -14,18 +14,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<Map<String, String>> pages = [
     {
-      "image": "assets/images/onboarding1.png",
+      "image": "assets/images/onboarding1.webp",
       "title": "All Your Health in One Place",
       "desc":
           "Securely store your vitals, lab reports, prescriptions, and medical history anytime, anywhere.",
     },
     {
-      "image": "assets/images/onboarding2.png",
+      "image": "assets/images/onboarding2.webp",
       "title": "Health Guidance",
       "desc": "Smart symptom analysis and personalized insights.",
     },
     {
-      "image": "assets/images/onboarding3.png",
+      "image": "assets/images/onboarding3.webp",
       "title": "Visual Analytics",
       "desc":
           "Understand trends and patterns with interactive charts and progress dashboards.",
