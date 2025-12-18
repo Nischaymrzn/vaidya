@@ -11,8 +11,17 @@ class App extends StatelessWidget {
       title: 'Vaidya.ai',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Outfit',
+        fontFamily: 'Urbanist',
         scaffoldBackgroundColor: AppColors.background,
+
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            color: AppColors.textPrimary,
+            fontSize: 22,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Urbanist',
+          ),
+        ),
       ),
       home: SplashScreen(),
     );
