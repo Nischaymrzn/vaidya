@@ -25,12 +25,9 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     ProfileScreen(),
   ];
 
-  /// Custom widget to render SVG icons
-  Widget _navIcon(String path, Color color, {double size = 28}) {
+  Widget _navIcon(String path, Color color) {
     return SvgPicture.asset(
       path,
-      width: size,
-      height: size,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
   }
@@ -41,9 +38,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: AppColors.border, width: 0.5), // top border
-          ),
+          border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
         ),
         child: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
@@ -57,63 +52,57 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           onTap: (index) => setState(() => _selectedIndex = index),
           items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home, size: 30, color: AppColors.isNotActiveNav),
-              activeIcon: Icon(
-                Icons.home,
-                size: 28,
-                color: AppColors.activeNav,
+              icon: _navIcon(
+                'assets/icons/home_new.svg',
+                AppColors.isNotActiveNav,
+              ),
+              activeIcon: _navIcon(
+                'assets/icons/home_new.svg',
+                AppColors.activeNav,
               ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/health.svg',
+                'assets/icons/record_new.svg',
                 AppColors.isNotActiveNav,
-                size: 28,
               ),
               activeIcon: _navIcon(
-                'assets/icons/health.svg',
+                'assets/icons/record_new.svg',
                 AppColors.activeNav,
-                size: 28,
               ),
               label: 'Records',
             ),
             BottomNavigationBarItem(
-              icon: Icon(
-                Icons.smart_toy_outlined,
-                size: 28,
-                color: AppColors.isNotActiveNav,
+              icon: _navIcon(
+                'assets/icons/assistant_new.svg',
+                AppColors.isNotActiveNav,
               ),
-              activeIcon: Icon(
-                Icons.smart_toy_outlined,
-                size: 28,
-                color: AppColors.activeNav,
+              activeIcon: _navIcon(
+                'assets/icons/assistant_new.svg',
+                AppColors.activeNav,
               ),
               label: 'Assistant',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/insights.svg',
+                'assets/icons/insights_new.svg',
                 AppColors.isNotActiveNav,
-                size: 30,
               ),
               activeIcon: _navIcon(
-                'assets/icons/insights.svg',
+                'assets/icons/insights_new.svg',
                 AppColors.activeNav,
-                size: 30,
               ),
               label: 'Insights',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/profile_2.svg',
+                'assets/icons/user_new.svg',
                 AppColors.isNotActiveNav,
-                size: 30,
               ),
               activeIcon: _navIcon(
-                'assets/icons/profile_2.svg',
+                'assets/icons/user_new.svg',
                 AppColors.activeNav,
-                size: 30,
               ),
               label: 'Profile',
             ),
