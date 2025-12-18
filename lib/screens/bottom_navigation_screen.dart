@@ -4,7 +4,7 @@ import 'package:vaidya/screens/bottom_screen/assistant.dart';
 import 'package:vaidya/screens/bottom_screen/insights.dart';
 import 'package:vaidya/screens/bottom_screen/profile.dart';
 import 'package:vaidya/screens/bottom_screen/records_screen.dart';
-import 'package:vaidya/screens/home_screen.dart';
+import 'package:vaidya/screens/bottom_screen/home/home_screen.dart';
 import 'package:vaidya/themes/colors.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
@@ -52,56 +52,50 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           onTap: (index) => setState(() => _selectedIndex = index),
           items: [
             BottomNavigationBarItem(
-              icon: _navIcon(
-                'assets/icons/home_new.svg',
-                AppColors.isNotActiveNav,
-              ),
+              icon: _navIcon('assets/icons/home.svg', AppColors.isNotActiveNav),
               activeIcon: _navIcon(
-                'assets/icons/home_new.svg',
+                'assets/icons/home.svg',
                 AppColors.activeNav,
               ),
               label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/record_new.svg',
+                'assets/icons/record.svg',
                 AppColors.isNotActiveNav,
               ),
               activeIcon: _navIcon(
-                'assets/icons/record_new.svg',
+                'assets/icons/record.svg',
                 AppColors.activeNav,
               ),
               label: 'Records',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/assistant_new.svg',
+                'assets/icons/assistant.svg',
                 AppColors.isNotActiveNav,
               ),
               activeIcon: _navIcon(
-                'assets/icons/assistant_new.svg',
+                'assets/icons/assistant.svg',
                 AppColors.activeNav,
               ),
               label: 'Assistant',
             ),
             BottomNavigationBarItem(
               icon: _navIcon(
-                'assets/icons/insights_new.svg',
+                'assets/icons/insights.svg',
                 AppColors.isNotActiveNav,
               ),
               activeIcon: _navIcon(
-                'assets/icons/insights_new.svg',
+                'assets/icons/insights.svg',
                 AppColors.activeNav,
               ),
               label: 'Insights',
             ),
             BottomNavigationBarItem(
-              icon: _navIcon(
-                'assets/icons/user_new.svg',
-                AppColors.isNotActiveNav,
-              ),
+              icon: _navIcon('assets/icons/user.svg', AppColors.isNotActiveNav),
               activeIcon: _navIcon(
-                'assets/icons/user_new.svg',
+                'assets/icons/user.svg',
                 AppColors.activeNav,
               ),
               label: 'Profile',
