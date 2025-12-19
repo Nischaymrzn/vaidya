@@ -5,6 +5,13 @@ class AssistantScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(child: Center(child: Text("Assistant")));
+    return SizedBox.expand(
+      child: Center(
+        child: Text(
+          "This is Assistant Page",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
   }
 }

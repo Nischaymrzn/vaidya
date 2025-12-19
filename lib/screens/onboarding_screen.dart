@@ -61,7 +61,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           padding: EdgeInsets.all(24),
           child: Column(
             children: [
-              // ---------- SKIP ----------
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton(
@@ -112,6 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 17,
+                              fontWeight: FontWeight.w500,
                               color: Color(0xFF555555),
                             ),
                           ),

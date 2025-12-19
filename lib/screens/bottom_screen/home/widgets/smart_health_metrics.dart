@@ -18,17 +18,17 @@ class SmartHealthMetrics extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(
-              "View All",
+              "View all",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary.withOpacity(0.8),
                 fontWeight: FontWeight.w500,
+                fontSize: 14,
               ),
             ),
           ],
         ),
         const SizedBox(height: 8),
 
-        // 2x2 Grid
         GridView.count(
           shrinkWrap: true,
           crossAxisCount: 2,
@@ -42,28 +42,28 @@ class SmartHealthMetrics extends StatelessWidget {
               name: "Heart Rate",
               value: "89",
               unit: "bpm",
-              updated: "Last update 1 day ago",
+              condition: "Normal",
             ),
             MetricsCard(
               iconPath: "assets/icons/blood_pressure.svg",
               name: "Blood Pressure",
               value: "90",
               unit: "mmHg",
-              updated: "Last update 9 day ago",
+              condition: "High",
             ),
             MetricsCard(
               iconPath: "assets/icons/blood_sugar.svg",
               name: "Blood Sugar",
               value: "92",
               unit: "mg/dL",
-              updated: "Last update 1 day ago",
+              condition: "Low",
             ),
             MetricsCard(
               iconPath: "assets/icons/bmi.svg",
               name: "BMI",
               value: "20",
               unit: "kg/m",
-              updated: "Last update 1 day ago",
+              condition: "Normal",
             ),
           ],
         ),

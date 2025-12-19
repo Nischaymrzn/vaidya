@@ -26,7 +26,7 @@ class MedicationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: 16, right: 16),
-      margin: const EdgeInsets.only(bottom: 8, top: 12),
+      margin: const EdgeInsets.only(bottom: 16, top: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -36,7 +36,7 @@ class MedicationCard extends StatelessWidget {
               color: const Color(0xFFE5E7EB),
               shape: BoxShape.circle,
             ),
-            child: SvgPicture.asset(iconPath, height: 24, width: 24),
+            child: SvgPicture.asset(iconPath, height: 28, width: 28),
           ),
           const SizedBox(width: 12),
 
@@ -47,7 +47,7 @@ class MedicationCard extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 19,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textPrimary,
                   ),
@@ -60,6 +60,7 @@ class MedicationCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -68,53 +69,7 @@ class MedicationCard extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: onView,
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.remove_red_eye,
-                            size: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'view',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    GestureDetector(
-                      onTap: onPdf,
-                      child: Row(
-                        children: const [
-                          Icon(
-                            Icons.download,
-                            size: 16,
-                            color: AppColors.textSecondary,
-                          ),
-                          SizedBox(width: 4),
-                          Text(
-                            'pdf',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
