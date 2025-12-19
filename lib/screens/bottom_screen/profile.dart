@@ -5,6 +5,13 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(child: Center(child: Text("Profile")));
+    return SizedBox.expand(
+      child: Center(
+        child: Text(
+          "This is Profile Page",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+      ),
+    );
   }
 }

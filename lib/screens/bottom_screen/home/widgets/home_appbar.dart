@@ -81,14 +81,42 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.notifications_active_rounded,
-            color: Colors.white,
-            size: 22,
-          ),
-          onPressed: () {},
-          padding: const EdgeInsets.only(right: 16, bottom: 6),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.notifications_active_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+              onPressed: () {},
+              padding: const EdgeInsets.only(right: 16, bottom: 6),
+            ),
+
+            // Notification badge
+            Positioned(
+              right: 12,
+              top: 4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Color(0xFFE53935),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                child: const Text(
+                  '5',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

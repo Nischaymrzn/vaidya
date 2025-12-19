@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vaidya/themes/colors.dart'; // your AppColors
+import 'package:vaidya/screens/bottom_screen/home/metric_detail_page.dart';
+import 'package:vaidya/themes/colors.dart';
 
 class MetricsCard extends StatelessWidget {
   final String iconPath;
   final String name;
   final String value;
   final String unit;
-  final String updated;
+  final String condition;
 
   const MetricsCard({
     super.key,
@@ -15,21 +16,40 @@ class MetricsCard extends StatelessWidget {
     required this.name,
     required this.value,
     required this.unit,
-    required this.updated,
+    required this.condition,
   });
+
+  Color _getConditionColor() {
+    switch (condition.toLowerCase()) {
+      case 'normal':
+        return const Color(0xFFBBF7D0);
+      case 'low':
+        return const Color(0xFFFEF3C7);
+      case 'high':
+        return const Color(0xFFFECDD3);
+      default:
+        return const Color(0xFFBBF7D0);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // onTap: () {
-      //   // Navigate to detail page
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => HeartRateDetailPage(), // your detail page
-      //     ),
-      //   );
-      // },
+      onTap: () {
+        // Navigate to detail page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MetricDetailPage(
+              metricName: name,
+              iconPath: iconPath,
+              value: value,
+              unit: unit,
+              condition: condition,
+            ),
+          ),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -39,11 +59,9 @@ class MetricsCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
-
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
@@ -54,48 +72,64 @@ class MetricsCard extends StatelessWidget {
                   ),
                   child: SvgPicture.asset(iconPath, height: 20, width: 20),
                 ),
-                const SizedBox(width: 6),
+                const SizedBox(width: 8),
                 Text(
                   name,
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 17,
                     color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 26),
-
+            const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.only(left: 12),
-              child: RichText(
-                text: TextSpan(
-                  text: value,
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 26,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: ' $unit',
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      text: value,
                       style: TextStyle(
-                        color: AppColors.textSecondary,
-                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Urbanist",
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' $unit',
+                          style: TextStyle(
+                            color: AppColors.textSecondary.withAlpha(200),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // Condition Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getConditionColor(),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      condition,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Text(
-                updated,
-                style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
+                  ),
+                ],
               ),
             ),
           ],

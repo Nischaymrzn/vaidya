@@ -33,10 +33,11 @@ class RecentMedications extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             Text(
-              "View All",
+              "View all",
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
+                color: AppColors.textSecondary.withAlpha(203),
                 fontWeight: FontWeight.w500,
+                fontSize: 14,
               ),
             ),
           ],
