@@ -29,43 +29,50 @@ class SmartHealthMetrics extends StatelessWidget {
         ),
         const SizedBox(height: 8),
 
-        GridView.count(
-          shrinkWrap: true,
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 166 / 139,
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            MetricsCard(
-              iconPath: "assets/icons/heart_rate.svg",
-              name: "Heart Rate",
-              value: "89",
-              unit: "bpm",
-              condition: "Normal",
-            ),
-            MetricsCard(
-              iconPath: "assets/icons/blood_pressure.svg",
-              name: "Blood Pressure",
-              value: "90",
-              unit: "mmHg",
-              condition: "High",
-            ),
-            MetricsCard(
-              iconPath: "assets/icons/blood_sugar.svg",
-              name: "Blood Sugar",
-              value: "92",
-              unit: "mg/dL",
-              condition: "Low",
-            ),
-            MetricsCard(
-              iconPath: "assets/icons/bmi.svg",
-              name: "BMI",
-              value: "20",
-              unit: "kg/m",
-              condition: "Normal",
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            // If width less than 600: 2 columns, else 4 columns
+            int crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
+
+            return GridView.count(
+              shrinkWrap: true,
+              crossAxisCount: crossAxisCount,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 166 / 139,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                MetricsCard(
+                  iconPath: "assets/icons/heart_rate.svg",
+                  name: "Heart Rate",
+                  value: "89",
+                  unit: "bpm",
+                  condition: "Normal",
+                ),
+                MetricsCard(
+                  iconPath: "assets/icons/blood_pressure.svg",
+                  name: "Blood Pressure",
+                  value: "90",
+                  unit: "mmHg",
+                  condition: "High",
+                ),
+                MetricsCard(
+                  iconPath: "assets/icons/blood_sugar.svg",
+                  name: "Blood Sugar",
+                  value: "92",
+                  unit: "mg/dL",
+                  condition: "Low",
+                ),
+                MetricsCard(
+                  iconPath: "assets/icons/bmi.svg",
+                  name: "BMI",
+                  value: "20",
+                  unit: "kg/m",
+                  condition: "Normal",
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
