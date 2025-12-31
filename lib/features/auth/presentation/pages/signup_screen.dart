@@ -4,7 +4,7 @@ import 'package:vaidya/core/widgets/divider_with_text.dart';
 import 'package:vaidya/core/widgets/google_login_button.dart';
 import 'package:vaidya/core/widgets/my_button.dart';
 import 'package:vaidya/core/widgets/my_text_form_field.dart';
-import 'package:vaidya/screens/login_screen.dart';
+import 'package:vaidya/features/auth/presentation/pages/login_screen.dart';
 
 class SignupScreen extends StatelessWidget {
   SignupScreen({super.key});
