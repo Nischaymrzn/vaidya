@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vaidya/screens/bottom_screen/home/metric_detail_page.dart';
+import 'package:vaidya/features/dashboard/presentation/pages/metric_detail_page.dart';
 import 'package:vaidya/themes/colors.dart';
 
 class MetricsCard extends StatelessWidget {

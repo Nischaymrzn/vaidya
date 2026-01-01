@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vaidya/screens/bottom_screen/home/widgets/metrics_card.dart';
+import 'package:vaidya/features/dashboard/presentation/widgets/metrics_card.dart';
 import 'package:vaidya/themes/colors.dart';
 
 class SmartHealthMetrics extends StatelessWidget {
