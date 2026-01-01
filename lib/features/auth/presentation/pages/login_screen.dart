@@ -1,22 +1,73 @@
 import 'package:flutter/material.dart';
-import 'package:vaidya/common/my_snackbar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vaidya/app/routes/app_routes.dart';
+import 'package:vaidya/core/utils/snackbar_utils.dart';
 import 'package:vaidya/core/widgets/divider_with_text.dart';
 import 'package:vaidya/core/widgets/google_login_button.dart';
 import 'package:vaidya/core/widgets/my_button.dart';
 import 'package:vaidya/core/widgets/my_text_form_field.dart';
 import 'package:vaidya/features/auth/presentation/pages/signup_screen.dart';
-import 'package:vaidya/screens/bottom_navigation_screen.dart';
+import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
+import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:vaidya/features/dashboard/presentation/pages/dashboard.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends ConsumerStatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      await ref
+          .read(authViewModelProvider.notifier)
+          .login(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+    }
+  }
+
+  void _navigateToSignup() {
+    AppRoutes.push(context, SignupScreen());
+  }
+
+  void _handleForgotPassword() {
+    // TODO: Implement forgot password
+    SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
+  }
+
+  void _handleGoogleSignIn() {
+    // TODO: Implement Google Sign In
+    SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authViewModelProvider);
+
+    // Listen to auth state changes
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.status == AuthStatus.authenticated) {
+        AppRoutes.pushReplacement(context, const DashboardScreen());
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        SnackbarUtils.showError(context, next.errorMessage!);
+      }
+    });
+
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -105,7 +156,7 @@ class LoginScreen extends StatelessWidget {
                     ),
 
                     TextButton(
-                      onPressed: () {},
+                      onPressed: _handleForgotPassword,
                       style: TextButton.styleFrom(padding: EdgeInsets.zero),
                       child: Text(
                         "Forgot Password?",
@@ -122,16 +173,10 @@ class LoginScreen extends StatelessWidget {
 
                 MyButton(
                   text: "Login",
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BottomNavigationScreen(),
-                        ),
-                      );
-                    }
-                  },
+                  height: 56,
+                  radius: 12,
+                  isLoading: authState.status == AuthStatus.loading,
+                  onPressed: _handleLogin,
                 ),
 
                 SizedBox(height: 8),
@@ -148,14 +193,7 @@ class LoginScreen extends StatelessWidget {
                     ),
 
                     TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignupScreen(),
-                          ),
-                        );
-                      },
+                      onPressed: _navigateToSignup,
                       child: Text(
                         "Sign up",
                         style: TextStyle(
@@ -174,14 +212,7 @@ class LoginScreen extends StatelessWidget {
 
                 SizedBox(height: 16),
 
-                GoogleLoginButton(
-                  onPressed: () {
-                    showMySnackBar(
-                      context: context,
-                      message: "Google Login clicked",
-                    );
-                  },
-                ),
+                GoogleLoginButton(onPressed: _handleGoogleSignIn),
               ],
             ),
           ),
