@@ -40,9 +40,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           .register(
             fullName: _nameController.text,
             email: _emailController.text,
-            username: _emailController.text.trim().split("@").first,
-            phoneNumber: _phoneController.text.isNotEmpty
-                ? _phoneController.text
+            role: "user",
+            number: _phoneController.text.isNotEmpty
+                ? int.tryParse(_phoneController.text)
                 : null,
             password: _passwordController.text,
           );
