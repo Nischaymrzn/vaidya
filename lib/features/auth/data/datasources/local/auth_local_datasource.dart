@@ -13,7 +13,7 @@ final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
   );
 });
 
-class AuthLocalDatasource implements IAuthDataSource {
+class AuthLocalDatasource implements IAuthLocalDataSource {
   final HiveService _hiveService;
   final UserSessionService _userSessionService;
   AuthLocalDatasource({
@@ -41,9 +41,9 @@ class AuthLocalDatasource implements IAuthDataSource {
         await _userSessionService.saveUserSession(
           userId: user.userId!,
           email: user.email,
-          fullName: user.fullName,
-          username: user.username ?? '',
-          phoneNumber: user.phoneNumber,
+          name: user.name,
+          role: user.role ?? '',
+          number: user.number,
           profilePicture: user.profilePicture ?? '',
         );
       }
@@ -55,16 +55,29 @@ class AuthLocalDatasource implements IAuthDataSource {
 
   @override
   Future<AuthHiveModel?> getCurrentUser() async {
-    return null;
+    try {
+      if (!_userSessionService.isLoggedIn()) {
+        return null;
+      }
+
+      final userId = _userSessionService.getCurrentUserId();
+      if (userId == null) {
+        return null;
+      }
+
+      return _hiveService.getUserById(userId);
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
   Future<bool> logout() async {
     try {
-      await _hiveService.logout();
-      return Future.value(true);
+      await _userSessionService.clearSession();
+      return true;
     } catch (e) {
-      return Future.value(false);
+      return false;
     }
   }
 
