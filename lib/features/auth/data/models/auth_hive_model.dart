@@ -11,16 +11,16 @@ class AuthHiveModel extends HiveObject {
   final String? userId;
 
   @HiveField(1)
-  final String fullName;
+  final String name;
 
   @HiveField(2)
   final String email;
 
   @HiveField(3)
-  final String? phoneNumber;
+  final int? number;
 
   @HiveField(4)
-  final String? username;
+  final String? role;
 
   @HiveField(5)
   final String? password;
@@ -30,10 +30,10 @@ class AuthHiveModel extends HiveObject {
 
   AuthHiveModel({
     String? userId,
-    required this.fullName,
+    required this.name,
     required this.email,
-    this.phoneNumber,
-    this.username,
+    this.number,
+    this.role,
     this.password,
     this.profilePicture,
   }) : userId = userId ?? const Uuid().v4();
@@ -42,10 +42,10 @@ class AuthHiveModel extends HiveObject {
   AuthEntity toEntity({AuthEntity? auth}) {
     return AuthEntity(
       userId: userId,
-      fullName: fullName,
+      name: name,
       email: email,
-      phoneNumber: phoneNumber,
-      username: username,
+      number: number,
+      role: role,
       password: password,
       profilePicture: profilePicture,
     );
@@ -55,10 +55,10 @@ class AuthHiveModel extends HiveObject {
   factory AuthHiveModel.fromEntity(AuthEntity entity) {
     return AuthHiveModel(
       userId: entity.userId,
-      fullName: entity.fullName,
+      name: entity.name,
       email: entity.email,
-      phoneNumber: entity.phoneNumber,
-      username: entity.username,
+      number: entity.number,
+      role: entity.role,
       password: entity.password,
       profilePicture: entity.profilePicture,
     );
