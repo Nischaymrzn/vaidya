@@ -29,7 +29,7 @@ class AuthApiModel {
       "number": number,
       "username": role,
       "password": password,
-      "confirmPassword": confirmPassword,
+      "confirmPassword": password,
       "profilePicture": profilePicture,
     };
   }

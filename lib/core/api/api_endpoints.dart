@@ -12,7 +12,7 @@ class ApiEndpoints {
 
   // ============ Auth Endpoints ============
   static const String userLogin = '/auth/login';
-  static const String userRegister = '/auth/login';
+  static const String userRegister = '/auth/register';
   static const String currentUser = '/auth/me';
 
   // ============ User Endpoints ============
