@@ -37,6 +37,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       onChanged: widget.onChanged,
       keyboardType: widget.keyboardType,
       obscureText: widget.obscureText ? _isObscured : false,
+      style: TextStyle(fontWeight: FontWeight.w500),
 
       validator:
           widget.validator ??

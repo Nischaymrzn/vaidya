@@ -105,7 +105,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 Text(
                   "Set up your Vaidya account now",
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, color: Color(0xFF313131)),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 83, 83, 83),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
 
                 SizedBox(height: 18),
@@ -119,7 +123,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         "Full Name",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -145,7 +149,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         "Email",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -183,7 +187,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         "Phone Number",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -221,7 +225,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         "Password",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -249,7 +253,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         "Confirm Password",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -282,7 +286,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ],
                 ),
 
-                SizedBox(height: 16),
+                SizedBox(height: 20),
 
                 MyButton(
                   text: "Create Account",
