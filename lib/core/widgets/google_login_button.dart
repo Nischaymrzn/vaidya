@@ -9,27 +9,31 @@ class GoogleLoginButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 46,
-      child: OutlinedButton.icon(
+      height: 48,
+      child: OutlinedButton(
         onPressed: onPressed,
-        icon: Image.asset("assets/images/logo_google.png", height: 20),
-        label: const Text(
-          "Login with Google",
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-            fontSize: 15,
-          ),
-        ),
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: Colors.grey.shade400, width: 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
           backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
+          side: BorderSide(color: Colors.grey.shade300),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/logo_google.png", height: 20, width: 20),
+            const SizedBox(width: 12),
+            const Text(
+              "Login with Google",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.black,
+              ),
+            ),
+          ],
         ),
       ),
     );

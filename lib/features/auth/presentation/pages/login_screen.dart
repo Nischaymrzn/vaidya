@@ -94,7 +94,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 Text(
                   "Enter your credentials to continue",
-                  style: TextStyle(fontSize: 18, color: Color(0xFF313131)),
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Color.fromARGB(255, 83, 83, 83),
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
 
                 SizedBox(height: 24),
@@ -108,7 +112,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         "Email",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -135,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         "Password",
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -163,6 +167,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF2D8CFF),
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -179,7 +184,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   onPressed: _handleLogin,
                 ),
 
-                SizedBox(height: 8),
+                SizedBox(height: 6),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

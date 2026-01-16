@@ -10,20 +10,20 @@ import 'package:vaidya/features/auth/domain/repositories/auth_repository.dart';
 class RegisterUsecaseParams extends Equatable {
   final String fullName;
   final String email;
-  final String? username;
+  final String? role;
   final String password;
-  final String? phoneNumber;
+  final int? number;
 
   const RegisterUsecaseParams({
     required this.fullName,
     required this.email,
-    this.username,
+    this.role,
     required this.password,
-    this.phoneNumber,
+    this.number,
   });
 
   @override
-  List<Object?> get props => [fullName, email, username, password, phoneNumber];
+  List<Object?> get props => [fullName, email, role, password, number];
 }
 
 final registerUsecaseProvider = Provider<RegisterUsecase>((ref) {
@@ -41,11 +41,11 @@ class RegisterUsecase
   @override
   Future<Either<Failure, bool>> call(RegisterUsecaseParams params) {
     final authEntity = AuthEntity(
-      fullName: params.fullName,
+      name: params.fullName,
       email: params.email,
-      username: params.username,
+      role: params.role,
       password: params.password,
-      phoneNumber: params.phoneNumber,
+      number: params.number,
     );
 
     return _authRepository.register(authEntity);
