@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/core/api/api_client.dart';
 import 'package:vaidya/core/api/api_endpoints.dart';
+import 'package:vaidya/core/services/storage/token_service.dart';
 import 'package:vaidya/core/services/storage/user_session_service.dart';
 import 'package:vaidya/features/auth/data/datasources/auth_datasource.dart';
 import 'package:vaidya/features/auth/data/models/auth_api_model.dart';
@@ -10,18 +14,22 @@ final authRemoteDataSourceProvider = Provider<IAuthRemoteDataSource>((ref) {
   return AuthRemoteDatasource(
     apiClient: ref.read(apiClientProvider),
     userSessionService: ref.read(userSessionServiceProvider),
+    tokenService: ref.read(tokenServiceProvider),
   );
 });
 
 class AuthRemoteDatasource implements IAuthRemoteDataSource {
   final ApiClient _apiClient;
   final UserSessionService _userSessionService;
+  final TokenService _tokenService;
 
   AuthRemoteDatasource({
     required ApiClient apiClient,
     required UserSessionService userSessionService,
+    required TokenService tokenService,
   }) : _apiClient = apiClient,
-       _userSessionService = userSessionService;
+       _userSessionService = userSessionService,
+       _tokenService = tokenService;
 
   @override
   Future<AuthApiModel?> getCurrentUser() async {
@@ -40,7 +48,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       if (response.data['success'] == true) {
         final data = response.data['data'] as Map<String, dynamic>;
         final currentUser = AuthApiModel.fromJson(data);
-
         await _userSessionService.saveUserSession(
           userId: currentUser.id!,
           email: currentUser.email,
@@ -66,13 +73,21 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
     if (response.data['success'] == true) {
       final data = response.data['data'] as Map<String, dynamic>;
-      final user = AuthApiModel.fromJson(data);
+
+      final userJson = data['user'] as Map<String, dynamic>;
+      final user = AuthApiModel.fromJson(userJson);
 
       await _userSessionService.saveUserSession(
         userId: user.id!,
         email: user.email,
         name: user.name,
+        role: user.role,
+        number: user.number,
       );
+      // Save token to TokenService
+      final token = response.data['data']['accessToken'];
+      // Later store token in secure storage
+      await _tokenService.saveToken(token);
 
       return user;
     }
@@ -104,5 +119,47 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     return user;
+  }
+
+  @override
+  Future<AuthApiModel?> updateProfile(
+    String userId, {
+    File? image,
+    String? name,
+    String? email,
+    int? number,
+  }) async {
+    final map = <String, dynamic>{};
+    if (name != null) map['name'] = name;
+    if (image != null) {
+      final filename = image.path.split(RegExp(r'[/\\]')).last;
+      map['image'] = await MultipartFile.fromFile(
+        image.path,
+        filename: filename,
+      );
+    }
+    final formData = FormData.fromMap(map);
+
+    final response = await _apiClient.put(
+      ApiEndpoints.updateUser(userId),
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      final updatedUser = AuthApiModel.fromJson(data);
+      await _userSessionService.saveUserSession(
+        userId: updatedUser.id!,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        role: updatedUser.role,
+        number: updatedUser.number,
+        profilePicture: updatedUser.profilePicture,
+      );
+      return updatedUser;
+    }
+
+    return null;
   }
 }
