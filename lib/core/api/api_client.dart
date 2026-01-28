@@ -2,19 +2,21 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:vaidya/core/api/api_endpoints.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:vaidya/core/api/api_endpoints.dart';
+import 'package:vaidya/core/services/storage/token_service.dart';
 
 // Provider for ApiClient
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
+  return ApiClient(tokenService: ref.read(tokenServiceProvider));
 });
 
 class ApiClient {
   late final Dio _dio;
+  final TokenService _tokenService;
 
-  ApiClient() {
+  ApiClient({required TokenService tokenService})
+    : _tokenService = tokenService {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -27,8 +29,8 @@ class ApiClient {
       ),
     );
 
-    // Add interceptors
-    _dio.interceptors.add(_AuthInterceptor());
+    // Add interceptors – use same TokenService as login so token is sent on every request
+    _dio.interceptors.add(_AuthInterceptor(_tokenService));
 
     // Auto retry on network failures
     _dio.interceptors.add(
@@ -121,7 +123,7 @@ class ApiClient {
     );
   }
 
-  // Multipart request for file uploads
+  // Multipart POST for file uploads (kept for other use cases)
   Future<Response> uploadFile(
     String path, {
     required FormData formData,
@@ -137,28 +139,23 @@ class ApiClient {
   }
 }
 
-// Auth Interceptor to add JWT token to requests
+// Auth Interceptor – reads token from TokenService (same store as login)
 class _AuthInterceptor extends Interceptor {
-  final _storage = const FlutterSecureStorage();
-  static const String _tokenKey = 'auth_token';
+  final TokenService _tokenService;
+
+  _AuthInterceptor(this._tokenService);
 
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final publicEndpoints = [ApiEndpoints.userLogin, ApiEndpoints.userRegister];
-
-    final isPublicGet =
-        options.method == 'GET' &&
-        publicEndpoints.any((endpoint) => options.path.startsWith(endpoint));
-
     final isAuthEndpoint =
         options.path == ApiEndpoints.userLogin ||
         options.path == ApiEndpoints.userRegister;
 
-    if (!isPublicGet && !isAuthEndpoint) {
-      final token = await _storage.read(key: _tokenKey);
+    if (!isAuthEndpoint) {
+      final token = await _tokenService.getToken();
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
       }
@@ -170,7 +167,7 @@ class _AuthInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response?.statusCode == 401) {
-      _storage.delete(key: _tokenKey);
+      _tokenService.removeToken();
     }
     handler.next(err);
   }

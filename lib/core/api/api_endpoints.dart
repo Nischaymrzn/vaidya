@@ -18,4 +18,5 @@ class ApiEndpoints {
   // ============ User Endpoints ============
   static const String user = '/users';
   static String userById(String id) => '/users/$id';
+  static String updateUser(String id) => '/users/$id';
 }
