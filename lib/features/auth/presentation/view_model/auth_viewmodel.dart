@@ -3,6 +3,7 @@ import 'package:vaidya/features/auth/domain/usecases/get_current_user_usecase.da
 import 'package:vaidya/features/auth/domain/usecases/login_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/register_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 
 final authViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
@@ -14,6 +15,7 @@ class AuthViewModel extends Notifier<AuthState> {
   late final LoginUsecase _loginUsecase;
   late final GetCurrentUserUsecase _getCurrentUserUsecase;
   late final LogoutUsecase _logoutUsecase;
+  late final UpdateProfileUsecase _updateProfileUsecase;
 
   @override
   AuthState build() {
@@ -21,6 +23,7 @@ class AuthViewModel extends Notifier<AuthState> {
     _loginUsecase = ref.read(loginUsecaseProvider);
     _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
+    _updateProfileUsecase = ref.read(updateProfileUsecaseProvider);
     return const AuthState();
   }
 
@@ -33,7 +36,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 100));
 
     final result = await _registerUsecase(
       RegisterUsecaseParams(
@@ -103,7 +106,47 @@ class AuthViewModel extends Notifier<AuthState> {
     );
   }
 
+  Future<void> updateProfile({
+    required String userId,
+    String? name,
+    String? email,
+    int? number,
+    String? imagePath,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+
+    final result = await _updateProfileUsecase(
+      UpdateProfileUsecaseParams(
+        userId: userId,
+        name: name,
+        email: email,
+        number: number,
+        imagePath: imagePath,
+      ),
+    );
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (updatedUser) => state = state.copyWith(
+        status: AuthStatus.authenticated,
+        user: updatedUser,
+        successMessage: 'Profile updated',
+      ),
+    );
+  }
+
+  void clearSuccessMessage() {
+    state = state.copyWith(successMessage: null);
+  }
+
   void resetState() {
-    state = const AuthState(status: AuthStatus.initial, errorMessage: null);
+    state = const AuthState(
+      status: AuthStatus.initial,
+      errorMessage: null,
+      successMessage: null,
+    );
   }
 }

@@ -23,26 +23,29 @@ class AuthApiModel {
 
   // toJSON
   Map<String, dynamic> toJson() {
-    return {
+    final map = <String, dynamic>{
       "name": name,
       "email": email,
       "number": number,
       "username": role,
       "password": password,
       "confirmPassword": password,
-      "profilePicture": profilePicture,
     };
+    if (profilePicture != null) {
+      map["profilePicture"] = profilePicture;
+    }
+    return map;
   }
 
   // fromJSON
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     return AuthApiModel(
-      id: json['_id'] as String,
+      id: json['_id'] ?? json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
       number: json['number'] as int?,
       role: json['role'] as String?,
-      profilePicture: json['profilePicture'] as String?,
+      profilePicture: (json['profilePicture'] ?? json['profileUrl']) as String?,
     );
   }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:vaidya/features/auth/data/models/auth_api_model.dart';
 import 'package:vaidya/features/auth/data/models/auth_hive_model.dart';
 
@@ -19,4 +21,11 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel?> login(String email, String password);
   Future<AuthApiModel?> getCurrentUser();
   Future<bool> logout();
+  Future<AuthApiModel?> updateProfile(
+    String userId, {
+    File? image,
+    String? name,
+    String? email,
+    int? number,
+  });
 }
