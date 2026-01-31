@@ -23,15 +23,18 @@ class AuthApiModel {
 
   // toJSON
   Map<String, dynamic> toJson() {
-    return {
+    final map = <String, dynamic>{
       "name": name,
       "email": email,
       "number": number,
       "username": role,
       "password": password,
       "confirmPassword": password,
-      "profilePicture": profilePicture,
     };
+    if (profilePicture != null) {
+      map["profilePicture"] = profilePicture;
+    }
+    return map;
   }
 
   // fromJSON
