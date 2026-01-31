@@ -36,7 +36,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 100));
 
     final result = await _registerUsecase(
       RegisterUsecaseParams(
