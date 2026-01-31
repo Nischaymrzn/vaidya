@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:vaidya/features/auth/domain/entities/auth_entity.dart';
 import 'package:vaidya/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/login_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/logout_usecase.dart';
@@ -26,14 +25,6 @@ void main() {
   late MockGetCurrentUserUsecase mockGetCurrentUserUsecase;
   late MockLogoutUsecase mockLogoutUsecase;
   late MockUpdateProfileUsecase mockUpdateProfileUsecase;
-
-  const tAuthEntity = AuthEntity(
-    userId: 'user-1',
-    name: 'Test User',
-    email: 'test@example.com',
-    number: 1234567890,
-    role: 'user',
-  );
 
   setUpAll(() {
     registerFallbackValue(const LoginUsecaseParams(email: '', password: ''));
