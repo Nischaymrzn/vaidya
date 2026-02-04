@@ -32,7 +32,7 @@ class UserSessionService {
     required String email,
     required String name,
     String? role,
-    int? number,
+    String? number,
     String? profilePicture,
   }) async {
     await _prefs.setBool(_keyIsLoggedIn, true);
@@ -40,9 +40,7 @@ class UserSessionService {
     await _prefs.setString(_keyUserEmail, email);
     await _prefs.setString(_keyUserName, name);
     await _prefs.setString(_keyUserRole, role ?? "");
-    if (number != null) {
-      await _prefs.setInt(_keyUserNumber, number);
-    }
+    await _prefs.setString(_keyUserNumber, number ?? "");
     if (profilePicture != null) {
       await _prefs.setString(_keyUserProfilePicture, profilePicture);
     }
