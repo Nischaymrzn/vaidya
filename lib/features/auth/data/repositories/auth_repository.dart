@@ -124,18 +124,157 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> getCurrentUser() async {
-    try {
-      final user = await _authDataSource.getCurrentUser();
+  Future<Either<Failure, AuthEntity>> loginWithGoogle() async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(ApiFailure(message: "No internet connection"));
+    }
 
-      if (user != null) {
-        final userEntity = user.toEntity();
-        return Right(userEntity);
+    try {
+      final token = await _authRemoteDatasource.getGoogleAccessToken();
+      if (token == null || token.trim().isEmpty) {
+        return const Left(ApiFailure(message: "Google authentication failed"));
       }
 
-      return const Left(LocalDatabaseFailure(message: "No any user logged in"));
+      return loginWithGoogleToken(token);
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? "Google login failed",
+        ),
+      );
     } catch (e) {
-      return Left(LocalDatabaseFailure(message: e.toString()));
+      final message = e.toString().replaceFirst('Exception: ', '');
+      return Left(ApiFailure(message: message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> loginWithGoogleToken(String token) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(ApiFailure(message: "No internet connection"));
+    }
+
+    if (token.trim().isEmpty) {
+      return const Left(ApiFailure(message: "Google authentication failed"));
+    }
+
+    try {
+      await _tokenService.saveToken(token);
+      final apiUser = await _authRemoteDatasource.getCurrentUser();
+      if (apiUser != null) {
+        return Right(apiUser.toEntity());
+      }
+
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return const Left(ApiFailure(message: "Google authentication failed"));
+    } on DioException catch (e) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? "Google login failed",
+        ),
+      );
+    } catch (e) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> isGoogleLoginConfigured() async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(ApiFailure(message: "No internet connection"));
+    }
+
+    try {
+      final configured = await _authRemoteDatasource.isGoogleLoginConfigured();
+      return Right(configured);
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message:
+              e.response?.data['message'] ?? "Unable to check Google login",
+        ),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> requestPasswordReset(String email) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(ApiFailure(message: "No internet connection"));
+    }
+
+    try {
+      final sent = await _authRemoteDatasource.requestPasswordReset(email);
+      if (sent) {
+        return const Right(true);
+      }
+      return const Left(ApiFailure(message: "Failed to send reset email"));
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message:
+              e.response?.data['message'] ??
+              "Failed to send password reset email",
+        ),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> getCurrentUser() async {
+    final token = await _tokenService.getToken();
+    if (token == null || token.isEmpty) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return const Left(ApiFailure(message: "Session expired. Please login."));
+    }
+
+    final isConnected = await _networkInfo.isConnected;
+    if (!isConnected) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return const Left(
+        ApiFailure(message: "Unable to verify session. Please login again."),
+      );
+    }
+
+    try {
+      final apiUser = await _authRemoteDatasource.getCurrentUser();
+      if (apiUser != null) {
+        return Right(apiUser.toEntity());
+      }
+
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return const Left(ApiFailure(message: "Session expired. Please login."));
+    } on DioException catch (e) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message:
+              e.response?.data['message'] ??
+              "Unable to verify session. Please login again.",
+        ),
+      );
+    } catch (e) {
+      await _authDataSource.logout();
+      await _tokenService.removeToken();
+      return Left(ApiFailure(message: e.toString()));
     }
   }
 
