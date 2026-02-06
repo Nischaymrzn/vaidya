@@ -7,6 +7,7 @@ import 'package:vaidya/core/widgets/my_button.dart';
 import 'package:vaidya/core/widgets/my_text_form_field.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:vaidya/features/dashboard/presentation/pages/dashboard.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -42,8 +43,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
             email: _emailController.text,
             role: "user",
             number: _phoneController.text.isNotEmpty
-                ? int.tryParse(_phoneController.text)
-                : null,
+                ? _phoneController.text
+                : "",
             password: _passwordController.text,
           );
     }
@@ -53,9 +54,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     Navigator.of(context).pop();
   }
 
-  void _handleGoogleSignIn() {
-    // TODO: Implement Google Sign In
-    SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
+  Future<void> _handleGoogleSignIn() async {
+    await ref.read(authViewModelProvider.notifier).loginWithGoogle();
   }
 
   @override
@@ -64,7 +64,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
       if (next.status == previous?.status) return;
 
-      if (next.status == AuthStatus.registered) {
+      if (next.status == AuthStatus.authenticated) {
+        ref.read(authViewModelProvider.notifier).resetState();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+      } else if (next.status == AuthStatus.registered) {
         SnackbarUtils.showSuccess(
           context,
           next.errorMessage ?? 'Registration successful! Please login.',
