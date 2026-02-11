@@ -4,9 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vaidya/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/is_google_login_configured_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/login_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_token_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/register_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/request_password_reset_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:vaidya/features/auth/presentation/pages/signup_screen.dart';
 
@@ -20,12 +24,28 @@ class MockLogoutUsecase extends Mock implements LogoutUsecase {}
 
 class MockUpdateProfileUsecase extends Mock implements UpdateProfileUsecase {}
 
+class MockRequestPasswordResetUsecase extends Mock
+    implements RequestPasswordResetUsecase {}
+
+class MockIsGoogleLoginConfiguredUsecase extends Mock
+    implements IsGoogleLoginConfiguredUsecase {}
+
+class MockLoginWithGoogleTokenUsecase extends Mock
+    implements LoginWithGoogleTokenUsecase {}
+
+class MockLoginWithGoogleUsecase extends Mock
+    implements LoginWithGoogleUsecase {}
+
 void main() {
   late MockRegisterUsecase mockRegisterUsecase;
   late MockLoginUsecase mockLoginUsecase;
   late MockGetCurrentUserUsecase mockGetCurrentUserUsecase;
   late MockLogoutUsecase mockLogoutUsecase;
   late MockUpdateProfileUsecase mockUpdateProfileUsecase;
+  late MockRequestPasswordResetUsecase mockRequestPasswordResetUsecase;
+  late MockIsGoogleLoginConfiguredUsecase mockIsGoogleLoginConfiguredUsecase;
+  late MockLoginWithGoogleTokenUsecase mockLoginWithGoogleTokenUsecase;
+  late MockLoginWithGoogleUsecase mockLoginWithGoogleUsecase;
 
   setUpAll(() {
     registerFallbackValue(const LoginUsecaseParams(email: '', password: ''));
@@ -33,6 +53,8 @@ void main() {
       const RegisterUsecaseParams(fullName: '', email: '', password: ''),
     );
     registerFallbackValue(const UpdateProfileUsecaseParams(userId: ''));
+    registerFallbackValue(const RequestPasswordResetUsecaseParams(email: ''));
+    registerFallbackValue(const LoginWithGoogleTokenUsecaseParams(token: ''));
   });
 
   setUp(() {
@@ -41,6 +63,10 @@ void main() {
     mockGetCurrentUserUsecase = MockGetCurrentUserUsecase();
     mockLogoutUsecase = MockLogoutUsecase();
     mockUpdateProfileUsecase = MockUpdateProfileUsecase();
+    mockRequestPasswordResetUsecase = MockRequestPasswordResetUsecase();
+    mockIsGoogleLoginConfiguredUsecase = MockIsGoogleLoginConfiguredUsecase();
+    mockLoginWithGoogleTokenUsecase = MockLoginWithGoogleTokenUsecase();
+    mockLoginWithGoogleUsecase = MockLoginWithGoogleUsecase();
   });
 
   Widget buildTestWidget() {
@@ -54,6 +80,18 @@ void main() {
         logoutUsecaseProvider.overrideWith((ref) => mockLogoutUsecase),
         updateProfileUsecaseProvider.overrideWith(
           (ref) => mockUpdateProfileUsecase,
+        ),
+        requestPasswordResetUsecaseProvider.overrideWith(
+          (ref) => mockRequestPasswordResetUsecase,
+        ),
+        isGoogleLoginConfiguredUsecaseProvider.overrideWith(
+          (ref) => mockIsGoogleLoginConfiguredUsecase,
+        ),
+        loginWithGoogleTokenUsecaseProvider.overrideWith(
+          (ref) => mockLoginWithGoogleTokenUsecase,
+        ),
+        loginWithGoogleUsecaseProvider.overrideWith(
+          (ref) => mockLoginWithGoogleUsecase,
         ),
       ],
       child: MaterialApp(home: const SignupScreen()),
@@ -135,7 +173,7 @@ void main() {
             email: 'user@example.com',
             role: 'user',
             password: 'password123',
-            number: 9876543210,
+            number: '9876543210',
           ),
         ),
       ).called(1);
