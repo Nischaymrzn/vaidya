@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:vaidya/core/services/storage/user_session_service.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/profile.dart';
+import 'package:vaidya/features/profile/presentation/pages/profile_screen.dart';
 
 class MockUserSessionService extends Mock implements UserSessionService {}
 
