@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:vaidya/core/constants/hive_table_constant.dart';
 import 'package:vaidya/features/auth/data/models/auth_hive_model.dart';
+import 'package:vaidya/features/family_health/data/models/family_group_hive_model.dart';
+import 'package:vaidya/features/records/data/models/medical_record_hive_model.dart';
 import 'package:path_provider/path_provider.dart';
 
 final hiveServiceProvider = Provider<HiveService>((ref) {
@@ -22,10 +24,35 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstant.authTypeId)) {
       Hive.registerAdapter(AuthHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.recordAttachmentTypeId)) {
+      Hive.registerAdapter(MedicalRecordAttachmentHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.recordsTypeId)) {
+      Hive.registerAdapter(MedicalRecordHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.recordsPaginationTypeId)) {
+      Hive.registerAdapter(MedicalRecordsPaginationHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.recordsResultTypeId)) {
+      Hive.registerAdapter(MedicalRecordsResultHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.aiScanResultTypeId)) {
+      Hive.registerAdapter(AiScanResultHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.familyGroupTypeId)) {
+      Hive.registerAdapter(FamilyGroupHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.familyGroupSummaryTypeId)) {
+      Hive.registerAdapter(FamilyGroupSummaryHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstant.familyInviteTypeId)) {
+      Hive.registerAdapter(FamilyInviteHiveModelAdapter());
+    }
   }
 
   Future<void> _openBoxes() async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstant.authTable);
+    await Hive.openBox<String>('feature_cache');
   }
 
   Future<void> close() async {
