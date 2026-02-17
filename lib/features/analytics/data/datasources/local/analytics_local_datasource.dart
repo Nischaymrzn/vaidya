@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/core/services/hive/feature_cache_service.dart';
 import 'package:vaidya/features/analytics/data/datasources/analytics_datasource.dart';
+import 'package:vaidya/features/analytics/data/models/analytics_summary_api_model.dart';
+import 'package:vaidya/features/analytics/data/models/analytics_summary_hive_model.dart';
 
 final analyticsLocalDataSourceProvider = Provider<IAnalyticsLocalDataSource>((
   ref,
@@ -19,12 +21,15 @@ class AnalyticsLocalDataSource implements IAnalyticsLocalDataSource {
   static const String _cacheKey = 'analytics_summary';
 
   @override
-  Future<void> cacheSummary(Map<String, dynamic> summary) {
-    return _cacheService.writeMap(_cacheKey, summary);
+  Future<void> cacheSummary(AnalyticsSummaryApiModel summary) {
+    final model = AnalyticsSummaryHiveModel.fromApiModel(summary);
+    return _cacheService.writeMap(_cacheKey, model.toJson());
   }
 
   @override
-  Future<Map<String, dynamic>?> getCachedSummary() {
-    return _cacheService.readMap(_cacheKey);
+  Future<AnalyticsSummaryApiModel?> getCachedSummary() async {
+    final cached = await _cacheService.readMap(_cacheKey);
+    if (cached == null) return null;
+    return AnalyticsSummaryHiveModel.fromJson(cached).toApiModel();
   }
 }
