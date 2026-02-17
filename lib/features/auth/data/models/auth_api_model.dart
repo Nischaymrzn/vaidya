@@ -6,6 +6,7 @@ class AuthApiModel {
   final String email;
   final String? number;
   final String? role;
+  final bool? isPremium;
   final String? password;
   final String? confirmPassword;
   final String? profilePicture;
@@ -16,6 +17,7 @@ class AuthApiModel {
     required this.email,
     this.number,
     this.role,
+    this.isPremium,
     this.password,
     this.confirmPassword,
     this.profilePicture,
@@ -34,6 +36,9 @@ class AuthApiModel {
     if (profilePicture != null) {
       map["profilePicture"] = profilePicture;
     }
+    if (isPremium != null) {
+      map["isPremium"] = isPremium;
+    }
     return map;
   }
 
@@ -45,6 +50,7 @@ class AuthApiModel {
       email: json['email'] as String,
       number: json['number'] as String?,
       role: json['role'] as String?,
+      isPremium: json['isPremium'] as bool?,
       profilePicture: (json['profilePicture'] ?? json['profileUrl']) as String?,
     );
   }
@@ -57,6 +63,7 @@ class AuthApiModel {
       email: email,
       number: number,
       role: role,
+      isPremium: isPremium,
       profilePicture: profilePicture,
     );
   }
@@ -68,6 +75,7 @@ class AuthApiModel {
       email: entity.email,
       number: entity.number,
       role: entity.role,
+      isPremium: entity.isPremium,
       password: entity.password,
       profilePicture: entity.profilePicture,
     );

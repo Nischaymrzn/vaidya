@@ -53,6 +53,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         role: currentUser.role,
         number: currentUser.number,
         profilePicture: currentUser.profilePicture,
+        isPremium: currentUser.isPremium,
       );
 
       return currentUser;
@@ -84,6 +85,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         name: user.name,
         role: user.role,
         number: user.number,
+        isPremium: user.isPremium,
       );
       await _tokenService.saveToken(token);
 
@@ -139,6 +141,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
           role: user.role,
           number: user.number,
           profilePicture: user.profilePicture,
+          isPremium: user.isPremium,
         );
       }
 
@@ -227,6 +230,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         role: updatedUser.role,
         number: updatedUser.number,
         profilePicture: updatedUser.profilePicture,
+        isPremium: updatedUser.isPremium,
       );
       return updatedUser;
     }
