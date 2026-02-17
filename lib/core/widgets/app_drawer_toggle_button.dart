@@ -9,7 +9,7 @@ class AppDrawerToggleButton extends StatelessWidget {
   const AppDrawerToggleButton({
     super.key,
     required this.color,
-    this.size = 21,
+    this.size = 18,
     this.padding,
   });
 
@@ -19,8 +19,10 @@ class AppDrawerToggleButton extends StatelessWidget {
       builder: (context) {
         return IconButton(
           onPressed: () => Scaffold.of(context).openDrawer(),
-          splashRadius: 20,
+          splashRadius: 18,
           padding: padding ?? EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+          visualDensity: VisualDensity.compact,
           icon: Icon(LucideIcons.panelLeftOpen, color: color, size: size),
         );
       },
