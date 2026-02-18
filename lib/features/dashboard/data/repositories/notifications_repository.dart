@@ -45,10 +45,8 @@ class NotificationsRepository implements INotificationsRepository {
           unreadOnly: unreadOnly,
         );
 
-        await _localDataSource.cacheNotifications(
-          remote.items.map((e) => e.data).toList(growable: false),
-        );
-        await _localDataSource.cachePagination(remote.pagination.toJson());
+        await _localDataSource.cacheNotifications(remote.items);
+        await _localDataSource.cachePagination(remote.pagination);
 
         return Right(remote.toEntity());
       } on DioException catch (e) {
@@ -67,12 +65,18 @@ class NotificationsRepository implements INotificationsRepository {
     final cachedPagination = await _localDataSource.getCachedPagination();
 
     if (cachedItems.isNotEmpty) {
-      final pagination = NotificationsPaginationApiModel.fromJson(cachedPagination ?? <String, dynamic>{});
+      final pagination = cachedPagination ??
+          const NotificationsPaginationApiModel(
+            total: 0,
+            page: 1,
+            limit: 20,
+            totalPages: 1,
+            hasNext: false,
+            hasPrev: false,
+          );
       return Right(
         NotificationsResultEntity(
-          notifications: cachedItems
-              .map((e) => NotificationEntity(id: (e['_id'] ?? e['id'] ?? '').toString(), data: e))
-              .toList(growable: false),
+          notifications: cachedItems.map((e) => e.toEntity()).toList(growable: false),
           pagination: pagination.toEntity(),
         ),
       );
