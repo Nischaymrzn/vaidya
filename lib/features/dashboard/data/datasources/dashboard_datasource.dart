@@ -3,3 +3,8 @@ import 'package:vaidya/features/dashboard/data/models/dashboard_summary_api_mode
 abstract interface class IDashboardRemoteDataSource {
   Future<DashboardSummaryApiModel> getDashboardSummary();
 }
+
+abstract interface class IDashboardLocalDataSource {
+  Future<void> cacheDashboardSummary(DashboardSummaryApiModel payload);
+  Future<DashboardSummaryApiModel?> getCachedDashboardSummary();
+}
