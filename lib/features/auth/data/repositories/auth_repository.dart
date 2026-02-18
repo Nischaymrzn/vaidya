@@ -47,7 +47,19 @@ class AuthRepository implements IAuthRepository {
     if (await _networkInfo.isConnected) {
       try {
         final apiModel = AuthApiModel.fromEntity(user);
-        await _authRemoteDatasource.register(apiModel);
+        final registered = await _authRemoteDatasource.register(apiModel);
+        await _upsertUserToLocal(
+          AuthEntity(
+            userId: registered.id,
+            name: registered.name,
+            email: registered.email,
+            number: registered.number,
+            role: registered.role,
+            isPremium: registered.isPremium,
+            password: user.password,
+            profilePicture: registered.profilePicture,
+          ),
+        );
         return Right(true);
       } on DioException catch (e) {
         return Left(
@@ -92,7 +104,17 @@ class AuthRepository implements IAuthRepository {
       try {
         final apiModel = await _authRemoteDatasource.login(email, password);
         if (apiModel != null) {
-          final entity = apiModel.toEntity();
+          final entity = AuthEntity(
+            userId: apiModel.id,
+            name: apiModel.name,
+            email: apiModel.email,
+            number: apiModel.number,
+            role: apiModel.role,
+            isPremium: apiModel.isPremium,
+            password: password,
+            profilePicture: apiModel.profilePicture,
+          );
+          await _upsertUserToLocal(entity);
           return Right(entity);
         }
 
@@ -163,7 +185,9 @@ class AuthRepository implements IAuthRepository {
       await _tokenService.saveToken(token);
       final apiUser = await _authRemoteDatasource.getCurrentUser();
       if (apiUser != null) {
-        return Right(apiUser.toEntity());
+        final entity = apiUser.toEntity();
+        await _upsertUserToLocal(entity);
+        return Right(entity);
       }
 
       await _authDataSource.logout();
@@ -236,25 +260,42 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
     final token = await _tokenService.getToken();
-    if (token == null || token.isEmpty) {
-      await _authDataSource.logout();
-      await _tokenService.removeToken();
-      return const Left(ApiFailure(message: "Session expired. Please login."));
-    }
-
+    final localCurrentUser = await _authDataSource.getCurrentUser();
     final isConnected = await _networkInfo.isConnected;
     if (!isConnected) {
-      await _authDataSource.logout();
-      await _tokenService.removeToken();
+      if (localCurrentUser != null) {
+        return Right(localCurrentUser.toEntity());
+      }
       return const Left(
-        ApiFailure(message: "Unable to verify session. Please login again."),
+        ApiFailure(message: "No internet connection and no local user session."),
       );
+    }
+
+    if (token == null || token.isEmpty) {
+      if (localCurrentUser != null) {
+        return Right(localCurrentUser.toEntity());
+      }
+      return const Left(ApiFailure(message: "Session expired. Please login."));
     }
 
     try {
       final apiUser = await _authRemoteDatasource.getCurrentUser();
       if (apiUser != null) {
-        return Right(apiUser.toEntity());
+        final existing = apiUser.id != null
+            ? await _authDataSource.getUserById(apiUser.id!)
+            : null;
+        final entity = AuthEntity(
+          userId: apiUser.id,
+          name: apiUser.name,
+          email: apiUser.email,
+          number: apiUser.number,
+          role: apiUser.role,
+          isPremium: apiUser.isPremium,
+          password: existing?.password,
+          profilePicture: apiUser.profilePicture,
+        );
+        await _upsertUserToLocal(entity);
+        return Right(entity);
       }
 
       await _authDataSource.logout();
@@ -314,7 +355,19 @@ class AuthRepository implements IAuthRepository {
         number: number,
       );
       if (updated != null) {
-        return Right(updated.toEntity());
+        final existing = await _authDataSource.getUserById(userId);
+        final entity = AuthEntity(
+          userId: updated.id,
+          name: updated.name,
+          email: updated.email,
+          number: updated.number,
+          role: updated.role,
+          isPremium: updated.isPremium,
+          password: existing?.password,
+          profilePicture: updated.profilePicture,
+        );
+        await _upsertUserToLocal(entity);
+        return Right(entity);
       }
       return const Left(ApiFailure(message: "Update profile failed"));
     } on DioException catch (e) {
@@ -327,5 +380,55 @@ class AuthRepository implements IAuthRepository {
     } catch (e) {
       return Left(ApiFailure(message: e.toString()));
     }
+  }
+
+  Future<void> _upsertUserToLocal(AuthEntity entity) async {
+    final userId = entity.userId?.trim();
+    if (userId == null || userId.isEmpty) return;
+
+    final existingById = await _authDataSource.getUserById(userId);
+    final localModel = AuthHiveModel.fromEntity(
+      AuthEntity(
+        userId: userId,
+        name: entity.name,
+        email: entity.email,
+        number: entity.number,
+        role: entity.role,
+        isPremium: entity.isPremium,
+        password: entity.password ?? existingById?.password,
+        profilePicture: entity.profilePicture,
+      ),
+    );
+
+    if (existingById != null) {
+      await _authDataSource.updateUser(localModel);
+      return;
+    }
+
+    final existingByEmail = await _authDataSource.getUserByEmail(entity.email);
+    if (existingByEmail != null) {
+      final existingEmailUserId = existingByEmail.userId?.trim();
+      if (existingEmailUserId != null &&
+          existingEmailUserId.isNotEmpty &&
+          existingEmailUserId != userId) {
+        await _authDataSource.deleteUser(existingEmailUserId);
+      }
+
+      await _authDataSource.register(
+        AuthHiveModel(
+          userId: userId,
+          name: entity.name,
+          email: entity.email,
+          number: entity.number,
+          role: entity.role,
+          password: entity.password ?? existingByEmail.password,
+          profilePicture: entity.profilePicture,
+          isPremium: entity.isPremium,
+        ),
+      );
+      return;
+    }
+
+    await _authDataSource.register(localModel);
   }
 }
