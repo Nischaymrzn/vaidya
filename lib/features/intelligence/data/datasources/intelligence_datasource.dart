@@ -14,6 +14,6 @@ abstract interface class IIntelligenceRemoteDataSource {
 }
 
 abstract interface class IIntelligenceLocalDataSource {
-  Future<void> cacheInsights(List<Map<String, dynamic>> items);
-  Future<List<Map<String, dynamic>>> getCachedInsights();
+  Future<void> cacheInsights(List<AiInsightApiModel> items);
+  Future<List<AiInsightApiModel>> getCachedInsights();
 }

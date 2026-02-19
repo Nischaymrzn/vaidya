@@ -6,6 +6,6 @@ abstract interface class IHealthInsightsRemoteDataSource {
 }
 
 abstract interface class IHealthInsightsLocalDataSource {
-  Future<void> cacheInsights(List<Map<String, dynamic>> items);
-  Future<List<Map<String, dynamic>>> getCachedInsights();
+  Future<void> cacheInsights(List<HealthInsightApiModel> items);
+  Future<List<HealthInsightApiModel>> getCachedInsights();
 }
