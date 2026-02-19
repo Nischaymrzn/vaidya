@@ -47,16 +47,20 @@ class SmartHealthMetrics extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Smart Health Metrics',
-              style: TextStyle(
-                fontSize: 20,
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
+            Expanded(
+              child: Text(
+                'Smart Health Metrics',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               'View all',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -71,52 +75,31 @@ class SmartHealthMetrics extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             final crossAxisCount = constraints.maxWidth < 600 ? 2 : 4;
+            final cards = [heartRate, bloodPressure, bloodSugar, bmi];
+            final mainAxisExtent = constraints.maxWidth < 600 ? 142.0 : 130.0;
 
-            return GridView.count(
+            return GridView.builder(
               shrinkWrap: true,
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 166 / 139,
+              itemCount: cards.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisExtent: mainAxisExtent,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
               physics: const NeverScrollableScrollPhysics(),
-              children: [
-                MetricsCard(
-                  iconPath: heartRate.iconPath,
-                  name: heartRate.name,
-                  value: heartRate.value,
-                  unit: heartRate.unit,
-                  condition: heartRate.condition,
-                  scorePercent: heartRate.scorePercent,
-                  historyPoints: heartRate.historyPoints,
-                ),
-                MetricsCard(
-                  iconPath: bloodPressure.iconPath,
-                  name: bloodPressure.name,
-                  value: bloodPressure.value,
-                  unit: bloodPressure.unit,
-                  condition: bloodPressure.condition,
-                  scorePercent: bloodPressure.scorePercent,
-                  historyPoints: bloodPressure.historyPoints,
-                ),
-                MetricsCard(
-                  iconPath: bloodSugar.iconPath,
-                  name: bloodSugar.name,
-                  value: bloodSugar.value,
-                  unit: bloodSugar.unit,
-                  condition: bloodSugar.condition,
-                  scorePercent: bloodSugar.scorePercent,
-                  historyPoints: bloodSugar.historyPoints,
-                ),
-                MetricsCard(
-                  iconPath: bmi.iconPath,
-                  name: bmi.name,
-                  value: bmi.value,
-                  unit: bmi.unit,
-                  condition: bmi.condition,
-                  scorePercent: bmi.scorePercent,
-                  historyPoints: bmi.historyPoints,
-                ),
-              ],
+              itemBuilder: (context, index) {
+                final card = cards[index];
+                return MetricsCard(
+                  iconPath: card.iconPath,
+                  name: card.name,
+                  value: card.value,
+                  unit: card.unit,
+                  condition: card.condition,
+                  scorePercent: card.scorePercent,
+                  historyPoints: card.historyPoints,
+                );
+              },
             );
           },
         ),
