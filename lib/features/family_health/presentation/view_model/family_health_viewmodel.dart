@@ -21,18 +21,22 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
   late final CreateFamilyGroupUsecase _createFamilyGroupUsecase;
   late final CreateFamilyInviteUsecase _createFamilyInviteUsecase;
   late final AddFamilyMemberUsecase _addFamilyMemberUsecase;
-  late final UpdateFamilyMemberRelationUsecase _updateFamilyMemberRelationUsecase;
+  late final UpdateFamilyMemberRelationUsecase
+  _updateFamilyMemberRelationUsecase;
   late final JoinFamilyInviteUsecase _joinFamilyInviteUsecase;
 
   @override
   FamilyHealthState build() {
     _getMyFamilyGroupUsecase = ref.read(getMyFamilyGroupUsecaseProvider);
-    _getMyFamilyGroupSummaryUsecase = ref.read(getMyFamilyGroupSummaryUsecaseProvider);
+    _getMyFamilyGroupSummaryUsecase = ref.read(
+      getMyFamilyGroupSummaryUsecaseProvider,
+    );
     _createFamilyGroupUsecase = ref.read(createFamilyGroupUsecaseProvider);
     _createFamilyInviteUsecase = ref.read(createFamilyInviteUsecaseProvider);
     _addFamilyMemberUsecase = ref.read(addFamilyMemberUsecaseProvider);
-    _updateFamilyMemberRelationUsecase =
-        ref.read(updateFamilyMemberRelationUsecaseProvider);
+    _updateFamilyMemberRelationUsecase = ref.read(
+      updateFamilyMemberRelationUsecaseProvider,
+    );
     _joinFamilyInviteUsecase = ref.read(joinFamilyInviteUsecaseProvider);
     return const FamilyHealthState();
   }
@@ -73,12 +77,16 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
 
   Future<bool> createGroup(Map<String, dynamic> payload) {
     return _runGroupMutation(
-      () => _createFamilyGroupUsecase(CreateFamilyGroupParams(payload: payload)),
+      () =>
+          _createFamilyGroupUsecase(CreateFamilyGroupParams(payload: payload)),
       'Family group created successfully',
     );
   }
 
-  Future<bool> createInvite(String groupId, {Map<String, dynamic> payload = const {}}) async {
+  Future<bool> createInvite(
+    String groupId, {
+    Map<String, dynamic> payload = const {},
+  }) async {
     state = state.copyWith(
       isSubmitting: true,
       clearError: true,
@@ -92,13 +100,10 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
     bool ok = false;
     String? message;
 
-    result.fold(
-      (failure) => message = failure.message,
-      (invite) {
-        ok = true;
-        state = state.copyWith(latestInvite: invite);
-      },
-    );
+    result.fold((failure) => message = failure.message, (invite) {
+      ok = true;
+      state = state.copyWith(latestInvite: invite);
+    });
 
     if (!ok) {
       state = state.copyWith(
@@ -118,8 +123,9 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
 
   Future<bool> addMember(String groupId, Map<String, dynamic> payload) {
     return _runGroupMutation(
-      () =>
-          _addFamilyMemberUsecase(AddFamilyMemberParams(groupId: groupId, payload: payload)),
+      () => _addFamilyMemberUsecase(
+        AddFamilyMemberParams(groupId: groupId, payload: payload),
+      ),
       'Family member added successfully',
     );
   }
@@ -141,7 +147,10 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
     );
   }
 
-  Future<bool> joinWithInvite(String token, {Map<String, dynamic> payload = const {}}) {
+  Future<bool> joinWithInvite(
+    String token, {
+    Map<String, dynamic> payload = const {},
+  }) {
     return _runGroupMutation(
       () => _joinFamilyInviteUsecase(
         JoinFamilyInviteParams(token: token, payload: payload),
@@ -166,13 +175,10 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
     bool ok = false;
     String? message;
 
-    result.fold(
-      (failure) => message = failure.message,
-      (group) {
-        ok = true;
-        state = state.copyWith(group: group);
-      },
-    );
+    result.fold((failure) => message = failure.message, (group) {
+      ok = true;
+      state = state.copyWith(group: group);
+    });
 
     if (!ok) {
       state = state.copyWith(
@@ -192,10 +198,6 @@ class FamilyHealthViewModel extends Notifier<FamilyHealthState> {
   }
 
   void clearMessages() {
-    state = state.copyWith(
-      clearError: true,
-      clearActionMessage: true,
-      clearInvite: true,
-    );
+    state = state.copyWith(clearError: true, clearActionMessage: true);
   }
 }
