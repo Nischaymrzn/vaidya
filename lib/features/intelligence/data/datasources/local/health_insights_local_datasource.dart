@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/core/services/hive/feature_cache_service.dart';
 import 'package:vaidya/features/intelligence/data/datasources/health_insights_datasource.dart';
+import 'package:vaidya/features/intelligence/data/models/health_insight_api_model.dart';
+import 'package:vaidya/features/intelligence/data/models/health_insight_hive_model.dart';
 
 final healthInsightsLocalDataSourceProvider =
     Provider<IHealthInsightsLocalDataSource>((ref) {
@@ -16,12 +18,18 @@ class HealthInsightsLocalDataSource implements IHealthInsightsLocalDataSource {
   static const String _itemsKey = 'health_insights_items';
 
   @override
-  Future<void> cacheInsights(List<Map<String, dynamic>> items) {
-    return _cacheService.writeList(_itemsKey, items);
+  Future<void> cacheInsights(List<HealthInsightApiModel> items) {
+    final normalized = items
+        .map((item) => HealthInsightHiveModel.fromApiModel(item).toJson())
+        .toList(growable: false);
+    return _cacheService.writeList(_itemsKey, normalized);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getCachedInsights() {
-    return _cacheService.readList(_itemsKey);
+  Future<List<HealthInsightApiModel>> getCachedInsights() async {
+    final cached = await _cacheService.readList(_itemsKey);
+    return cached
+        .map((item) => HealthInsightHiveModel.fromJson(item).toApiModel())
+        .toList(growable: false);
   }
 }
