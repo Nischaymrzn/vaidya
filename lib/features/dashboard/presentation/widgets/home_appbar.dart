@@ -6,6 +6,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   final String userName;
   final String progress;
   final String premiumText;
+  final int unreadCount;
   final VoidCallback? onNotificationTap;
 
   const HomeAppbar({
@@ -13,6 +14,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.userName = 'Nischay',
     this.progress = '--',
     this.premiumText = 'Premium',
+    this.unreadCount = 0,
     this.onNotificationTap,
   });
 
@@ -20,7 +22,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 75,
-      leadingWidth: 56,
+      leadingWidth: 44,
       backgroundColor: AppColors.primary,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
@@ -97,27 +99,34 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onNotificationTap,
               padding: const EdgeInsets.only(right: 16, bottom: 6),
             ),
-            Positioned(
-              right: 12,
-              top: 4,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE53935),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                child: const Text(
-                  '5',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
+            if (unreadCount > 0)
+              Positioned(
+                right: 12,
+                top: 4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
                   ),
-                  textAlign: TextAlign.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE53935),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
+                  child: Text(
+                    unreadCount > 99 ? '99+' : '$unreadCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ],
