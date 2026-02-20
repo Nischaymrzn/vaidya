@@ -6,7 +6,6 @@ import 'package:vaidya/core/services/connectivity/network_info.dart';
 import 'package:vaidya/features/intelligence/data/datasources/local/risk_assessments_local_datasource.dart';
 import 'package:vaidya/features/intelligence/data/datasources/remote/risk_assessments_remote_datasource.dart';
 import 'package:vaidya/features/intelligence/data/datasources/risk_assessments_datasource.dart';
-import 'package:vaidya/features/intelligence/data/models/risk_assessment_api_model.dart';
 import 'package:vaidya/features/intelligence/domain/entities/risk_assessment_entity.dart';
 import 'package:vaidya/features/intelligence/domain/repositories/risk_assessments_repository.dart';
 
@@ -36,9 +35,7 @@ class RiskAssessmentsRepository implements IRiskAssessmentsRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getAssessments();
-        await _localDataSource.cacheAssessments(
-          remote.map((e) => e.data).toList(growable: false),
-        );
+        await _localDataSource.cacheAssessments(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch risk assessments'));
@@ -50,9 +47,7 @@ class RiskAssessmentsRepository implements IRiskAssessmentsRepository {
     final cached = await _localDataSource.getCachedAssessments();
     if (cached.isNotEmpty) {
       return Right(
-        cached
-            .map((item) => RiskAssessmentEntity(id: (item['_id'] ?? item['id'] ?? '').toString(), data: item))
-            .toList(growable: false),
+        cached.map((item) => item.toEntity()).toList(growable: false),
       );
     }
 
@@ -73,9 +68,9 @@ class RiskAssessmentsRepository implements IRiskAssessmentsRepository {
     }
 
     final cached = await _localDataSource.getCachedAssessments();
-    final match = cached.where((item) => (item['_id'] ?? item['id'] ?? '').toString() == id).cast<Map<String, dynamic>>().toList(growable: false);
+    final match = cached.where((item) => item.id == id).toList(growable: false);
     if (match.isNotEmpty) {
-      return Right(RiskAssessmentApiModel.fromJson(match.first).toEntity());
+      return Right(match.first.toEntity());
     }
 
     return const Left(ApiFailure(message: 'No internet connection and no cached risk assessment found.'));

@@ -84,7 +84,7 @@ class PredictionRepository implements IPredictionRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await runRemote();
-        await _localDataSource.cacheResult(cacheKey, remote.data);
+        await _localDataSource.cacheResult(cacheKey, remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Prediction failed'));
@@ -95,7 +95,7 @@ class PredictionRepository implements IPredictionRepository {
 
     final cached = await _localDataSource.getCachedResult(cacheKey);
     if (cached != null) {
-      return Right(PredictionApiModel.fromJson(cacheKey, cached).toEntity());
+      return Right(cached.toEntity());
     }
 
     return Left(ApiFailure(message: offlineMessage));
