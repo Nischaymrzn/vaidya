@@ -7,6 +7,6 @@ abstract interface class IProfileRemoteDataSource {
 }
 
 abstract interface class IProfileLocalDataSource {
-  Future<void> cacheUser(Map<String, dynamic> payload);
-  Future<Map<String, dynamic>?> getCachedUser();
+  Future<void> cacheUser(ProfileUserApiModel user);
+  Future<ProfileUserApiModel?> getCachedUser();
 }
