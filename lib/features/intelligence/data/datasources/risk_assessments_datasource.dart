@@ -7,6 +7,6 @@ abstract interface class IRiskAssessmentsRemoteDataSource {
 }
 
 abstract interface class IRiskAssessmentsLocalDataSource {
-  Future<void> cacheAssessments(List<Map<String, dynamic>> items);
-  Future<List<Map<String, dynamic>>> getCachedAssessments();
+  Future<void> cacheAssessments(List<RiskAssessmentApiModel> items);
+  Future<List<RiskAssessmentApiModel>> getCachedAssessments();
 }

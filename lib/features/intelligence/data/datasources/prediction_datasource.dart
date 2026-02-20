@@ -9,6 +9,6 @@ abstract interface class IPredictionRemoteDataSource {
 }
 
 abstract interface class IPredictionLocalDataSource {
-  Future<void> cacheResult(String key, Map<String, dynamic> result);
-  Future<Map<String, dynamic>?> getCachedResult(String key);
+  Future<void> cacheResult(String key, PredictionApiModel result);
+  Future<PredictionApiModel?> getCachedResult(String key);
 }
