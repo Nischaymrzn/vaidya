@@ -5,7 +5,8 @@ import 'package:vaidya/features/symptoms/domain/usecases/get_symptoms_usecase.da
 import 'package:vaidya/features/symptoms/domain/usecases/update_symptom_usecase.dart';
 import 'package:vaidya/features/symptoms/presentation/state/symptoms_state.dart';
 
-final symptomsViewModelProvider = NotifierProvider<SymptomsViewModel, SymptomsState>(SymptomsViewModel.new);
+final symptomsViewModelProvider =
+    NotifierProvider<SymptomsViewModel, SymptomsState>(SymptomsViewModel.new);
 
 class SymptomsViewModel extends Notifier<SymptomsState> {
   late final GetSymptomsUsecase _getUsecase;
@@ -36,18 +37,34 @@ class SymptomsViewModel extends Notifier<SymptomsState> {
     final summaryResult = await _getSummaryUsecase();
 
     itemsResult.fold(
-      (failure) => state = state.copyWith(status: SymptomsStatus.error, errorMessage: failure.message),
+      (failure) => state = state.copyWith(
+        status: SymptomsStatus.error,
+        errorMessage: failure.message,
+      ),
       (items) {
         summaryResult.fold(
-          (_) => state = state.copyWith(status: SymptomsStatus.loaded, items: items, clearError: true),
-          (summary) => state = state.copyWith(status: SymptomsStatus.loaded, items: items, summary: summary, clearError: true),
+          (_) => state = state.copyWith(
+            status: SymptomsStatus.loaded,
+            items: items,
+            clearError: true,
+          ),
+          (summary) => state = state.copyWith(
+            status: SymptomsStatus.loaded,
+            items: items,
+            summary: summary,
+            clearError: true,
+          ),
         );
       },
     );
   }
 
   Future<bool> create(Map<String, dynamic> payload) async {
-    state = state.copyWith(isSubmitting: true, clearError: true, clearActionMessage: true);
+    state = state.copyWith(
+      isSubmitting: true,
+      clearError: true,
+      clearActionMessage: true,
+    );
     final result = await _createUsecase(payload);
     bool ok = false;
     String? message;
@@ -55,35 +72,59 @@ class SymptomsViewModel extends Notifier<SymptomsState> {
     result.fold((failure) => message = failure.message, (_) => ok = true);
 
     if (!ok) {
-      state = state.copyWith(isSubmitting: false, errorMessage: message ?? 'Failed to create item');
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: message ?? 'Failed to create item',
+      );
       return false;
     }
 
     await load(forceLoading: false);
-    state = state.copyWith(isSubmitting: false, actionMessage: 'Created successfully', clearError: true);
+    state = state.copyWith(
+      isSubmitting: false,
+      actionMessage: 'Created successfully',
+      clearError: true,
+    );
     return true;
   }
 
   Future<bool> update(String id, Map<String, dynamic> payload) async {
-    state = state.copyWith(isSubmitting: true, clearError: true, clearActionMessage: true);
-    final result = await _updateUsecase(UpdateSymptomParams(id: id, payload: payload));
+    state = state.copyWith(
+      isSubmitting: true,
+      clearError: true,
+      clearActionMessage: true,
+    );
+    final result = await _updateUsecase(
+      UpdateSymptomParams(id: id, payload: payload),
+    );
     bool ok = false;
     String? message;
 
     result.fold((failure) => message = failure.message, (_) => ok = true);
 
     if (!ok) {
-      state = state.copyWith(isSubmitting: false, errorMessage: message ?? 'Failed to update item');
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: message ?? 'Failed to update item',
+      );
       return false;
     }
 
     await load(forceLoading: false);
-    state = state.copyWith(isSubmitting: false, actionMessage: 'Updated successfully', clearError: true);
+    state = state.copyWith(
+      isSubmitting: false,
+      actionMessage: 'Updated successfully',
+      clearError: true,
+    );
     return true;
   }
 
   Future<bool> remove(String id) async {
-    state = state.copyWith(isSubmitting: true, clearError: true, clearActionMessage: true);
+    state = state.copyWith(
+      isSubmitting: true,
+      clearError: true,
+      clearActionMessage: true,
+    );
     final result = await _deleteUsecase(DeleteSymptomParams(id: id));
     bool ok = false;
     String? message;
@@ -91,12 +132,19 @@ class SymptomsViewModel extends Notifier<SymptomsState> {
     result.fold((failure) => message = failure.message, (_) => ok = true);
 
     if (!ok) {
-      state = state.copyWith(isSubmitting: false, errorMessage: message ?? 'Failed to delete item');
+      state = state.copyWith(
+        isSubmitting: false,
+        errorMessage: message ?? 'Failed to delete item',
+      );
       return false;
     }
 
     await load(forceLoading: false);
-    state = state.copyWith(isSubmitting: false, actionMessage: 'Deleted successfully', clearError: true);
+    state = state.copyWith(
+      isSubmitting: false,
+      actionMessage: 'Deleted successfully',
+      clearError: true,
+    );
     return true;
   }
 
