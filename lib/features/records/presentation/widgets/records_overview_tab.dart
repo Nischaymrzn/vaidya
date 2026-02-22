@@ -48,44 +48,55 @@ class RecordsOverviewTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero,
-          crossAxisCount: 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-          childAspectRatio: 1.9,
-          children: [
-            _OverviewStatItem(
-              data: _OverviewStatData(
-                label: 'Total records',
-                value: '${allRecords.length}',
-                detail: 'All time',
-              ),
-            ),
-            _OverviewStatItem(
-              data: _OverviewStatData(
-                label: 'New uploads',
-                value: '$newUploads',
-                detail: 'Last 14 days',
-              ),
-            ),
-            _OverviewStatItem(
-              data: _OverviewStatData(
-                label: 'AI processed',
-                value: '$aiProcessedCount',
-                detail: 'Ready to review',
-              ),
-            ),
-            _OverviewStatItem(
-              data: _OverviewStatData(
-                label: 'Providers',
-                value: '$providerCount',
-                detail: 'Connected sources',
-              ),
-            ),
-          ],
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final cardAspectRatio = width < 360
+                ? 1.55
+                : width < 430
+                ? 1.7
+                : 1.9;
+
+            return GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              crossAxisCount: 2,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: cardAspectRatio,
+              children: [
+                _OverviewStatItem(
+                  data: _OverviewStatData(
+                    label: 'Total records',
+                    value: '${allRecords.length}',
+                    detail: 'All time',
+                  ),
+                ),
+                _OverviewStatItem(
+                  data: _OverviewStatData(
+                    label: 'New uploads',
+                    value: '$newUploads',
+                    detail: 'Last 14 days',
+                  ),
+                ),
+                _OverviewStatItem(
+                  data: _OverviewStatData(
+                    label: 'AI processed',
+                    value: '$aiProcessedCount',
+                    detail: 'Ready to review',
+                  ),
+                ),
+                _OverviewStatItem(
+                  data: _OverviewStatData(
+                    label: 'Providers',
+                    value: '$providerCount',
+                    detail: 'Connected sources',
+                  ),
+                ),
+              ],
+            );
+          },
         ),
         const SizedBox(height: 12),
         LayoutBuilder(
@@ -106,7 +117,10 @@ class RecordsOverviewTab extends StatelessWidget {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 7, child: _recentRecordsCard(recent, count: recent.length)),
+                Expanded(
+                  flex: 7,
+                  child: _recentRecordsCard(recent, count: recent.length),
+                ),
                 const SizedBox(width: 20),
                 Expanded(
                   flex: 3,
@@ -126,7 +140,10 @@ class RecordsOverviewTab extends StatelessWidget {
     );
   }
 
-  Widget _recentRecordsCard(List<MedicalRecordEntity> recent, {required int count}) {
+  Widget _recentRecordsCard(
+    List<MedicalRecordEntity> recent, {
+    required int count,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.card,
@@ -605,6 +622,8 @@ class _OverviewStatItem extends StatelessWidget {
         children: [
           Text(
             data.label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 11.5,
@@ -613,19 +632,25 @@ class _OverviewStatItem extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 2),
-          Text(
-            data.value,
-            style: TextStyle(
-              fontFamily: 'Urbanist',
-              fontSize: 27,
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
+          const SizedBox(height: 1),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              data.value,
+              style: TextStyle(
+                fontFamily: 'Urbanist',
+                fontSize: 27,
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             data.detail,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
@@ -758,4 +783,3 @@ class _InsightItem {
     required this.badgeText,
   });
 }
-

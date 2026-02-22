@@ -63,6 +63,28 @@ class RecordsDocumentsTab extends StatelessWidget {
                 ),
               ),
             ),
+            OutlinedButton.icon(
+              onPressed: onAddMore,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              icon: const Icon(Icons.add_rounded, size: 16),
+              label: Text(
+                'Add more',
+                style: TextStyle(
+                  fontFamily: 'Urbanist',
+                  fontSize: 13.5,
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 10),
