@@ -1,9 +1,14 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/features/records/domain/entities/medical_record_entity.dart';
+import 'package:vaidya/features/records/domain/entities/record_support_entity.dart';
 import 'package:vaidya/features/records/domain/usecases/create_medical_record_usecase.dart';
+import 'package:vaidya/features/records/domain/usecases/get_allergies_usecase.dart';
 import 'package:vaidya/features/records/domain/usecases/delete_medical_record_usecase.dart';
 import 'package:vaidya/features/records/domain/usecases/get_medical_record_by_id_usecase.dart';
 import 'package:vaidya/features/records/domain/usecases/get_medical_records_usecase.dart';
+import 'package:vaidya/features/records/domain/usecases/get_immunizations_usecase.dart';
+import 'package:vaidya/features/records/domain/usecases/get_medications_usecase.dart';
 import 'package:vaidya/features/records/domain/usecases/scan_medical_image_usecase.dart';
 import 'package:vaidya/features/records/domain/usecases/update_medical_record_usecase.dart';
 import 'package:vaidya/features/records/presentation/state/records_state.dart';
@@ -18,6 +23,9 @@ class RecordsViewModel extends Notifier<RecordsState> {
   late final UpdateMedicalRecordUsecase _updateMedicalRecordUsecase;
   late final DeleteMedicalRecordUsecase _deleteMedicalRecordUsecase;
   late final ScanMedicalImageUsecase _scanMedicalImageUsecase;
+  late final GetMedicationsUsecase _getMedicationsUsecase;
+  late final GetAllergiesUsecase _getAllergiesUsecase;
+  late final GetImmunizationsUsecase _getImmunizationsUsecase;
 
   @override
   RecordsState build() {
@@ -29,10 +37,17 @@ class RecordsViewModel extends Notifier<RecordsState> {
     _updateMedicalRecordUsecase = ref.read(updateMedicalRecordUsecaseProvider);
     _deleteMedicalRecordUsecase = ref.read(deleteMedicalRecordUsecaseProvider);
     _scanMedicalImageUsecase = ref.read(scanMedicalImageUsecaseProvider);
+    _getMedicationsUsecase = ref.read(getMedicationsUsecaseProvider);
+    _getAllergiesUsecase = ref.read(getAllergiesUsecaseProvider);
+    _getImmunizationsUsecase = ref.read(getImmunizationsUsecaseProvider);
     return const RecordsState();
   }
 
-  Future<void> loadRecords({int? page, bool forceLoading = false}) async {
+  Future<void> loadRecords({
+    int? page,
+    bool forceLoading = false,
+    String? userId,
+  }) async {
     final targetPage = page ?? state.page;
     final shouldLoad =
         forceLoading ||
@@ -46,7 +61,11 @@ class RecordsViewModel extends Notifier<RecordsState> {
     );
 
     final result = await _getMedicalRecordsUsecase(
-      GetMedicalRecordsParams(page: targetPage, limit: state.limit),
+      GetMedicalRecordsParams(
+        page: targetPage,
+        limit: state.limit,
+        userId: userId,
+      ),
     );
 
     result.fold(
@@ -65,6 +84,48 @@ class RecordsViewModel extends Notifier<RecordsState> {
           clearError: true,
         );
       },
+    );
+  }
+
+  Future<void> loadSupportData({
+    String? userId,
+    bool forceLoading = false,
+  }) async {
+    final shouldLoad =
+        forceLoading ||
+        state.medications.isEmpty ||
+        state.allergies.isEmpty ||
+        state.immunizations.isEmpty;
+
+    if (!shouldLoad) return;
+
+    state = state.copyWith(isSupportLoading: true, clearError: true);
+
+    final medicationsResult = await _getMedicationsUsecase(
+      GetMedicationsParams(userId: userId),
+    );
+    final allergiesResult = await _getAllergiesUsecase(
+      GetAllergiesParams(userId: userId),
+    );
+    final immunizationsResult = await _getImmunizationsUsecase(
+      GetImmunizationsParams(userId: userId),
+    );
+
+    final medications = _resolveList<MedicationEntity>(medicationsResult);
+    final allergies = _resolveList<AllergyEntity>(allergiesResult);
+    final immunizations = _resolveList<ImmunizationEntity>(immunizationsResult);
+
+    final firstFailureMessage =
+        medicationsResult.fold((l) => l.message, (_) => null) ??
+        allergiesResult.fold((l) => l.message, (_) => null) ??
+        immunizationsResult.fold((l) => l.message, (_) => null);
+
+    state = state.copyWith(
+      isSupportLoading: false,
+      medications: medications,
+      allergies: allergies,
+      immunizations: immunizations,
+      errorMessage: firstFailureMessage,
     );
   }
 
@@ -273,5 +334,9 @@ class RecordsViewModel extends Notifier<RecordsState> {
   void setDocumentsPage(int page) {
     if (page < 1) return;
     state = state.copyWith(documentsPage: page);
+  }
+
+  List<T> _resolveList<T>(Either<dynamic, List<T>> result) {
+    return result.fold((_) => <T>[], (data) => data);
   }
 }
