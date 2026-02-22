@@ -9,8 +9,11 @@ abstract interface class ISymptomsRemoteDataSource {
 }
 
 abstract interface class ISymptomsLocalDataSource {
-  Future<void> cacheSymptoms(List<Map<String, dynamic>> items);
-  Future<List<Map<String, dynamic>>> getCachedSymptoms();
+  Future<void> cacheSymptoms(List<SymptomApiModel> items);
+  Future<List<SymptomApiModel>> getCachedSymptoms();
+  Future<SymptomApiModel?> getCachedSymptomById(String id);
+  Future<SymptomApiModel> upsertSymptom(SymptomApiModel payload);
+  Future<bool> removeSymptomById(String id);
   Future<void> cacheSymptomsSummary(Map<String, dynamic> payload);
   Future<Map<String, dynamic>?> getCachedSymptomsSummary();
 }
