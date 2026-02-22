@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vaidya/core/widgets/app_side_drawer.dart';
 import 'package:vaidya/core/widgets/notifications_panel.dart';
+import 'package:vaidya/features/dashboard/domain/entities/notification_entity.dart';
+import 'package:vaidya/features/dashboard/presentation/state/notifications_state.dart';
+import 'package:vaidya/features/dashboard/presentation/view_model/notifications_viewmodel.dart';
 import 'package:vaidya/features/records/domain/entities/medical_record_entity.dart';
 import 'package:vaidya/features/records/presentation/pages/record_editor_page.dart';
 import 'package:vaidya/features/records/presentation/state/records_state.dart';
@@ -33,12 +35,22 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
       ref
           .read(recordsViewModelProvider.notifier)
           .loadRecords(forceLoading: true);
+      ref
+          .read(recordsViewModelProvider.notifier)
+          .loadSupportData(forceLoading: true);
+      ref
+          .read(notificationsViewModelProvider.notifier)
+          .load(forceLoading: true);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(recordsViewModelProvider);
+    final notificationsState = ref.watch(notificationsViewModelProvider);
+    final unreadCount = notificationsState.items
+        .where((item) => !item.isRead)
+        .length;
 
     ref.listen<RecordsState>(recordsViewModelProvider, (previous, next) {
       if (next.errorMessage != null &&
@@ -53,11 +65,20 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
       }
     });
 
+    ref.listen<NotificationsState>(notificationsViewModelProvider, (
+      previous,
+      next,
+    ) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
+        _showMessage(next.errorMessage!, isError: true);
+      }
+    });
+
     final filteredRecords = _applyFilters(state.records, state);
     final aiProcessedCount = state.records
         .where((record) => record.aiScanned)
         .length;
-    final notifications = _buildNotifications(state.records);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -74,10 +95,30 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               RecordsTopBanner(
-                onNotificationTap: () {
+                unreadCount: unreadCount,
+                onNotificationTap: () async {
+                  await ref
+                      .read(notificationsViewModelProvider.notifier)
+                      .load(forceLoading: true);
+                  if (!mounted) return;
+                  final refreshed = ref.read(notificationsViewModelProvider);
+                  final refreshedItems = _buildNotificationItems(
+                    refreshed.items,
+                  );
                   showNotificationsPanel(
-                    context,
-                    items: notifications,
+                    this.context,
+                    items: refreshedItems,
+                    isLoading: refreshed.status == NotificationsStatus.loading,
+                    onMarkRead: (id) async {
+                      return ref
+                          .read(notificationsViewModelProvider.notifier)
+                          .markRead(id);
+                    },
+                    onMarkAllRead: () async {
+                      return ref
+                          .read(notificationsViewModelProvider.notifier)
+                          .markAllRead();
+                    },
                   );
                 },
               ),
@@ -499,49 +540,48 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
       );
   }
 
-  List<AppNotificationItem> _buildNotifications(
-    List<MedicalRecordEntity> records,
+  List<AppNotificationItem> _buildNotificationItems(
+    List<NotificationEntity> notifications,
   ) {
-    if (records.isEmpty) {
-      return const [
-        AppNotificationItem(
-          title: 'Record added',
-          subtitle: 'Your health records will appear here once uploaded.',
-          dateLabel: 'Today',
-        ),
-      ];
+    if (notifications.isEmpty) {
+      return const <AppNotificationItem>[];
     }
 
-    final sorted = [...records]
-      ..sort((a, b) {
-        final aDate =
-            tryParseDate(a.effectiveDate)?.millisecondsSinceEpoch ?? 0;
-        final bDate =
-            tryParseDate(b.effectiveDate)?.millisecondsSinceEpoch ?? 0;
-        return bDate.compareTo(aDate);
-      });
-
-    return sorted
-        .take(5)
-        .map((record) {
-          final date = tryParseDate(record.effectiveDate);
-          final title = record.aiScanned ? 'AI summary ready' : 'Record added';
-          final subtitle = record.aiScanned
-              ? 'Review AI insights for ${record.title}.'
-              : '${record.title} created successfully.';
-
+    return notifications
+        .map((item) {
           return AppNotificationItem(
-            title: title,
-            subtitle: subtitle,
-            dateLabel: _formatShortDate(date),
+            id: item.id,
+            title: item.title.isEmpty ? 'Notification' : item.title,
+            subtitle: item.message.isEmpty
+                ? 'You have a new health update.'
+                : item.message,
+            dateLabel: _formatNotificationDate(item.createdAt),
+            read: item.isRead,
           );
         })
         .toList(growable: false);
   }
 
-  String _formatShortDate(DateTime? date) {
+  String _formatNotificationDate(DateTime? date) {
     if (date == null) return 'Today';
-    return DateFormat('MMM dd').format(date.toLocal());
+    const months = <String>[
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    final local = date.toLocal();
+    final month = months[local.month - 1];
+    final day = local.day.toString().padLeft(2, '0');
+    return '$month $day';
   }
 }
 
@@ -585,4 +625,3 @@ class _TabItem extends StatelessWidget {
     );
   }
 }
-

@@ -29,6 +29,7 @@ class GetMedicalRecordsUsecase
     return _recordsRepository.getMedicalRecords(
       page: params.page,
       limit: params.limit,
+      userId: params.userId,
     );
   }
 }
@@ -36,7 +37,11 @@ class GetMedicalRecordsUsecase
 class GetMedicalRecordsParams {
   final int page;
   final int limit;
+  final String? userId;
 
-  const GetMedicalRecordsParams({required this.page, required this.limit});
+  const GetMedicalRecordsParams({
+    required this.page,
+    required this.limit,
+    this.userId,
+  });
 }
-
