@@ -20,7 +20,11 @@ class VitalApiModel {
     if (raw is! List) return const [];
     return raw
         .whereType<Map>()
-        .map((item) => VitalApiModel.fromJson(item.map((k, v) => MapEntry(k.toString(), v))))
+        .map(
+          (item) => VitalApiModel.fromJson(
+            item.map((k, v) => MapEntry(k.toString(), v)),
+          ),
+        )
         .toList(growable: false);
   }
 }
