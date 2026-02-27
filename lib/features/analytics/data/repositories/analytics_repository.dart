@@ -37,7 +37,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
     if (await _networkInfo.isConnected) {
       try {
         final summary = await _remoteDataSource.getSummary(months: months);
-        await _localDataSource.cacheSummary(summary);
+        await _localDataSource.saveSummary(summary);
         return Right(summary.toEntity());
       } on DioException catch (e) {
         return Left(
@@ -55,7 +55,7 @@ class AnalyticsRepository implements IAnalyticsRepository {
       }
     }
 
-    final cached = await _localDataSource.getCachedSummary();
+    final cached = await _localDataSource.getSummary();
     if (cached != null) {
       return Right(cached.toEntity());
     }

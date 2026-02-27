@@ -8,26 +8,26 @@ final analyticsLocalDataSourceProvider = Provider<IAnalyticsLocalDataSource>((
   ref,
 ) {
   return AnalyticsLocalDataSource(
-    cacheService: ref.read(featureCacheServiceProvider),
+    saveService: ref.read(featureCacheServiceProvider),
   );
 });
 
 class AnalyticsLocalDataSource implements IAnalyticsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const AnalyticsLocalDataSource({required FeatureCacheService cacheService})
-    : _cacheService = cacheService;
+  const AnalyticsLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _cacheKey = 'analytics_summary';
 
   @override
-  Future<void> cacheSummary(AnalyticsSummaryApiModel summary) {
+  Future<void> saveSummary(AnalyticsSummaryApiModel summary) {
     final model = AnalyticsSummaryHiveModel.fromApiModel(summary);
     return _cacheService.writeMap(_cacheKey, model.toJson());
   }
 
   @override
-  Future<AnalyticsSummaryApiModel?> getCachedSummary() async {
+  Future<AnalyticsSummaryApiModel?> getSummary() async {
     final cached = await _cacheService.readMap(_cacheKey);
     if (cached == null) return null;
     return AnalyticsSummaryHiveModel.fromJson(cached).toApiModel();

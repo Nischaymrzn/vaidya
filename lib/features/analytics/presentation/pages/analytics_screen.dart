@@ -40,6 +40,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final state = ref.watch(analyticsViewModelProvider);
     final viewData = AnalyticsViewData.fromEntity(state.summary);
 
@@ -53,7 +55,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     final hasAnyData = state.summary.data.isNotEmpty;
 
     final body = state.status == AnalyticsStatus.loading && !hasAnyData
-        ? const Center(
+        ? Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           )
         : RefreshIndicator(
@@ -65,14 +67,14 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const AnalyticsHeaderSection(),
+                  AnalyticsHeaderSection(),
                   if (state.status == AnalyticsStatus.loading &&
                       hasAnyData) ...[
-                    const SizedBox(height: 10),
-                    const LinearProgressIndicator(
+                    SizedBox(height: 10),
+                    LinearProgressIndicator(
                       minHeight: 2,
                       color: AppColors.primary,
-                      backgroundColor: Color(0xFFE6EEF9),
+                      backgroundColor: AppColors.primarySoft,
                     ),
                   ],
                   if (state.status == AnalyticsStatus.error && hasAnyData) ...[
@@ -90,7 +92,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
                     color: AppColors.card,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: AppColors.border),
                     ),
                     child: AnalyticsSummaryGrid(items: viewData.summaryCards),
                   ),
@@ -208,12 +210,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.only(left: 10),
           child: AppDrawerToggleButton(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'Analytics',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -251,21 +253,26 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFFFEF2F2),
-        border: Border.all(color: const Color(0xFFFCA5A5)),
+        color: isDark ? AppColors.dangerSurface : const Color(0xFFFEF2F2),
+        border: Border.all(
+          color: isDark
+              ? AppColors.error.withValues(alpha: 0.35)
+              : const Color(0xFFFCA5A5),
+        ),
       ),
       child: Text(
         message,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: Color(0xFF991B1B),
+          color: isDark ? AppColors.error : Color(0xFF991B1B),
         ),
       ),
     );
