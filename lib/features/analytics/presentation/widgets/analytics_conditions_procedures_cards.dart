@@ -125,7 +125,7 @@ class AnalyticsProceduresCard extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -167,7 +167,7 @@ class _BarRow extends StatelessWidget {
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -203,7 +203,7 @@ class _BarRow extends StatelessWidget {
           child: Text(
             '$value',
             textAlign: TextAlign.right,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 14,
               fontWeight: FontWeight.w600,
