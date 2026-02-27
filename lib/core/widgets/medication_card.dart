@@ -33,7 +33,7 @@ class MedicationCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFE5E7EB),
+              color: AppColors.surfaceMuted,
               shape: BoxShape.circle,
             ),
             child: SvgPicture.asset(iconPath, height: 28, width: 28),
@@ -46,7 +46,7 @@ class MedicationCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -57,7 +57,7 @@ class MedicationCard extends StatelessWidget {
                   children: [
                     Text(
                       date,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
@@ -66,7 +66,7 @@ class MedicationCard extends StatelessWidget {
                     const SizedBox(width: 16),
                     Text(
                       hospital,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
@@ -81,7 +81,7 @@ class MedicationCard extends StatelessWidget {
           // More button
           GestureDetector(
             onTap: onMore,
-            child: const Icon(Icons.more_horiz, color: AppColors.textSecondary),
+            child: Icon(Icons.more_horiz, color: AppColors.textSecondary),
           ),
         ],
       ),

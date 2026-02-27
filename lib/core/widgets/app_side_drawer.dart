@@ -59,7 +59,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           color: AppColors.textSecondary,
           fontSize: 12,
@@ -78,9 +78,9 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
     Widget? trailing,
   }) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 2, 10, 2),
+      padding: EdgeInsets.fromLTRB(10, 2, 10, 2),
       child: Material(
-        color: selected ? const Color(0xFFE8F1FF) : Colors.transparent,
+        color: selected ? AppColors.primarySoft : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
@@ -123,14 +123,14 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
     bool selected = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.only(left: 44, right: 12, top: 1, bottom: 1),
+      padding: EdgeInsets.only(left: 44, right: 12, top: 1, bottom: 1),
       child: Row(
         children: [
           Container(width: 1, height: 34, color: AppColors.border),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Material(
-              color: selected ? const Color(0xFFE8F1FF) : Colors.transparent,
+              color: selected ? AppColors.primarySoft : Colors.transparent,
               borderRadius: BorderRadius.circular(10),
               child: InkWell(
                 onTap: onTap,
@@ -162,6 +162,8 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     return Drawer(
       backgroundColor: AppColors.background,
       child: SafeArea(
@@ -179,7 +181,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Vaidya.ai',
                       style: TextStyle(
@@ -192,7 +194,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
                   ),
                   IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(
+                    icon: Icon(
                       LucideIcons.panelLeftClose,
                       color: AppColors.textSecondary,
                     ),
