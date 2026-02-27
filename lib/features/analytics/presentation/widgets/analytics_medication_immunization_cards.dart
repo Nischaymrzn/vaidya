@@ -219,7 +219,7 @@ class _StackedHistoryChart<T> extends StatelessWidget {
                         xLabelOf(item),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -290,7 +290,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 13,
             fontWeight: FontWeight.w500,

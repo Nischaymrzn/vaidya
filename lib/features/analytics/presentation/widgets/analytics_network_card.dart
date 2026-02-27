@@ -61,9 +61,9 @@ class _ProviderGraph extends StatelessWidget {
     final providers = topProviders.take(6).toList(growable: false);
     return Container(
       height: 320,
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
@@ -115,7 +115,7 @@ class _ProviderGraph extends StatelessWidget {
                       width: 2,
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Patient',
                     style: TextStyle(
                       fontFamily: 'Urbanist',
@@ -135,7 +135,7 @@ class _ProviderGraph extends StatelessWidget {
                     width: nodeRadius * 2,
                     height: nodeRadius * 2,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.card,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: AppColors.primary.withValues(alpha: .75),
@@ -167,7 +167,7 @@ class _ProviderGraph extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -239,7 +239,7 @@ class _ProviderStats extends StatelessWidget {
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          padding: EdgeInsets.fromLTRB(14, 12, 14, 12),
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(14),
@@ -248,7 +248,7 @@ class _ProviderStats extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'TOP PROVIDERS',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -269,7 +269,7 @@ class _ProviderStats extends StatelessWidget {
                           provider.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -289,7 +289,7 @@ class _ProviderStats extends StatelessWidget {
                         ),
                         child: Text(
                           '${provider.count}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -319,7 +319,7 @@ class _StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      padding: EdgeInsets.fromLTRB(14, 10, 14, 10),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -330,7 +330,7 @@ class _StatTile extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -341,7 +341,7 @@ class _StatTile extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             '$value',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 36 / 1.6,
               height: 1,
@@ -412,3 +412,4 @@ class _NetworkLinesPainter extends CustomPainter {
     return false;
   }
 }
+
