@@ -88,6 +88,10 @@ class UserSessionService {
     return _prefs.getBool(_keyUserIsPremium) ?? false;
   }
 
+  Future<void> setCurrentUserIsPremium(bool isPremium) async {
+    await _prefs.setBool(_keyUserIsPremium, isPremium);
+  }
+
   // Clear user session (logout)
   Future<void> clearSession() async {
     await _prefs.remove(_keyIsLoggedIn);
