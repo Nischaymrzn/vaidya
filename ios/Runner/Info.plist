@@ -61,5 +61,11 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Vaidya Care uses microphone access for voice consultation input.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Vaidya Care uses speech recognition to transcribe your voice during consultations.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Vaidya uses your location to include GPS coordinates in emergency fall alerts.</string>
 </dict>
 </plist>
