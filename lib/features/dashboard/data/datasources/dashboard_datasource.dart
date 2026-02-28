@@ -5,6 +5,6 @@ abstract interface class IDashboardRemoteDataSource {
 }
 
 abstract interface class IDashboardLocalDataSource {
-  Future<void> cacheDashboardSummary(DashboardSummaryApiModel payload);
-  Future<DashboardSummaryApiModel?> getCachedDashboardSummary();
+  Future<void> saveDashboardSummary(DashboardSummaryApiModel data);
+  Future<DashboardSummaryApiModel?> getDashboardSummary();
 }
