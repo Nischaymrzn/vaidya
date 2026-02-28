@@ -39,7 +39,7 @@ class AnalyticsSectionCard extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 33 / 2,
                 fontWeight: FontWeight.w600,
@@ -49,7 +49,7 @@ class AnalyticsSectionCard extends StatelessWidget {
             const SizedBox(height: 2),
             Text(
               subtitle,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -74,16 +74,16 @@ class AnalyticsEmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 30),
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 30),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         border: Border.all(color: AppColors.border),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -93,3 +93,4 @@ class AnalyticsEmptyState extends StatelessWidget {
     );
   }
 }
+
