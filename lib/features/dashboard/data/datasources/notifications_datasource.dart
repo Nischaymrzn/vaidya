@@ -12,8 +12,8 @@ abstract interface class INotificationsRemoteDataSource {
 }
 
 abstract interface class INotificationsLocalDataSource {
-  Future<void> cacheNotifications(List<NotificationApiModel> items);
-  Future<List<NotificationApiModel>> getCachedNotifications();
-  Future<void> cachePagination(NotificationsPaginationApiModel pagination);
-  Future<NotificationsPaginationApiModel?> getCachedPagination();
+  Future<void> saveNotifications(List<NotificationApiModel> items);
+  Future<List<NotificationApiModel>> getNotifications();
+  Future<void> savePagination(NotificationsPaginationApiModel pagination);
+  Future<NotificationsPaginationApiModel?> getPagination();
 }
