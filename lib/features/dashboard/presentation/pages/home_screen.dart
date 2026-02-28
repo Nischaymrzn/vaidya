@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/app/routes/app_routes.dart';
+import 'package:vaidya/core/services/storage/user_session_service.dart';
 import 'package:vaidya/core/widgets/app_side_drawer.dart';
 import 'package:vaidya/core/widgets/notifications_panel.dart';
 import 'package:vaidya/features/dashboard/domain/entities/dashboard_summary_entity.dart';
@@ -47,10 +48,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final dashboardState = ref.watch(dashboardViewModelProvider);
     final notificationsState = ref.watch(notificationsViewModelProvider);
+    final session = ref.read(userSessionServiceProvider);
     final summary = dashboardState.summary;
     final hasSummary = summary != const DashboardSummaryEntity.empty();
+    final premiumText = session.getCurrentUserIsPremium() ? 'Premium' : 'Free';
     final unreadCount = notificationsState.items
         .where((item) => !item.isRead)
         .length;
@@ -87,7 +92,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     if (dashboardState.status == DashboardStatus.loading && !hasSummary) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.background,
         body: Center(
           child: CircularProgressIndicator(color: AppColors.primary),
@@ -104,7 +109,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
+                Text(
                   'Unable to load dashboard data.',
                   style: TextStyle(
                     fontSize: 16,
@@ -116,7 +121,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 Text(
                   dashboardState.errorMessage ?? 'Please try again.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -149,6 +154,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         progress: summary.vaidyaScore != null
             ? '${summary.vaidyaScore!.round()}%'
             : '--',
+        premiumText: premiumText,
         unreadCount: unreadCount,
         onNotificationTap: () async {
           await ref
