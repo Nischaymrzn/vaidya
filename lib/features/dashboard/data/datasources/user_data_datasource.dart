@@ -6,6 +6,6 @@ abstract interface class IUserDataRemoteDataSource {
 }
 
 abstract interface class IUserDataLocalDataSource {
-  Future<void> cacheUserData(UserDataApiModel payload);
-  Future<UserDataApiModel?> getCachedUserData();
+  Future<void> saveUserData(UserDataApiModel data);
+  Future<UserDataApiModel?> getUserData();
 }
