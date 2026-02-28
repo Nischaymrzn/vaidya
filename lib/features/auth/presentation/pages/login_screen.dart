@@ -224,7 +224,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                 SizedBox(height: 16),
 
-                GoogleLoginButton(onPressed: _handleGoogleSignIn),
+                GoogleLoginButton(
+                  onPressed: _handleGoogleSignIn,
+                  isLoading: authState.status == AuthStatus.loading,
+                ),
               ],
             ),
           ),

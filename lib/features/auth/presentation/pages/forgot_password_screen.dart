@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vaidya/core/utils/snackbar_utils.dart';
 import 'package:vaidya/core/widgets/my_button.dart';
 import 'package:vaidya/core/widgets/my_text_form_field.dart';
+import 'package:vaidya/features/auth/presentation/pages/forgot_password_sent_screen.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
 
@@ -18,7 +18,6 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
-  bool _resetLinkSent = false;
 
   @override
   void dispose() {
@@ -34,20 +33,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         .requestPasswordReset(email: _emailController.text.trim());
   }
 
-  Future<void> _openEmailApp() async {
-    final uri = Uri(
-      scheme: 'mailto',
-      path: _emailController.text.trim().isEmpty
-          ? null
-          : _emailController.text.trim(),
-    );
-
-    final opened = await launchUrl(uri);
-    if (!opened && mounted) {
-      SnackbarUtils.showError(context, 'Could not open email app');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
@@ -56,10 +41,12 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       if (next.status == previous?.status) return;
 
       if (next.status == AuthStatus.passwordResetEmailSent) {
-        setState(() => _resetLinkSent = true);
-        SnackbarUtils.showSuccess(
-          context,
-          next.successMessage ?? 'Reset link sent. Please check your email.',
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => ForgotPasswordSentScreen(
+              email: _emailController.text.trim(),
+            ),
+          ),
         );
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
         SnackbarUtils.showError(context, next.errorMessage!);
@@ -117,18 +104,6 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   isLoading: authState.status == AuthStatus.loading,
                   onPressed: _handleSendResetLink,
                 ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: _openEmailApp,
-                  child: const Text('Open Email App'),
-                ),
-                if (_resetLinkSent) ...[
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Reset link sent. Please open your email and continue there.',
-                    style: TextStyle(fontSize: 14, color: Colors.black87),
-                  ),
-                ],
               ],
             ),
           ),
