@@ -22,7 +22,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -31,7 +31,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Symptom Activity',
             style: TextStyle(
               fontSize: 18,
@@ -40,7 +40,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Frequency over the past 30 days',
             style: TextStyle(
               fontSize: 14,
@@ -50,7 +50,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (visibleSymptoms.isEmpty)
-            const Text(
+            Text(
               'No symptom activity available.',
               style: TextStyle(
                 fontSize: 14,
@@ -69,7 +69,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
                       child: Text(
                         item.name,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.w500,
@@ -95,7 +95,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.circular(12),
@@ -103,7 +103,7 @@ class DashboardSymptomActivityCard extends StatelessWidget {
             ),
             child: Text(
               'Pattern detected: ${pattern.isEmpty ? 'No symptom pattern detected yet.' : pattern}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,
