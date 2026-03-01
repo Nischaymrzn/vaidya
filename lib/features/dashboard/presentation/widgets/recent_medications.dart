@@ -41,7 +41,7 @@ class RecentMedications extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: AppColors.card,
@@ -49,7 +49,7 @@ class RecentMedications extends StatelessWidget {
             border: Border.all(color: AppColors.border, width: 1),
           ),
           child: items.isEmpty
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(16),
                   child: Text(
                     'No recent medication or health records available.',
@@ -65,7 +65,7 @@ class RecentMedications extends StatelessWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: items.length,
                   separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey.shade300,
+                    color: AppColors.border,
                     thickness: 1.2,
                     height: 2,
                   ),
