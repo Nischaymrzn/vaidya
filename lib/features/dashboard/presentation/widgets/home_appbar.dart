@@ -20,6 +20,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return AppBar(
       toolbarHeight: 75,
       leadingWidth: 44,
@@ -49,10 +50,10 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               Row(
                 children: [
-                  const SizedBox(width: 8),
-                  const Icon(
+                  SizedBox(width: 8),
+                  Icon(
                     Icons.health_and_safety_rounded,
-                    color: AppColors.background,
+                    color: isDark ? Colors.white : AppColors.background,
                   ),
                   const SizedBox(width: 4),
                   Text(
@@ -67,10 +68,13 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
               ),
               const SizedBox(width: 8),
               Image.asset('assets/images/line_sep.png', height: 16),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Row(
                 children: [
-                  const Icon(Icons.star_rounded, color: AppColors.background),
+                  Icon(
+                    Icons.star_rounded,
+                    color: isDark ? Colors.white : AppColors.background,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     premiumText,
