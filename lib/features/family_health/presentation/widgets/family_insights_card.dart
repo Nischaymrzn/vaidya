@@ -19,7 +19,7 @@ class FamilyInsightsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -30,7 +30,7 @@ class FamilyInsightsCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 17,
               fontWeight: FontWeight.w600,
@@ -40,7 +40,7 @@ class FamilyInsightsCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -71,20 +71,6 @@ class _InsightTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFFDBEAFE),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            alignment: Alignment.center,
-            child: const Icon(
-              LucideIcons.sparkles,
-              size: 16,
-              color: AppColors.primary,
-            ),
-          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -92,7 +78,7 @@ class _InsightTile extends StatelessWidget {
               children: [
                 Text(
                   insight.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -102,7 +88,7 @@ class _InsightTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   insight.detail,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 12.5,
                     fontWeight: FontWeight.w500,
@@ -127,7 +113,7 @@ class FamilyCareChecklist extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -136,7 +122,7 @@ class FamilyCareChecklist extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Care checklist',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -146,7 +132,7 @@ class FamilyCareChecklist extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'Immediate next steps for this profile.',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -172,8 +158,8 @@ class FamilyCareChecklist extends StatelessWidget {
               onPressed: onStartConsult,
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: const BorderSide(color: AppColors.primary),
+                padding: EdgeInsets.symmetric(vertical: 12),
+                side: BorderSide(color: AppColors.primary),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -223,7 +209,7 @@ class _CareItem extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -233,7 +219,7 @@ class _CareItem extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 detail,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,
