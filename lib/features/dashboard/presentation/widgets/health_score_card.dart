@@ -17,6 +17,7 @@ class HealthScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final parsedScore =
         int.tryParse(score) ?? (trend.isNotEmpty ? trend.last.score : null);
     final displayScore = parsedScore?.toString() ?? '--';
@@ -39,7 +40,7 @@ class HealthScoreCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.card,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AppColors.border, width: 1),
           ),
@@ -60,10 +61,10 @@ class HealthScoreCard extends StatelessWidget {
                       ),
                       Text(
                         displayScore,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary,
+                          color: isDark ? Colors.black : AppColors.textPrimary,
                         ),
                       ),
                     ],
@@ -73,7 +74,7 @@ class HealthScoreCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'VAIDYA Score',
                           style: TextStyle(
                             fontSize: 16,
@@ -112,7 +113,7 @@ class HealthScoreCard extends StatelessWidget {
                 ),
                 child: Text(
                   status,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,
