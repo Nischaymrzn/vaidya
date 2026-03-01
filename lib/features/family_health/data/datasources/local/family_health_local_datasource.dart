@@ -4,27 +4,30 @@ import 'package:vaidya/features/family_health/data/datasources/family_health_dat
 import 'package:vaidya/features/family_health/data/models/family_group_api_model.dart';
 import 'package:vaidya/features/family_health/data/models/family_group_hive_model.dart';
 
-final familyHealthLocalDataSourceProvider = Provider<IFamilyHealthLocalDataSource>((ref) {
-  return FamilyHealthLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
-});
+final familyHealthLocalDataSourceProvider =
+    Provider<IFamilyHealthLocalDataSource>((ref) {
+      return FamilyHealthLocalDataSource(
+        saveService: ref.read(featureCacheServiceProvider),
+      );
+    });
 
 class FamilyHealthLocalDataSource implements IFamilyHealthLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const FamilyHealthLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const FamilyHealthLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _groupKey = 'family_group';
   static const String _summaryKey = 'family_group_summary';
 
   @override
-  Future<void> cacheGroup(FamilyGroupApiModel payload) {
-    final hiveModel = FamilyGroupHiveModel.fromApiModel(payload);
+  Future<void> saveGroup(FamilyGroupApiModel data) {
+    final hiveModel = FamilyGroupHiveModel.fromApiModel(data);
     return _cacheService.writeMap(_groupKey, hiveModel.toJson());
   }
 
   @override
-  Future<FamilyGroupApiModel?> getCachedGroup() async {
+  Future<FamilyGroupApiModel?> getGroup() async {
     final cached = await _cacheService.readMap(_groupKey);
     if (cached == null) return null;
     final hiveModel = FamilyGroupHiveModel.fromJson(cached);
@@ -32,13 +35,13 @@ class FamilyHealthLocalDataSource implements IFamilyHealthLocalDataSource {
   }
 
   @override
-  Future<void> cacheSummary(FamilyGroupSummaryApiModel payload) {
-    final hiveModel = FamilyGroupSummaryHiveModel.fromApiModel(payload);
+  Future<void> saveSummary(FamilyGroupSummaryApiModel data) {
+    final hiveModel = FamilyGroupSummaryHiveModel.fromApiModel(data);
     return _cacheService.writeMap(_summaryKey, hiveModel.toJson());
   }
 
   @override
-  Future<FamilyGroupSummaryApiModel?> getCachedSummary() async {
+  Future<FamilyGroupSummaryApiModel?> getSummary() async {
     final cached = await _cacheService.readMap(_summaryKey);
     if (cached == null) return null;
     final hiveModel = FamilyGroupSummaryHiveModel.fromJson(cached);

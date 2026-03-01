@@ -27,29 +27,41 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
     required IFamilyHealthRemoteDataSource remoteDataSource,
     required IFamilyHealthLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, FamilyGroupEntity>> getMyGroup() async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getMyGroup();
-        await _localDataSource.cacheGroup(remote);
+        await _localDataSource.saveGroup(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch family group'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? 'Failed to fetch family group',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedGroup();
+    final cached = await _localDataSource.getGroup();
     if (cached != null) {
       return Right(cached.toEntity());
     }
-    return const Left(ApiFailure(message: 'No internet connection and no cached family group available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached family group available.',
+      ),
+    );
   }
 
   @override
@@ -57,29 +69,50 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getMyGroupSummary();
-        await _localDataSource.cacheSummary(remote);
+        await _localDataSource.saveSummary(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch family summary'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? 'Failed to fetch family summary',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedSummary();
+    final cached = await _localDataSource.getSummary();
     if (cached != null) {
       return Right(cached.toEntity());
     }
-    return const Left(ApiFailure(message: 'No internet connection and no cached family summary available.'));
+    return const Left(
+      ApiFailure(
+        message:
+            'No internet connection and no cached family summary available.',
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, FamilyGroupEntity>> createGroup(Map<String, dynamic> payload) {
-    return _performGroupMutation(() => _remoteDataSource.createGroup(payload), 'Failed to create family group');
+  Future<Either<Failure, FamilyGroupEntity>> createGroup(
+    Map<String, dynamic> payload,
+  ) {
+    return _performGroupMutation(
+      () => _remoteDataSource.createGroup(payload),
+      'Failed to create family group',
+    );
   }
 
   @override
-  Future<Either<Failure, FamilyInviteEntity>> createInvite(String groupId, Map<String, dynamic> payload) async {
+  Future<Either<Failure, FamilyInviteEntity>> createInvite(
+    String groupId,
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       return const Left(ApiFailure(message: 'No internet connection.'));
     }
@@ -88,15 +121,29 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
       final result = await _remoteDataSource.createInvite(groupId, payload);
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to create invite link'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message:
+              e.response?.data['message'] ?? 'Failed to create invite link',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, FamilyGroupEntity>> addMember(String groupId, Map<String, dynamic> payload) {
-    return _performGroupMutation(() => _remoteDataSource.addMember(groupId, payload), 'Failed to add family member');
+  Future<Either<Failure, FamilyGroupEntity>> addMember(
+    String groupId,
+    Map<String, dynamic> payload,
+  ) {
+    return _performGroupMutation(
+      () => _remoteDataSource.addMember(groupId, payload),
+      'Failed to add family member',
+    );
   }
 
   @override
@@ -112,8 +159,14 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
   }
 
   @override
-  Future<Either<Failure, FamilyGroupEntity>> joinWithInvite(String token, Map<String, dynamic> payload) {
-    return _performGroupMutation(() => _remoteDataSource.joinWithInvite(token, payload), 'Failed to join family group');
+  Future<Either<Failure, FamilyGroupEntity>> joinWithInvite(
+    String token,
+    Map<String, dynamic> payload,
+  ) {
+    return _performGroupMutation(
+      () => _remoteDataSource.joinWithInvite(token, payload),
+      'Failed to join family group',
+    );
   }
 
   Future<Either<Failure, FamilyGroupEntity>> _performGroupMutation(
@@ -126,12 +179,19 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
 
     try {
       final result = await run();
-      await _localDataSource.cacheGroup(result);
+      await _localDataSource.saveGroup(result);
       return Right(result.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? fallbackMessage));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? fallbackMessage,
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 }
