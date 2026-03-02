@@ -6,19 +6,21 @@ import 'package:vaidya/features/intelligence/data/models/intelligence_api_model.
 
 final intelligenceLocalDataSourceProvider =
     Provider<IIntelligenceLocalDataSource>((ref) {
-      return IntelligenceLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
+      return IntelligenceLocalDataSource(
+        saveService: ref.read(featureCacheServiceProvider),
+      );
     });
 
 class IntelligenceLocalDataSource implements IIntelligenceLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const IntelligenceLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const IntelligenceLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _insightsKey = 'intelligence_ai_insights';
 
   @override
-  Future<void> cacheInsights(List<AiInsightApiModel> items) {
+  Future<void> saveInsights(List<AiInsightApiModel> items) {
     final normalized = items
         .map((item) => AiInsightHiveModel.fromApiModel(item).toJson())
         .toList(growable: false);
@@ -26,7 +28,7 @@ class IntelligenceLocalDataSource implements IIntelligenceLocalDataSource {
   }
 
   @override
-  Future<List<AiInsightApiModel>> getCachedInsights() async {
+  Future<List<AiInsightApiModel>> getInsights() async {
     final cached = await _cacheService.readList(_insightsKey);
     return cached
         .map((item) => AiInsightHiveModel.fromJson(item).toApiModel())

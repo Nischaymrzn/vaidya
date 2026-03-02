@@ -6,19 +6,22 @@ import 'package:vaidya/features/intelligence/data/models/health_insight_hive_mod
 
 final healthInsightsLocalDataSourceProvider =
     Provider<IHealthInsightsLocalDataSource>((ref) {
-      return HealthInsightsLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
+      return HealthInsightsLocalDataSource(
+        saveService: ref.read(featureCacheServiceProvider),
+      );
     });
 
 class HealthInsightsLocalDataSource implements IHealthInsightsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const HealthInsightsLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const HealthInsightsLocalDataSource({
+    required FeatureCacheService saveService,
+  }) : _cacheService = saveService;
 
   static const String _itemsKey = 'health_insights_items';
 
   @override
-  Future<void> cacheInsights(List<HealthInsightApiModel> items) {
+  Future<void> saveInsights(List<HealthInsightApiModel> items) {
     final normalized = items
         .map((item) => HealthInsightHiveModel.fromApiModel(item).toJson())
         .toList(growable: false);
@@ -26,7 +29,7 @@ class HealthInsightsLocalDataSource implements IHealthInsightsLocalDataSource {
   }
 
   @override
-  Future<List<HealthInsightApiModel>> getCachedInsights() async {
+  Future<List<HealthInsightApiModel>> getInsights() async {
     final cached = await _cacheService.readList(_itemsKey);
     return cached
         .map((item) => HealthInsightHiveModel.fromJson(item).toApiModel())
