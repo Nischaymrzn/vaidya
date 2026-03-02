@@ -27,73 +27,95 @@ class PredictionRepository implements IPredictionRepository {
     required IPredictionRemoteDataSource remoteDataSource,
     required IPredictionLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
-  Future<Either<Failure, PredictionEntity>> predictSymptom(List<String> symptoms) {
+  Future<Either<Failure, PredictionEntity>> predictSymptom(
+    List<String> symptoms,
+  ) {
     return _runPrediction(
-      cacheKey: 'symptom',
+      saveKey: 'symptom',
       runRemote: () => _remoteDataSource.predictSymptom(symptoms),
-      offlineMessage: 'No internet connection and no cached symptom prediction available.',
+      offlineMessage:
+          'No internet connection and no cached symptom prediction available.',
     );
   }
 
   @override
-  Future<Either<Failure, PredictionEntity>> predictHeartDisease(Map<String, dynamic> payload) {
+  Future<Either<Failure, PredictionEntity>> predictHeartDisease(
+    Map<String, dynamic> payload,
+  ) {
     return _runPrediction(
-      cacheKey: 'heart_disease',
+      saveKey: 'heart_disease',
       runRemote: () => _remoteDataSource.predictHeartDisease(payload),
-      offlineMessage: 'No internet connection and no cached heart disease prediction available.',
+      offlineMessage:
+          'No internet connection and no cached heart disease prediction available.',
     );
   }
 
   @override
-  Future<Either<Failure, PredictionEntity>> predictDiabetes(Map<String, dynamic> payload) {
+  Future<Either<Failure, PredictionEntity>> predictDiabetes(
+    Map<String, dynamic> payload,
+  ) {
     return _runPrediction(
-      cacheKey: 'diabetes',
+      saveKey: 'diabetes',
       runRemote: () => _remoteDataSource.predictDiabetes(payload),
-      offlineMessage: 'No internet connection and no cached diabetes prediction available.',
+      offlineMessage:
+          'No internet connection and no cached diabetes prediction available.',
     );
   }
 
   @override
-  Future<Either<Failure, PredictionEntity>> predictBrainTumor(String imagePath) {
+  Future<Either<Failure, PredictionEntity>> predictBrainTumor(
+    String imagePath,
+  ) {
     return _runPrediction(
-      cacheKey: 'brain_tumor',
+      saveKey: 'brain_tumor',
       runRemote: () => _remoteDataSource.predictBrainTumor(imagePath),
-      offlineMessage: 'No internet connection and no cached brain tumor prediction available.',
+      offlineMessage:
+          'No internet connection and no cached brain tumor prediction available.',
     );
   }
 
   @override
-  Future<Either<Failure, PredictionEntity>> predictTuberculosis(String imagePath) {
+  Future<Either<Failure, PredictionEntity>> predictTuberculosis(
+    String imagePath,
+  ) {
     return _runPrediction(
-      cacheKey: 'tuberculosis',
+      saveKey: 'tuberculosis',
       runRemote: () => _remoteDataSource.predictTuberculosis(imagePath),
-      offlineMessage: 'No internet connection and no cached tuberculosis prediction available.',
+      offlineMessage:
+          'No internet connection and no cached tuberculosis prediction available.',
     );
   }
 
   Future<Either<Failure, PredictionEntity>> _runPrediction({
-    required String cacheKey,
+    required String saveKey,
     required Future<PredictionApiModel> Function() runRemote,
     required String offlineMessage,
   }) async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await runRemote();
-        await _localDataSource.cacheResult(cacheKey, remote);
+        await _localDataSource.saveResult(saveKey, remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Prediction failed'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? 'Prediction failed',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedResult(cacheKey);
+    final cached = await _localDataSource.getResult(saveKey);
     if (cached != null) {
       return Right(cached.toEntity());
     }
