@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vaidya/core/services/storage/user_session_service.dart';
+import 'package:vaidya/core/utils/snackbar_utils.dart';
+import 'package:vaidya/core/widgets/app_button_styles.dart';
 import 'package:vaidya/features/intelligence/presentation/services/intelligence_report_service.dart';
+import 'package:vaidya/features/intelligence/presentation/services/premium_report_access_service.dart';
 import 'package:vaidya/features/intelligence/presentation/view_model/prediction_viewmodel.dart';
 import 'package:vaidya/themes/colors.dart';
 
@@ -66,7 +70,8 @@ class _HeartDiseasePredictionScreenState
 
     if (!ok) {
       setState(
-        () => _errorText = state.errorMessage ?? 'Unable to generate prediction.',
+        () =>
+            _errorText = state.errorMessage ?? 'Unable to generate prediction.',
       );
       return;
     }
@@ -79,7 +84,18 @@ class _HeartDiseasePredictionScreenState
   }
 
   Future<void> _downloadReport() async {
-    if (_result == null) return;
+    if (_result == null) {
+      SnackbarUtils.showWarning(
+        context,
+        'Run heart disease analysis before downloading report.',
+      );
+      return;
+    }
+    final allowed = await PremiumReportAccessService.ensurePremiumAccess(
+      context,
+      ref,
+    );
+    if (!allowed) return;
 
     final probability = _readHeartProbability(_result);
     final riskLevel = (_result?['riskLevel'] ?? 'Low').toString();
@@ -98,62 +114,105 @@ class _HeartDiseasePredictionScreenState
         .where((e) => e.isNotEmpty)
         .toList(growable: false);
 
-    final path = await IntelligenceReportService.downloadPredictionReport(
-      filename: 'heart-disease-risk-report.pdf',
-      title: 'Heart Disease Risk Report',
-      summary: summary,
-      metrics: [
-        PredictionReportMetric(
-          label: 'Heart disease probability',
-          value: probability == null ? 'N/A' : '$probability%',
+    try {
+      final path = await IntelligenceReportService.downloadPredictionReport(
+        filename: 'heart-disease-risk-report.pdf',
+        title: 'Heart Disease Risk Report',
+        summary: summary,
+        patient: PredictionReportPatient(
+          name: 'Member',
+          age: _ageController.text.trim(),
+          sex: _gender,
         ),
-        PredictionReportMetric(
-          label: 'Risk level',
-          value: riskLevel,
+        meta: PredictionReportMeta(
+          module: 'Heart Disease Prediction',
+          collectedAt: DateTime.now().toIso8601String(),
+          referredBy: 'Vaidya AI',
         ),
-        PredictionReportMetric(
-          label: 'Prediction',
-          value: _predictionLabel(_result?['prediction']),
-        ),
-        PredictionReportMetric(
-          label: 'Age',
-          value: _ageController.text.trim(),
-        ),
-        PredictionReportMetric(
-          label: 'BMI',
-          value: _bmiController.text.trim(),
-        ),
-        PredictionReportMetric(
-          label: 'HbA1c',
-          value: _hba1cController.text.trim(),
-        ),
-        PredictionReportMetric(
-          label: 'Blood glucose',
-          value: _glucoseController.text.trim(),
-        ),
-      ],
-      findings: insights,
-      recommendations: const [
-        'Keep blood pressure and glucose tracking consistent.',
-        'Review high/moderate risk outputs with a clinician.',
-        'Update labs periodically for better confidence.',
-      ],
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Report downloaded to: $path',
-          style: const TextStyle(fontFamily: 'Urbanist'),
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+        comments: const [
+          'Results combine your input with recent health history to fine-tune probability.',
+        ],
+        metrics: [
+          PredictionReportMetric(
+            label: 'Heart disease probability',
+            value: probability == null ? 'N/A' : '$probability%',
+            reference: '0-100',
+            status: riskLevel,
+            unit: '%',
+          ),
+          PredictionReportMetric(
+            label: 'Risk level',
+            value: riskLevel,
+            reference: 'Low / Moderate / High',
+            status: riskLevel,
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Prediction',
+            value: _predictionLabel(_result?['prediction']),
+            reference: 'Model output',
+            status: 'AI',
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Age',
+            value: _ageController.text.trim(),
+            reference: 'Adult',
+            status: 'Input',
+            unit: 'years',
+          ),
+          PredictionReportMetric(
+            label: 'BMI',
+            value: _bmiController.text.trim(),
+            reference: '18.5-24.9',
+            status: riskLevel,
+            unit: 'kg/m2',
+          ),
+          PredictionReportMetric(
+            label: 'HbA1c',
+            value: _hba1cController.text.trim(),
+            reference: '<5.7',
+            status: riskLevel,
+            unit: '%',
+          ),
+          PredictionReportMetric(
+            label: 'Blood glucose',
+            value: _glucoseController.text.trim(),
+            reference: '70-140',
+            status: riskLevel,
+            unit: 'mg/dL',
+          ),
+        ],
+        findings: insights,
+        recommendations: const [
+          'Keep blood pressure and glucose tracking consistent.',
+          'Review high/moderate risk outputs with a clinician.',
+          'Update labs periodically for better confidence.',
+        ],
+      );
+      if (!mounted) return;
+      final fileName = path.split(RegExp(r'[/\\\\]')).last.trim();
+      SnackbarUtils.showSuccess(
+        context,
+        fileName.isEmpty
+            ? 'Heart disease report downloaded successfully.'
+            : 'Heart disease report downloaded: $fileName',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      SnackbarUtils.showError(
+        context,
+        'Unable to download heart disease report. Please try again.',
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(predictionViewModelProvider);
+    final isPremium = ref
+        .read(userSessionServiceProvider)
+        .getCurrentUserIsPremium();
     final isSubmitting = state.isSubmitting;
     final probability = _readHeartProbability(_result);
     final nonHeart = _readNonHeartProbability(_result);
@@ -169,7 +228,7 @@ class _HeartDiseasePredictionScreenState
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           'Heart Disease Prediction',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -183,7 +242,7 @@ class _HeartDiseasePredictionScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Personalized estimates based on blood pressure, metabolic markers, lifestyle, and history.',
               style: TextStyle(
                 color: AppColors.textSecondary,
@@ -285,7 +344,8 @@ class _HeartDiseasePredictionScreenState
                             value: _cardiacHistory,
                             items: const ['0', '1'],
                             labels: const {'0': 'No', '1': 'Yes'},
-                            onChanged: (v) => setState(() => _cardiacHistory = v),
+                            onChanged: (v) =>
+                                setState(() => _cardiacHistory = v),
                           ),
                         ),
                       ],
@@ -296,14 +356,16 @@ class _HeartDiseasePredictionScreenState
                       child: ElevatedButton(
                         onPressed: isSubmitting ? null : _analyze,
                         style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(46),
+                          minimumSize: Size.fromHeight(46),
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(999),
                           ),
                         ),
-                        child: Text(isSubmitting ? 'Analyzing...' : 'Analyze heart risk'),
+                        child: Text(
+                          isSubmitting ? 'Analyzing...' : 'Analyze heart risk',
+                        ),
                       ),
                     ),
                   ],
@@ -318,7 +380,7 @@ class _HeartDiseasePredictionScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Heart disease probability',
                         style: TextStyle(
                           color: AppColors.textSecondary,
@@ -332,7 +394,7 @@ class _HeartDiseasePredictionScreenState
                   const SizedBox(height: 4),
                   Text(
                     probability == null ? '--' : '$probability%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -368,14 +430,18 @@ class _HeartDiseasePredictionScreenState
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _result == null ? null : _downloadReport,
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text('Download report PDF'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
+                      icon: Icon(
+                        isPremium
+                            ? Icons.download_rounded
+                            : Icons.lock_outline_rounded,
+                        size: 18,
                       ),
+                      label: Text(
+                        isPremium
+                            ? 'Download report PDF'
+                            : 'Unlock PDF download',
+                      ),
+                      style: AppButtonStyles.pillOutlined(),
                     ),
                   ),
                 ],
@@ -387,13 +453,13 @@ class _HeartDiseasePredictionScreenState
               child: insights.isEmpty
                   ? Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(14),
+                      padding: EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: AppColors.border),
-                        color: const Color(0xFFF8FAFC),
+                        color: AppColors.surfaceSoft,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Generate a prediction to view personalized insights.',
                         style: TextStyle(
                           color: AppColors.textSecondary,
@@ -408,18 +474,18 @@ class _HeartDiseasePredictionScreenState
                             (insight) => Container(
                               width: double.infinity,
                               margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: AppColors.border),
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceSoft,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     (insight['title'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -428,7 +494,7 @@ class _HeartDiseasePredictionScreenState
                                   const SizedBox(height: 3),
                                   Text(
                                     (insight['description'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -451,7 +517,7 @@ class _HeartDiseasePredictionScreenState
   Widget _panel({required String title, required Widget child}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
@@ -462,7 +528,7 @@ class _HeartDiseasePredictionScreenState
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 20 / 1.2,
               fontWeight: FontWeight.w600,
@@ -514,10 +580,8 @@ class _HeartDiseasePredictionScreenState
       ),
       items: items
           .map(
-            (v) => DropdownMenuItem<String>(
-              value: v,
-              child: Text(labels[v] ?? v),
-            ),
+            (v) =>
+                DropdownMenuItem<String>(value: v, child: Text(labels[v] ?? v)),
           )
           .toList(),
       onChanged: (v) {
@@ -540,10 +604,10 @@ class _HeartDiseasePredictionScreenState
         break;
       case 'low':
         bg = const Color(0xFFECFDF5);
-        fg = const Color(0xFF047857);
+        fg = Color(0xFF047857);
         break;
       default:
-        bg = const Color(0xFFE2E8F0);
+        bg = AppColors.border;
         fg = const Color(0xFF334155);
     }
     return Container(
@@ -554,11 +618,7 @@ class _HeartDiseasePredictionScreenState
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: fg,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -571,7 +631,7 @@ class _HeartDiseasePredictionScreenState
           Expanded(
             child: Text(
               k,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -580,7 +640,7 @@ class _HeartDiseasePredictionScreenState
           ),
           Text(
             v,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -621,3 +681,4 @@ class _HeartDiseasePredictionScreenState
     return null;
   }
 }
+
