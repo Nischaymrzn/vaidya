@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vaidya/core/services/storage/user_session_service.dart';
+import 'package:vaidya/core/utils/snackbar_utils.dart';
+import 'package:vaidya/core/widgets/app_button_styles.dart';
 import 'package:vaidya/features/intelligence/presentation/services/intelligence_report_service.dart';
+import 'package:vaidya/features/intelligence/presentation/services/premium_report_access_service.dart';
 import 'package:vaidya/features/intelligence/presentation/view_model/prediction_viewmodel.dart';
 import 'package:vaidya/themes/colors.dart';
 
@@ -66,7 +70,8 @@ class _DiabetesPredictionScreenState
 
     if (!ok) {
       setState(
-        () => _errorText = state.errorMessage ?? 'Unable to generate prediction.',
+        () =>
+            _errorText = state.errorMessage ?? 'Unable to generate prediction.',
       );
       return;
     }
@@ -79,9 +84,21 @@ class _DiabetesPredictionScreenState
   }
 
   Future<void> _downloadReport() async {
-    if (_result == null) return;
+    if (_result == null) {
+      SnackbarUtils.showWarning(
+        context,
+        'Run diabetes analysis before downloading report.',
+      );
+      return;
+    }
+    final allowed = await PremiumReportAccessService.ensurePremiumAccess(
+      context,
+      ref,
+    );
+    if (!allowed) return;
     final probability = (_result?['probability'] ?? '--').toString();
     final riskLevel = (_result?['riskLevel'] ?? 'Low').toString();
+    final predictionLabel = (_result?['prediction'] ?? '--').toString();
 
     final findings = ((_result?['insights'] as List?) ?? const [])
         .whereType<Map>()
@@ -94,57 +111,113 @@ class _DiabetesPredictionScreenState
         .where((e) => e.isNotEmpty)
         .toList(growable: false);
 
-    final path = await IntelligenceReportService.downloadPredictionReport(
-      filename: 'diabetes-risk-report.pdf',
-      title: 'Diabetes Risk Report',
-      summary: 'Predicted diabetes probability is $probability% ($riskLevel risk).',
-      metrics: [
-        PredictionReportMetric(label: 'Probability', value: '$probability%'),
-        PredictionReportMetric(label: 'Risk level', value: riskLevel),
-        PredictionReportMetric(
-          label: 'Prediction',
-          value: (_result?['prediction'] ?? '--').toString(),
+    try {
+      final path = await IntelligenceReportService.downloadPredictionReport(
+        filename: 'diabetes-risk-report.pdf',
+        title: 'Diabetes Risk Report',
+        summary:
+            'Predicted diabetes probability is $probability% ($riskLevel risk).',
+        patient: PredictionReportPatient(
+          name: 'Member',
+          age: _ageController.text.trim(),
+          sex: 'N/A',
         ),
-        PredictionReportMetric(
-          label: 'Glucose',
-          value: _glucoseController.text.trim(),
-          note: 'mg/dL',
+        meta: PredictionReportMeta(
+          module: 'Diabetes Prediction',
+          collectedAt: DateTime.now().toIso8601String(),
+          referredBy: 'Vaidya AI',
         ),
-        PredictionReportMetric(
-          label: 'HbA1c',
-          value: _hba1cController.text.trim(),
-          note: '%',
-        ),
-        PredictionReportMetric(label: 'BMI', value: _bmiController.text.trim()),
-        PredictionReportMetric(label: 'Age', value: _ageController.text.trim()),
-        PredictionReportMetric(
-          label: 'Blood pressure',
-          value: _bpController.text.trim(),
-          note: 'mmHg',
-        ),
-      ],
-      findings: findings,
-      recommendations: const [
-        'Continue periodic glucose and HbA1c monitoring.',
-        'Keep BMI and blood pressure within target range.',
-        'Review moderate/high risk outputs with your clinician.',
-      ],
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Report downloaded to: $path',
-          style: const TextStyle(fontFamily: 'Urbanist'),
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+        comments: [
+          'Run analysis to view personalized insights and recommendations.',
+        ],
+        metrics: [
+          PredictionReportMetric(
+            label: 'Probability',
+            value: '$probability%',
+            reference: '0-100',
+            status: riskLevel,
+            unit: '%',
+          ),
+          PredictionReportMetric(
+            label: 'Risk level',
+            value: riskLevel,
+            reference: 'Low / Moderate / High',
+            status: riskLevel,
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Prediction',
+            value: predictionLabel,
+            reference: 'Model output',
+            status: 'AI',
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Fasting glucose',
+            value: _glucoseController.text.trim(),
+            reference: '70-99',
+            status: riskLevel,
+            unit: 'mg/dL',
+          ),
+          PredictionReportMetric(
+            label: 'HbA1c',
+            value: _hba1cController.text.trim(),
+            reference: '<5.7',
+            status: riskLevel,
+            unit: '%',
+          ),
+          PredictionReportMetric(
+            label: 'BMI',
+            value: _bmiController.text.trim(),
+            reference: '18.5-24.9',
+            status: riskLevel,
+            unit: 'kg/m2',
+          ),
+          PredictionReportMetric(
+            label: 'Age',
+            value: _ageController.text.trim(),
+            reference: 'Adult',
+            status: 'Input',
+            unit: 'years',
+          ),
+          PredictionReportMetric(
+            label: 'Blood pressure',
+            value: _bpController.text.trim(),
+            reference: '90-120',
+            status: riskLevel,
+            unit: 'mmHg',
+          ),
+        ],
+        findings: findings,
+        recommendations: const [
+          'Continue periodic glucose and HbA1c monitoring.',
+          'Keep BMI and blood pressure within target range.',
+          'Review moderate/high risk outputs with your clinician.',
+        ],
+      );
+      if (!mounted) return;
+      final fileName = path.split(RegExp(r'[/\\\\]')).last.trim();
+      SnackbarUtils.showSuccess(
+        context,
+        fileName.isEmpty
+            ? 'Diabetes report downloaded successfully.'
+            : 'Diabetes report downloaded: $fileName',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      SnackbarUtils.showError(
+        context,
+        'Unable to download diabetes report. Please try again.',
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(predictionViewModelProvider);
+    final isPremium = ref
+        .read(userSessionServiceProvider)
+        .getCurrentUserIsPremium();
     final isSubmitting = state.isSubmitting;
     final riskLevel = (_result?['riskLevel'] ?? 'Waiting').toString();
     final probability = (_result?['probability']?.toString() ?? '--');
@@ -159,7 +232,7 @@ class _DiabetesPredictionScreenState
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           'Diabetes Prediction',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -173,7 +246,7 @@ class _DiabetesPredictionScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Fast risk estimation based on metabolic markers and lifestyle signals.',
               style: TextStyle(
                 color: AppColors.textSecondary,
@@ -208,7 +281,14 @@ class _DiabetesPredictionScreenState
                       children: [
                         Expanded(child: _field(_bmiController, 'BMI', '23.4')),
                         const SizedBox(width: 10),
-                        Expanded(child: _field(_ageController, 'Age', '32', isInt: true)),
+                        Expanded(
+                          child: _field(
+                            _ageController,
+                            'Age',
+                            '32',
+                            isInt: true,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 10),
@@ -234,7 +314,10 @@ class _DiabetesPredictionScreenState
                             ),
                             items: const [
                               DropdownMenuItem(value: 'no', child: Text('No')),
-                              DropdownMenuItem(value: 'yes', child: Text('Yes')),
+                              DropdownMenuItem(
+                                value: 'yes',
+                                child: Text('Yes'),
+                              ),
                             ],
                             onChanged: (v) {
                               if (v != null) setState(() => _familyHistory = v);
@@ -249,7 +332,7 @@ class _DiabetesPredictionScreenState
                       child: ElevatedButton(
                         onPressed: isSubmitting ? null : _analyze,
                         style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(46),
+                          minimumSize: Size.fromHeight(46),
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
@@ -275,7 +358,7 @@ class _DiabetesPredictionScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Risk score',
                         style: TextStyle(
                           color: AppColors.textSecondary,
@@ -289,7 +372,7 @@ class _DiabetesPredictionScreenState
                   const SizedBox(height: 4),
                   Text(
                     probability == '--' ? '--' : '$probability%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 32,
                       fontWeight: FontWeight.w600,
@@ -319,14 +402,18 @@ class _DiabetesPredictionScreenState
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _result == null ? null : _downloadReport,
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text('Download report PDF'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
+                      icon: Icon(
+                        isPremium
+                            ? Icons.download_rounded
+                            : Icons.lock_outline_rounded,
+                        size: 18,
                       ),
+                      label: Text(
+                        isPremium
+                            ? 'Download report PDF'
+                            : 'Unlock PDF download',
+                      ),
+                      style: AppButtonStyles.pillOutlined(),
                     ),
                   ),
                 ],
@@ -336,7 +423,7 @@ class _DiabetesPredictionScreenState
             _panel(
               title: 'Lifestyle recommendations',
               child: insights.isEmpty
-                  ? const Text(
+                  ? Text(
                       'Generate a prediction to view personalized insights.',
                       style: TextStyle(
                         color: AppColors.textSecondary,
@@ -350,18 +437,18 @@ class _DiabetesPredictionScreenState
                             (insight) => Container(
                               width: double.infinity,
                               margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: AppColors.border),
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceSoft,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     (insight['title'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -370,7 +457,7 @@ class _DiabetesPredictionScreenState
                                   const SizedBox(height: 3),
                                   Text(
                                     (insight['description'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -393,7 +480,7 @@ class _DiabetesPredictionScreenState
   Widget _panel({required String title, required Widget child}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
@@ -404,7 +491,7 @@ class _DiabetesPredictionScreenState
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 20 / 1.2,
               fontWeight: FontWeight.w600,
@@ -458,10 +545,10 @@ class _DiabetesPredictionScreenState
         break;
       case 'low':
         bg = const Color(0xFFECFDF5);
-        fg = const Color(0xFF047857);
+        fg = Color(0xFF047857);
         break;
       default:
-        bg = const Color(0xFFE2E8F0);
+        bg = AppColors.border;
         fg = const Color(0xFF334155);
     }
     return Container(
@@ -472,12 +559,9 @@ class _DiabetesPredictionScreenState
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: fg,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w600),
       ),
     );
   }
 }
+

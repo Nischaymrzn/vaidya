@@ -3,7 +3,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vaidya/core/services/storage/user_session_service.dart';
+import 'package:vaidya/core/utils/snackbar_utils.dart';
+import 'package:vaidya/core/widgets/app_button_styles.dart';
 import 'package:vaidya/features/intelligence/presentation/services/intelligence_report_service.dart';
+import 'package:vaidya/features/intelligence/presentation/services/premium_report_access_service.dart';
 import 'package:vaidya/features/intelligence/presentation/view_model/prediction_viewmodel.dart';
 import 'package:vaidya/themes/colors.dart';
 
@@ -43,7 +47,9 @@ class _BrainTumorPredictionScreenState
     setState(() => _errorText = null);
 
     if (_imagePath == null || _imagePath!.trim().isEmpty) {
-      setState(() => _errorText = 'Please upload an MRI scan image before analysis.');
+      setState(
+        () => _errorText = 'Please upload an MRI scan image before analysis.',
+      );
       return;
     }
 
@@ -56,7 +62,8 @@ class _BrainTumorPredictionScreenState
 
     if (!ok) {
       setState(
-        () => _errorText = state.errorMessage ?? 'Unable to generate prediction.',
+        () =>
+            _errorText = state.errorMessage ?? 'Unable to generate prediction.',
       );
       return;
     }
@@ -69,7 +76,18 @@ class _BrainTumorPredictionScreenState
   }
 
   Future<void> _downloadReport() async {
-    if (_result == null) return;
+    if (_result == null) {
+      SnackbarUtils.showWarning(
+        context,
+        'Run brain tumor analysis before downloading report.',
+      );
+      return;
+    }
+    final allowed = await PremiumReportAccessService.ensurePremiumAccess(
+      context,
+      ref,
+    );
+    if (!allowed) return;
     final probability = (_result?['probability'] ?? '--').toString();
     final prediction = (_result?['prediction'] ?? '--').toString();
 
@@ -84,42 +102,108 @@ class _BrainTumorPredictionScreenState
         .where((e) => e.isNotEmpty)
         .toList(growable: false);
 
-    final path = await IntelligenceReportService.downloadPredictionReport(
-      filename: 'brain-tumor-risk-report.pdf',
-      title: 'Brain Tumor Risk Report',
-      summary: 'Prediction is "$prediction" with confidence $probability%.',
-      metrics: [
-        PredictionReportMetric(label: 'Prediction', value: prediction),
-        PredictionReportMetric(label: 'Probability', value: '$probability%'),
-        PredictionReportMetric(label: 'Age group', value: _ageGroup),
-        PredictionReportMetric(label: 'Symptom severity', value: _severity),
-        PredictionReportMetric(label: 'Persistent headaches', value: _yesNo(_headache)),
-        PredictionReportMetric(label: 'Vision changes', value: _yesNo(_vision)),
-        PredictionReportMetric(label: 'Dizziness', value: _yesNo(_dizziness)),
-        PredictionReportMetric(label: 'Seizures', value: _yesNo(_seizures)),
-      ],
-      findings: insights,
-      recommendations: const [
-        'Consult a clinician for moderate/high risk outputs.',
-        'Upload follow-up MRI scans to refine trend interpretation.',
-        'Track neurological symptoms consistently.',
-      ],
-    );
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Report downloaded to: $path',
-          style: const TextStyle(fontFamily: 'Urbanist'),
+    try {
+      final path = await IntelligenceReportService.downloadPredictionReport(
+        filename: 'brain-tumor-risk-report.pdf',
+        title: 'Brain Tumor Risk Report',
+        summary: 'Prediction is "$prediction" with confidence $probability%.',
+        patient: const PredictionReportPatient(name: 'Member', sex: 'N/A'),
+        meta: PredictionReportMeta(
+          module: 'Brain Tumor Prediction',
+          collectedAt: DateTime.now().toIso8601String(),
+          referredBy: 'Vaidya AI',
         ),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+        comments: const [
+          'Run analysis to view imaging signals and risk summary.',
+        ],
+        metrics: [
+          PredictionReportMetric(
+            label: 'Prediction',
+            value: prediction,
+            reference: 'Model output',
+            status: prediction,
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Probability',
+            value: '$probability%',
+            reference: '0-100',
+            status: prediction,
+            unit: '%',
+          ),
+          PredictionReportMetric(
+            label: 'Age group',
+            value: _ageGroup,
+            reference: 'Risk modifier',
+            status: 'Input',
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Symptom severity',
+            value: _severity,
+            reference: 'Clinical scale',
+            status: 'Input',
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Persistent headaches',
+            value: _yesNo(_headache),
+            reference: 'Symptom',
+            status: _yesNo(_headache),
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Vision changes',
+            value: _yesNo(_vision),
+            reference: 'Symptom',
+            status: _yesNo(_vision),
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Dizziness',
+            value: _yesNo(_dizziness),
+            reference: 'Symptom',
+            status: _yesNo(_dizziness),
+            unit: '-',
+          ),
+          PredictionReportMetric(
+            label: 'Seizures',
+            value: _yesNo(_seizures),
+            reference: 'Symptom',
+            status: _yesNo(_seizures),
+            unit: '-',
+          ),
+        ],
+        findings: insights,
+        recommendations: const [
+          'Consult a clinician for moderate/high risk outputs.',
+          'Upload follow-up MRI scans to refine trend interpretation.',
+          'Track neurological symptoms consistently.',
+        ],
+      );
+      if (!mounted) return;
+      final fileName = path.split(RegExp(r'[/\\\\]')).last.trim();
+      SnackbarUtils.showSuccess(
+        context,
+        fileName.isEmpty
+            ? 'Brain tumor report downloaded successfully.'
+            : 'Brain tumor report downloaded: $fileName',
+      );
+    } catch (_) {
+      if (!mounted) return;
+      SnackbarUtils.showError(
+        context,
+        'Unable to download brain tumor report. Please try again.',
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(predictionViewModelProvider);
+    final isPremium = ref
+        .read(userSessionServiceProvider)
+        .getCurrentUserIsPremium();
     final isSubmitting = state.isSubmitting;
     final probability = (_result?['probability']?.toString() ?? '--');
     final prediction = (_result?['prediction']?.toString() ?? 'Waiting');
@@ -134,7 +218,7 @@ class _BrainTumorPredictionScreenState
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: const Text(
+        title: Text(
           'Brain Tumor Prediction',
           style: TextStyle(
             color: AppColors.textPrimary,
@@ -148,7 +232,7 @@ class _BrainTumorPredictionScreenState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Upload MRI scans and track neurological signals for AI-based risk estimation.',
               style: TextStyle(
                 color: AppColors.textSecondary,
@@ -167,7 +251,9 @@ class _BrainTumorPredictionScreenState
                       onPressed: _pickImage,
                       icon: const Icon(Icons.upload_rounded),
                       label: Text(
-                        _imagePath == null ? 'Upload MRI scan image' : 'Change MRI scan image',
+                        _imagePath == null
+                            ? 'Upload MRI scan image'
+                            : 'Change MRI scan image',
                       ),
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size.fromHeight(46),
@@ -224,9 +310,18 @@ class _BrainTumorPredictionScreenState
                             isDense: true,
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'youth', child: Text('Below 18')),
-                            DropdownMenuItem(value: 'adult', child: Text('18-50')),
-                            DropdownMenuItem(value: 'senior', child: Text('50+')),
+                            DropdownMenuItem(
+                              value: 'youth',
+                              child: Text('Below 18'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'adult',
+                              child: Text('18-50'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'senior',
+                              child: Text('50+'),
+                            ),
                           ],
                           onChanged: (v) {
                             if (v != null) setState(() => _ageGroup = v);
@@ -245,9 +340,18 @@ class _BrainTumorPredictionScreenState
                             isDense: true,
                           ),
                           items: const [
-                            DropdownMenuItem(value: 'mild', child: Text('Mild')),
-                            DropdownMenuItem(value: 'moderate', child: Text('Moderate')),
-                            DropdownMenuItem(value: 'severe', child: Text('Severe')),
+                            DropdownMenuItem(
+                              value: 'mild',
+                              child: Text('Mild'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'moderate',
+                              child: Text('Moderate'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'severe',
+                              child: Text('Severe'),
+                            ),
                           ],
                           onChanged: (v) {
                             if (v != null) setState(() => _severity = v);
@@ -262,7 +366,7 @@ class _BrainTumorPredictionScreenState
                     child: ElevatedButton(
                       onPressed: isSubmitting ? null : _analyze,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(46),
+                        minimumSize: Size.fromHeight(46),
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
@@ -270,7 +374,9 @@ class _BrainTumorPredictionScreenState
                         ),
                       ),
                       child: Text(
-                        isSubmitting ? 'Analyzing...' : 'Analyze brain tumor risk',
+                        isSubmitting
+                            ? 'Analyzing...'
+                            : 'Analyze brain tumor risk',
                       ),
                     ),
                   ),
@@ -283,7 +389,10 @@ class _BrainTumorPredictionScreenState
               child: Column(
                 children: [
                   _kv('Prediction', prediction),
-                  _kv('Probability', probability == '--' ? '--' : '$probability%'),
+                  _kv(
+                    'Probability',
+                    probability == '--' ? '--' : '$probability%',
+                  ),
                   const SizedBox(height: 10),
                   if (_errorText != null)
                     Container(
@@ -308,14 +417,18 @@ class _BrainTumorPredictionScreenState
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: _result == null ? null : _downloadReport,
-                      icon: const Icon(Icons.download_rounded, size: 18),
-                      label: const Text('Download report PDF'),
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size.fromHeight(44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999),
-                        ),
+                      icon: Icon(
+                        isPremium
+                            ? Icons.download_rounded
+                            : Icons.lock_outline_rounded,
+                        size: 18,
                       ),
+                      label: Text(
+                        isPremium
+                            ? 'Download report PDF'
+                            : 'Unlock PDF download',
+                      ),
+                      style: AppButtonStyles.pillOutlined(),
                     ),
                   ),
                 ],
@@ -325,7 +438,7 @@ class _BrainTumorPredictionScreenState
             _panel(
               title: 'Next steps',
               child: insights.isEmpty
-                  ? const Text(
+                  ? Text(
                       'Generate a prediction to view personalized insights.',
                       style: TextStyle(
                         color: AppColors.textSecondary,
@@ -339,18 +452,18 @@ class _BrainTumorPredictionScreenState
                             (insight) => Container(
                               width: double.infinity,
                               margin: const EdgeInsets.only(bottom: 8),
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(color: AppColors.border),
-                                color: const Color(0xFFF8FAFC),
+                                color: AppColors.surfaceSoft,
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     (insight['title'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -359,7 +472,7 @@ class _BrainTumorPredictionScreenState
                                   const SizedBox(height: 3),
                                   Text(
                                     (insight['description'] ?? '').toString(),
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textSecondary,
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
@@ -382,7 +495,7 @@ class _BrainTumorPredictionScreenState
   Widget _panel({required String title, required Widget child}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
@@ -393,7 +506,7 @@ class _BrainTumorPredictionScreenState
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 20 / 1.2,
               fontWeight: FontWeight.w600,
@@ -414,7 +527,7 @@ class _BrainTumorPredictionScreenState
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
@@ -424,7 +537,7 @@ class _BrainTumorPredictionScreenState
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
@@ -445,7 +558,7 @@ class _BrainTumorPredictionScreenState
           Expanded(
             child: Text(
               k,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.textSecondary,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -454,7 +567,7 @@ class _BrainTumorPredictionScreenState
           ),
           Text(
             v,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.textPrimary,
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -467,3 +580,4 @@ class _BrainTumorPredictionScreenState
 
   String _yesNo(bool value) => value ? 'Yes' : 'No';
 }
+
