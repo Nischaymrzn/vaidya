@@ -26,9 +26,9 @@ class IntelligenceRepository implements IIntelligenceRepository {
     required IIntelligenceRemoteDataSource remoteDataSource,
     required IIntelligenceLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, List<AiInsightEntity>>> generateInsights({
@@ -43,21 +43,33 @@ class IntelligenceRepository implements IIntelligenceRepository {
           maxItems: maxItems,
           force: force,
         );
-        await _localDataSource.cacheInsights(remote);
+        await _localDataSource.saveInsights(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to generate AI insights'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? 'Failed to generate AI insights',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedInsights();
+    final cached = await _localDataSource.getInsights();
     if (cached.isNotEmpty) {
       return Right(cached.map((e) => e.toEntity()).toList(growable: false));
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached AI insights available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached AI insights available.',
+      ),
+    );
   }
 
   @override
@@ -70,12 +82,22 @@ class IntelligenceRepository implements IIntelligenceRepository {
     }
 
     try {
-      final remote = await _remoteDataSource.chat(messages: messages, doctor: doctor);
+      final remote = await _remoteDataSource.chat(
+        messages: messages,
+        doctor: doctor,
+      );
       return Right(remote.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to get AI reply'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to get AI reply',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 }
