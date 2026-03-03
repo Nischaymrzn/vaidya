@@ -7,15 +7,15 @@ import 'package:vaidya/features/records/data/models/record_support_api_model.dar
 
 final recordsLocalDataSourceProvider = Provider<IRecordsLocalDataSource>((ref) {
   return RecordsLocalDataSource(
-    cacheService: ref.read(featureCacheServiceProvider),
+    saveService: ref.read(featureCacheServiceProvider),
   );
 });
 
 class RecordsLocalDataSource implements IRecordsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const RecordsLocalDataSource({required FeatureCacheService cacheService})
-    : _cacheService = cacheService;
+  const RecordsLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _medicalRecordsKey = 'records_medical_records';
   static const String _medicationsKey = 'records_medications';
@@ -25,7 +25,7 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
       'records_pending_medical_record_ops';
 
   @override
-  Future<void> cacheMedicalRecords(MedicalRecordsResultApiModel result) {
+  Future<void> saveMedicalRecords(MedicalRecordsResultApiModel result) {
     final hiveModel = MedicalRecordsResultHiveModel.fromApiModel(result);
     return _cacheService.writeMap(
       _medicalRecordsKey,
@@ -34,7 +34,7 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<MedicalRecordsResultApiModel?> getCachedMedicalRecords() async {
+  Future<MedicalRecordsResultApiModel?> getMedicalRecords() async {
     final cached = await _cacheService.readMap(_medicalRecordsKey);
     if (cached == null) return null;
     final hiveModel = MedicalRecordsResultHiveModel.fromResponse(cached);
@@ -42,8 +42,8 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<MedicalRecordApiModel?> getCachedMedicalRecordById(String id) async {
-    final cached = await getCachedMedicalRecords();
+  Future<MedicalRecordApiModel?> getMedicalRecordById(String id) async {
+    final cached = await getMedicalRecords();
     if (cached == null) return null;
 
     for (final record in cached.records) {
@@ -58,9 +58,11 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   Future<MedicalRecordApiModel> upsertMedicalRecord(
     MedicalRecordApiModel record,
   ) async {
-    final cached = await getCachedMedicalRecords() ?? _emptyMedicalRecordsResult();
+    final cached = await getMedicalRecords() ?? _emptyMedicalRecordsResult();
     final updatedRecords = List<MedicalRecordApiModel>.from(cached.records);
-    final index = updatedRecords.indexWhere((item) => _sameId(item.id, record.id));
+    final index = updatedRecords.indexWhere(
+      (item) => _sameId(item.id, record.id),
+    );
 
     if (index >= 0) {
       updatedRecords[index] = record;
@@ -70,33 +72,41 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
 
     final updated = MedicalRecordsResultApiModel(
       records: updatedRecords,
-      pagination: _recalculatePagination(cached.pagination, updatedRecords.length),
+      pagination: _recalculatePagination(
+        cached.pagination,
+        updatedRecords.length,
+      ),
     );
-    await cacheMedicalRecords(updated);
+    await saveMedicalRecords(updated);
     return record;
   }
 
   @override
   Future<bool> removeMedicalRecordById(String id) async {
-    final cached = await getCachedMedicalRecords();
+    final cached = await getMedicalRecords();
     if (cached == null) return false;
 
     final beforeCount = cached.records.length;
-    final updatedRecords = cached.records.where((item) => !_sameId(item.id, id)).toList(growable: false);
+    final updatedRecords = cached.records
+        .where((item) => !_sameId(item.id, id))
+        .toList(growable: false);
     if (beforeCount == updatedRecords.length) {
       return false;
     }
 
     final updated = MedicalRecordsResultApiModel(
       records: updatedRecords,
-      pagination: _recalculatePagination(cached.pagination, updatedRecords.length),
+      pagination: _recalculatePagination(
+        cached.pagination,
+        updatedRecords.length,
+      ),
     );
-    await cacheMedicalRecords(updated);
+    await saveMedicalRecords(updated);
     return true;
   }
 
   @override
-  Future<void> cacheMedications(List<MedicationApiModel> medications) {
+  Future<void> saveMedications(List<MedicationApiModel> medications) {
     return _cacheService.writeList(
       _medicationsKey,
       medications.map((item) => item.toJson()).toList(growable: false),
@@ -104,14 +114,14 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<List<MedicationApiModel>> getCachedMedications() async {
+  Future<List<MedicationApiModel>> getMedications() async {
     final cached = await _cacheService.readList(_medicationsKey);
     return cached.map(MedicationApiModel.fromJson).toList(growable: false);
   }
 
   @override
-  Future<MedicationApiModel?> getCachedMedicationById(String id) async {
-    final cached = await getCachedMedications();
+  Future<MedicationApiModel?> getMedicationById(String id) async {
+    final cached = await getMedications();
     for (final medication in cached) {
       if (_sameId(medication.id, id)) {
         return medication;
@@ -121,8 +131,10 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<MedicationApiModel> upsertMedication(MedicationApiModel medication) async {
-    final cached = await getCachedMedications();
+  Future<MedicationApiModel> upsertMedication(
+    MedicationApiModel medication,
+  ) async {
+    final cached = await getMedications();
     final updated = List<MedicationApiModel>.from(cached);
     final index = updated.indexWhere((item) => _sameId(item.id, medication.id));
 
@@ -132,23 +144,25 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
       updated.insert(0, medication);
     }
 
-    await cacheMedications(updated);
+    await saveMedications(updated);
     return medication;
   }
 
   @override
   Future<bool> removeMedicationById(String id) async {
-    final cached = await getCachedMedications();
-    final updated = cached.where((item) => !_sameId(item.id, id)).toList(growable: false);
+    final cached = await getMedications();
+    final updated = cached
+        .where((item) => !_sameId(item.id, id))
+        .toList(growable: false);
     if (updated.length == cached.length) {
       return false;
     }
-    await cacheMedications(updated);
+    await saveMedications(updated);
     return true;
   }
 
   @override
-  Future<void> cacheAllergies(List<AllergyApiModel> allergies) {
+  Future<void> saveAllergies(List<AllergyApiModel> allergies) {
     return _cacheService.writeList(
       _allergiesKey,
       allergies.map((item) => item.toJson()).toList(growable: false),
@@ -156,14 +170,14 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<List<AllergyApiModel>> getCachedAllergies() async {
+  Future<List<AllergyApiModel>> getAllergies() async {
     final cached = await _cacheService.readList(_allergiesKey);
     return cached.map(AllergyApiModel.fromJson).toList(growable: false);
   }
 
   @override
-  Future<AllergyApiModel?> getCachedAllergyById(String id) async {
-    final cached = await getCachedAllergies();
+  Future<AllergyApiModel?> getAllergyById(String id) async {
+    final cached = await getAllergies();
     for (final allergy in cached) {
       if (_sameId(allergy.id, id)) {
         return allergy;
@@ -174,7 +188,7 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
 
   @override
   Future<AllergyApiModel> upsertAllergy(AllergyApiModel allergy) async {
-    final cached = await getCachedAllergies();
+    final cached = await getAllergies();
     final updated = List<AllergyApiModel>.from(cached);
     final index = updated.indexWhere((item) => _sameId(item.id, allergy.id));
 
@@ -184,23 +198,25 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
       updated.insert(0, allergy);
     }
 
-    await cacheAllergies(updated);
+    await saveAllergies(updated);
     return allergy;
   }
 
   @override
   Future<bool> removeAllergyById(String id) async {
-    final cached = await getCachedAllergies();
-    final updated = cached.where((item) => !_sameId(item.id, id)).toList(growable: false);
+    final cached = await getAllergies();
+    final updated = cached
+        .where((item) => !_sameId(item.id, id))
+        .toList(growable: false);
     if (updated.length == cached.length) {
       return false;
     }
-    await cacheAllergies(updated);
+    await saveAllergies(updated);
     return true;
   }
 
   @override
-  Future<void> cacheImmunizations(List<ImmunizationApiModel> immunizations) {
+  Future<void> saveImmunizations(List<ImmunizationApiModel> immunizations) {
     return _cacheService.writeList(
       _immunizationsKey,
       immunizations.map((item) => item.toJson()).toList(growable: false),
@@ -208,14 +224,14 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   }
 
   @override
-  Future<List<ImmunizationApiModel>> getCachedImmunizations() async {
+  Future<List<ImmunizationApiModel>> getImmunizations() async {
     final cached = await _cacheService.readList(_immunizationsKey);
     return cached.map(ImmunizationApiModel.fromJson).toList(growable: false);
   }
 
   @override
-  Future<ImmunizationApiModel?> getCachedImmunizationById(String id) async {
-    final cached = await getCachedImmunizations();
+  Future<ImmunizationApiModel?> getImmunizationById(String id) async {
+    final cached = await getImmunizations();
     for (final immunization in cached) {
       if (_sameId(immunization.id, id)) {
         return immunization;
@@ -228,9 +244,11 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   Future<ImmunizationApiModel> upsertImmunization(
     ImmunizationApiModel immunization,
   ) async {
-    final cached = await getCachedImmunizations();
+    final cached = await getImmunizations();
     final updated = List<ImmunizationApiModel>.from(cached);
-    final index = updated.indexWhere((item) => _sameId(item.id, immunization.id));
+    final index = updated.indexWhere(
+      (item) => _sameId(item.id, immunization.id),
+    );
 
     if (index >= 0) {
       updated[index] = immunization;
@@ -238,18 +256,20 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
       updated.insert(0, immunization);
     }
 
-    await cacheImmunizations(updated);
+    await saveImmunizations(updated);
     return immunization;
   }
 
   @override
   Future<bool> removeImmunizationById(String id) async {
-    final cached = await getCachedImmunizations();
-    final updated = cached.where((item) => !_sameId(item.id, id)).toList(growable: false);
+    final cached = await getImmunizations();
+    final updated = cached
+        .where((item) => !_sameId(item.id, id))
+        .toList(growable: false);
     if (updated.length == cached.length) {
       return false;
     }
-    await cacheImmunizations(updated);
+    await saveImmunizations(updated);
     return true;
   }
 
@@ -257,14 +277,19 @@ class RecordsLocalDataSource implements IRecordsLocalDataSource {
   Future<void> enqueuePendingMedicalRecordOperation(
     Map<String, dynamic> operation,
   ) async {
-    final operations = await getPendingMedicalRecordOperations();
+    final operations = List<Map<String, dynamic>>.from(
+      await getPendingMedicalRecordOperations(),
+    );
     operations.add(Map<String, dynamic>.from(operation));
     await savePendingMedicalRecordOperations(operations);
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getPendingMedicalRecordOperations() {
-    return _cacheService.readList(_pendingMedicalRecordOpsKey);
+  Future<List<Map<String, dynamic>>> getPendingMedicalRecordOperations() async {
+    final cached = await _cacheService.readList(_pendingMedicalRecordOpsKey);
+    return cached
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList(growable: true);
   }
 
   @override
