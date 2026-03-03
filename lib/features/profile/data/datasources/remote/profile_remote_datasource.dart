@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/core/api/api_client.dart';
 import 'package:vaidya/core/api/api_endpoints.dart';
 import 'package:vaidya/features/profile/data/datasources/profile_datasource.dart';
+import 'package:vaidya/features/profile/data/models/profile_checkout_session_api_model.dart';
+import 'package:vaidya/features/profile/data/models/profile_payment_status_api_model.dart';
 import 'package:vaidya/features/profile/data/models/profile_user_api_model.dart';
 
 final profileRemoteDataSourceProvider = Provider<IProfileRemoteDataSource>((
@@ -59,5 +61,31 @@ class ProfileRemoteDataSource implements IProfileRemoteDataSource {
     final response = await _apiClient.delete(ApiEndpoints.userById(id));
     if (response.data['success'] == true) return;
     throw Exception(response.data['message'] ?? 'Failed to delete profile');
+  }
+
+  @override
+  Future<ProfilePaymentStatusApiModel> getPaymentStatus() async {
+    final response = await _apiClient.get(ApiEndpoints.paymentStatus);
+    if (response.data['success'] == true) {
+      final data =
+          response.data['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
+      return ProfilePaymentStatusApiModel.fromJson(data);
+    }
+    throw Exception(
+      response.data['message'] ?? 'Failed to fetch payment status',
+    );
+  }
+
+  @override
+  Future<ProfileCheckoutSessionApiModel> createCheckoutSession() async {
+    final response = await _apiClient.post(ApiEndpoints.paymentCheckoutSession);
+    if (response.data['success'] == true) {
+      final data =
+          response.data['data'] as Map<String, dynamic>? ?? <String, dynamic>{};
+      return ProfileCheckoutSessionApiModel.fromJson(data);
+    }
+    throw Exception(
+      response.data['message'] ?? 'Failed to create checkout session',
+    );
   }
 }
