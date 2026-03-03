@@ -52,32 +52,36 @@ abstract interface class IRecordsRemoteDataSource {
 }
 
 abstract interface class IRecordsLocalDataSource {
-  Future<void> cacheMedicalRecords(MedicalRecordsResultApiModel result);
+  Future<void> saveMedicalRecords(MedicalRecordsResultApiModel result);
 
-  Future<MedicalRecordsResultApiModel?> getCachedMedicalRecords();
-  Future<MedicalRecordApiModel?> getCachedMedicalRecordById(String id);
-  Future<MedicalRecordApiModel> upsertMedicalRecord(MedicalRecordApiModel record);
+  Future<MedicalRecordsResultApiModel?> getMedicalRecords();
+  Future<MedicalRecordApiModel?> getMedicalRecordById(String id);
+  Future<MedicalRecordApiModel> upsertMedicalRecord(
+    MedicalRecordApiModel record,
+  );
   Future<bool> removeMedicalRecordById(String id);
 
-  Future<void> cacheMedications(List<MedicationApiModel> medications);
+  Future<void> saveMedications(List<MedicationApiModel> medications);
 
-  Future<List<MedicationApiModel>> getCachedMedications();
-  Future<MedicationApiModel?> getCachedMedicationById(String id);
+  Future<List<MedicationApiModel>> getMedications();
+  Future<MedicationApiModel?> getMedicationById(String id);
   Future<MedicationApiModel> upsertMedication(MedicationApiModel medication);
   Future<bool> removeMedicationById(String id);
 
-  Future<void> cacheAllergies(List<AllergyApiModel> allergies);
+  Future<void> saveAllergies(List<AllergyApiModel> allergies);
 
-  Future<List<AllergyApiModel>> getCachedAllergies();
-  Future<AllergyApiModel?> getCachedAllergyById(String id);
+  Future<List<AllergyApiModel>> getAllergies();
+  Future<AllergyApiModel?> getAllergyById(String id);
   Future<AllergyApiModel> upsertAllergy(AllergyApiModel allergy);
   Future<bool> removeAllergyById(String id);
 
-  Future<void> cacheImmunizations(List<ImmunizationApiModel> immunizations);
+  Future<void> saveImmunizations(List<ImmunizationApiModel> immunizations);
 
-  Future<List<ImmunizationApiModel>> getCachedImmunizations();
-  Future<ImmunizationApiModel?> getCachedImmunizationById(String id);
-  Future<ImmunizationApiModel> upsertImmunization(ImmunizationApiModel immunization);
+  Future<List<ImmunizationApiModel>> getImmunizations();
+  Future<ImmunizationApiModel?> getImmunizationById(String id);
+  Future<ImmunizationApiModel> upsertImmunization(
+    ImmunizationApiModel immunization,
+  );
   Future<bool> removeImmunizationById(String id);
 
   Future<void> enqueuePendingMedicalRecordOperation(
