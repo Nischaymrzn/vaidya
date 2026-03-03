@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:vaidya/core/services/storage/user_session_service.dart';
-import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
-import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
+import 'package:vaidya/features/profile/presentation/state/profile_state.dart';
+import 'package:vaidya/features/profile/presentation/view_model/profile_viewmodel.dart';
 import 'package:vaidya/themes/colors.dart';
 
 final _emailProvider = Provider<String?>((ref) {
@@ -53,15 +53,22 @@ class _PersonalInformationScreenState
     super.initState();
 
     final session = ref.read(userSessionServiceProvider);
+    final userId = session.getCurrentUserId();
 
     _initialName = session.getCurrentUserFullName() ?? '';
-    _initialPhone = '9841002428';
+    _initialPhone = session.getCurrentUserPhoneNumber() ?? '';
 
     _nameController = TextEditingController(text: _initialName);
     _phoneController = TextEditingController(text: _initialPhone);
 
     _nameController.addListener(_checkChanges);
     _phoneController.addListener(_checkChanges);
+
+    if (userId != null && userId.trim().isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(profileViewModelProvider.notifier).load(userId);
+      });
+    }
   }
 
   void _checkChanges() {
@@ -154,34 +161,39 @@ class _PersonalInformationScreenState
     if (userId == null) return;
 
     final name = _nameController.text.trim();
-    final numberStr = _phoneController.text.trim();
-    final number = int.tryParse(numberStr);
+    final number = _phoneController.text.trim();
     final email = session.getCurrentUserEmail();
 
     await ref
-        .read(authViewModelProvider.notifier)
-        .updateProfile(
-          userId: userId,
-          name: name.isEmpty ? null : name,
-          email: email,
-          number: number,
-          imagePath: _selectedImage?.path,
-        );
+        .read(profileViewModelProvider.notifier)
+        .update(userId, <String, dynamic>{
+          if (name.isNotEmpty) 'name': name,
+          if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
+          if (number.isNotEmpty) 'number': number,
+        }, imagePath: _selectedImage?.path);
   }
 
   @override
   Widget build(BuildContext context) {
     final email = ref.watch(_emailProvider) ?? '';
     final profile = ref.watch(currentUserProfileProvider);
-    final authState = ref.watch(authViewModelProvider);
+    final profileState = ref.watch(profileViewModelProvider);
+    final data = profileState.user?.data ?? <String, dynamic>{};
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final cardColor = AppColors.card;
+    final borderColor = AppColors.border;
+    final mutedColor = AppColors.textSecondary;
 
-    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
-      if (next.status == AuthStatus.error && next.errorMessage != null) {
+    ref.listen<ProfileState>(profileViewModelProvider, (previous, next) {
+      if (next.errorMessage != null &&
+          next.errorMessage != previous?.errorMessage) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(next.errorMessage!)));
       }
-      if (next.successMessage != null) {
+      if (next.actionMessage != null &&
+          next.actionMessage != previous?.actionMessage) {
         setState(() {
           _initialName = _nameController.text.trim();
           _initialPhone = _phoneController.text.trim();
@@ -190,18 +202,23 @@ class _PersonalInformationScreenState
         });
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(next.successMessage!)));
-        ref.read(authViewModelProvider.notifier).clearSuccessMessage();
+        ).showSnackBar(SnackBar(content: Text(next.actionMessage!)));
       }
     });
 
-    final isUpdating = authState.status == AuthStatus.loading;
+    if (_nameController.text.trim().isEmpty && data['name'] != null) {
+      _nameController.text = data['name'].toString();
+    }
+    if (_phoneController.text.trim().isEmpty && data['number'] != null) {
+      _phoneController.text = data['number'].toString();
+    }
+    final isUpdating = profileState.isSubmitting;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Personal Information'),
-        backgroundColor: AppColors.background,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
       ),
       body: Padding(
@@ -212,9 +229,9 @@ class _PersonalInformationScreenState
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: borderColor),
               ),
               child: Row(
                 children: [
@@ -238,7 +255,7 @@ class _PersonalInformationScreenState
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: const BoxDecoration(
-                              color: AppColors.primary,
+                              color: Color(0xFF1F7AE0),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
@@ -260,18 +277,15 @@ class _PersonalInformationScreenState
                           _nameController.text.trim().isEmpty
                               ? 'Your Name'
                               : _nameController.text.trim(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         Text(
                           email,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: AppColors.textSecondary,
-                          ),
+                          style: TextStyle(fontSize: 16, color: mutedColor),
                         ),
                       ],
                     ),
@@ -298,8 +312,8 @@ class _PersonalInformationScreenState
               onPressed: (_hasChanges && !isUpdating) ? _saveChanges : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: _hasChanges
-                    ? AppColors.primary
-                    : AppColors.border,
+                    ? colorScheme.primary
+                    : borderColor,
                 foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(48),
                 shape: RoundedRectangleBorder(
@@ -341,16 +355,21 @@ class _EditableField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardColor = AppColors.card;
+    final borderColor = AppColors.border;
+    final mutedColor = AppColors.textSecondary;
+    final textColor = theme.colorScheme.onSurface;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Label
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: mutedColor,
           ),
         ),
         const SizedBox(height: 6),
@@ -359,16 +378,16 @@ class _EditableField extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
-            color: AppColors.card,
+            color: cardColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: borderColor),
           ),
           child: TextField(
             controller: controller,
             keyboardType: keyboardType,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
-              color: AppColors.textPrimary,
+              color: textColor,
               fontWeight: FontWeight.w500,
             ),
             decoration: const InputDecoration(

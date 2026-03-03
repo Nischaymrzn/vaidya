@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:vaidya/core/error/failures.dart';
+import 'package:vaidya/features/profile/domain/entities/profile_payment_status_entity.dart';
 import 'package:vaidya/features/profile/domain/entities/profile_user_entity.dart';
 
 abstract interface class IProfileRepository {
@@ -10,4 +11,6 @@ abstract interface class IProfileRepository {
     String? imagePath,
   });
   Future<Either<Failure, bool>> deleteUser(String id);
+  Future<Either<Failure, ProfilePaymentStatusEntity>> getPaymentStatus();
+  Future<Either<Failure, String>> createCheckoutSession();
 }
