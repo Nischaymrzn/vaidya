@@ -67,7 +67,7 @@ class RecordsActionButtons extends StatelessWidget {
             ),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(999),

@@ -66,7 +66,7 @@ class RecordsDocumentsTab extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onAddMore,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 8,
                 ),
@@ -74,7 +74,7 @@ class RecordsDocumentsTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              icon: const Icon(Icons.add_rounded, size: 16),
+              icon: Icon(Icons.add_rounded, size: 16),
               label: Text(
                 'Add more',
                 style: TextStyle(
@@ -87,9 +87,9 @@ class RecordsDocumentsTab extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(16),
@@ -112,7 +112,7 @@ class RecordsDocumentsTab extends StatelessWidget {
                 fontSize: 14,
                 color: AppColors.textSecondary,
               ),
-              prefixIcon: const Icon(Icons.search_rounded, size: 18),
+              prefixIcon: Icon(Icons.search_rounded, size: 18),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(999),
                 borderSide: BorderSide(
@@ -127,16 +127,16 @@ class RecordsDocumentsTab extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(999),
-                borderSide: const BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: AppColors.primary),
               ),
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         if (totalCount == 0)
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(16),
@@ -161,9 +161,9 @@ class RecordsDocumentsTab extends StatelessWidget {
           );
         }),
         if (totalCount > 0) ...[
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Row(
               children: [
                 Expanded(
@@ -260,12 +260,12 @@ class _YearSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 2, bottom: 6),
+            padding: EdgeInsets.only(left: 2, bottom: 6),
             child: Text(
               '$year',
               style: TextStyle(
@@ -286,20 +286,20 @@ class _YearSection extends StatelessWidget {
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 8,
-                  offset: const Offset(0, 1),
+                  offset: Offset(0, 1),
                 ),
               ],
             ),
             child: Column(
               children: [
-                const _DocumentsHeaderRow(),
+                _DocumentsHeaderRow(),
                 Divider(
                   color: AppColors.border.withValues(alpha: 0.9),
                   height: 1,
                 ),
                 ListView.separated(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
                   itemCount: records.length,
                   separatorBuilder: (_, __) => Divider(
@@ -355,9 +355,9 @@ class _DocumentTile extends StatelessWidget {
               child: Container(
                 width: 34,
                 height: 34,
-                padding: const EdgeInsets.all(5),
+                padding: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5EDEE),
+                  color: AppColors.surfaceSoft,
                   shape: BoxShape.circle,
                   border: Border.all(color: AppColors.border),
                 ),
@@ -384,7 +384,7 @@ class _DocumentTile extends StatelessWidget {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         formatDateLabel(record.effectiveDate),
                         style: TextStyle(
@@ -421,14 +421,14 @@ class _DocumentTile extends StatelessWidget {
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: PopupMenuButton<RecordMenuAction>(
-                      color: Colors.white,
+                      color: AppColors.card,
                       padding: EdgeInsets.zero,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                        side: const BorderSide(color: AppColors.border),
+                        side: BorderSide(color: AppColors.border),
                       ),
                       onSelected: (action) => onRecordAction(record, action),
-                      itemBuilder: (context) => const [
+                      itemBuilder: (context) => [
                         PopupMenuItem(
                           value: RecordMenuAction.viewRecord,
                           child: _MenuLabel(
@@ -495,7 +495,7 @@ class _DocumentsHeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
+    return Padding(
       padding: EdgeInsets.fromLTRB(14, 8, 14, 2),
       child: Row(
         children: [
@@ -568,7 +568,7 @@ class _MenuLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDelete ? const Color(0xFFE53935) : AppColors.textPrimary;
+    final color = isDelete ? Color(0xFFE53935) : AppColors.textPrimary;
     return Row(
       children: [
         Icon(icon, size: 18, color: color),
