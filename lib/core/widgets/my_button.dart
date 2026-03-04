@@ -28,7 +28,9 @@ class MyButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: isLoading ? baseColor.withOpacity(0.65) : baseColor,
+          backgroundColor: isLoading
+              ? baseColor.withValues(alpha: 0.65)
+              : baseColor,
           elevation: isLoading ? 0 : 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radius),

@@ -12,7 +12,7 @@ class RegisterUsecaseParams extends Equatable {
   final String email;
   final String? role;
   final String password;
-  final int? number;
+  final String? number;
 
   const RegisterUsecaseParams({
     required this.fullName,

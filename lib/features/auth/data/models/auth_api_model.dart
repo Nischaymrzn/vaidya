@@ -4,7 +4,7 @@ class AuthApiModel {
   final String? id;
   final String name;
   final String email;
-  final int? number;
+  final String? number;
   final String? role;
   final String? password;
   final String? confirmPassword;
@@ -43,7 +43,7 @@ class AuthApiModel {
       id: json['_id'] ?? json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
-      number: json['number'] as int?,
+      number: json['number'] as String?,
       role: json['role'] as String?,
       profilePicture: (json['profilePicture'] ?? json['profileUrl']) as String?,
     );

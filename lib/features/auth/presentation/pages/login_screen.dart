@@ -6,6 +6,7 @@ import 'package:vaidya/core/widgets/divider_with_text.dart';
 import 'package:vaidya/core/widgets/google_login_button.dart';
 import 'package:vaidya/core/widgets/my_button.dart';
 import 'package:vaidya/core/widgets/my_text_form_field.dart';
+import 'package:vaidya/features/auth/presentation/pages/forgot_password_screen.dart';
 import 'package:vaidya/features/auth/presentation/pages/signup_screen.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
@@ -22,6 +23,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(authViewModelProvider.notifier).getCurrentUser();
+    });
+  }
 
   @override
   void dispose() {
@@ -46,13 +55,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _handleForgotPassword() {
-    // TODO: Implement forgot password
-    SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
+    AppRoutes.push(context, const ForgotPasswordScreen());
   }
 
-  void _handleGoogleSignIn() {
-    // TODO: Implement Google Sign In
-    SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
+  Future<void> _handleGoogleSignIn() async {
+    await ref.read(authViewModelProvider.notifier).loginWithGoogle();
   }
 
   @override

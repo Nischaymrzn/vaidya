@@ -47,8 +47,8 @@ class MedicationCard extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 19,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
@@ -58,7 +58,7 @@ class MedicationCard extends StatelessWidget {
                     Text(
                       date,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
@@ -67,7 +67,7 @@ class MedicationCard extends StatelessWidget {
                     Text(
                       hospital,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),

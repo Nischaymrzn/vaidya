@@ -5,9 +5,13 @@ import 'package:mocktail/mocktail.dart';
 import 'package:vaidya/core/error/failures.dart';
 import 'package:vaidya/features/auth/domain/entities/auth_entity.dart';
 import 'package:vaidya/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/is_google_login_configured_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/login_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_token_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/register_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/request_password_reset_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
@@ -22,19 +26,35 @@ class MockLogoutUsecase extends Mock implements LogoutUsecase {}
 
 class MockUpdateProfileUsecase extends Mock implements UpdateProfileUsecase {}
 
+class MockRequestPasswordResetUsecase extends Mock
+    implements RequestPasswordResetUsecase {}
+
+class MockIsGoogleLoginConfiguredUsecase extends Mock
+    implements IsGoogleLoginConfiguredUsecase {}
+
+class MockLoginWithGoogleTokenUsecase extends Mock
+    implements LoginWithGoogleTokenUsecase {}
+
+class MockLoginWithGoogleUsecase extends Mock
+    implements LoginWithGoogleUsecase {}
+
 void main() {
   late MockRegisterUsecase mockRegisterUsecase;
   late MockLoginUsecase mockLoginUsecase;
   late MockGetCurrentUserUsecase mockGetCurrentUserUsecase;
   late MockLogoutUsecase mockLogoutUsecase;
   late MockUpdateProfileUsecase mockUpdateProfileUsecase;
+  late MockRequestPasswordResetUsecase mockRequestPasswordResetUsecase;
+  late MockIsGoogleLoginConfiguredUsecase mockIsGoogleLoginConfiguredUsecase;
+  late MockLoginWithGoogleTokenUsecase mockLoginWithGoogleTokenUsecase;
+  late MockLoginWithGoogleUsecase mockLoginWithGoogleUsecase;
   late ProviderContainer container;
 
   const tAuthEntity = AuthEntity(
     userId: 'user-1',
     name: 'Test User',
     email: 'test@example.com',
-    number: 1234567890,
+    number: '1234567890',
     role: 'user',
   );
 
@@ -44,6 +64,8 @@ void main() {
     registerFallbackValue(
       const RegisterUsecaseParams(fullName: '', email: '', password: ''),
     );
+    registerFallbackValue(const RequestPasswordResetUsecaseParams(email: ''));
+    registerFallbackValue(const LoginWithGoogleTokenUsecaseParams(token: ''));
   });
 
   setUp(() {
@@ -52,6 +74,10 @@ void main() {
     mockGetCurrentUserUsecase = MockGetCurrentUserUsecase();
     mockLogoutUsecase = MockLogoutUsecase();
     mockUpdateProfileUsecase = MockUpdateProfileUsecase();
+    mockRequestPasswordResetUsecase = MockRequestPasswordResetUsecase();
+    mockIsGoogleLoginConfiguredUsecase = MockIsGoogleLoginConfiguredUsecase();
+    mockLoginWithGoogleTokenUsecase = MockLoginWithGoogleTokenUsecase();
+    mockLoginWithGoogleUsecase = MockLoginWithGoogleUsecase();
 
     container = ProviderContainer(
       overrides: [
@@ -63,6 +89,18 @@ void main() {
         logoutUsecaseProvider.overrideWith((ref) => mockLogoutUsecase),
         updateProfileUsecaseProvider.overrideWith(
           (ref) => mockUpdateProfileUsecase,
+        ),
+        requestPasswordResetUsecaseProvider.overrideWith(
+          (ref) => mockRequestPasswordResetUsecase,
+        ),
+        isGoogleLoginConfiguredUsecaseProvider.overrideWith(
+          (ref) => mockIsGoogleLoginConfiguredUsecase,
+        ),
+        loginWithGoogleTokenUsecaseProvider.overrideWith(
+          (ref) => mockLoginWithGoogleTokenUsecase,
+        ),
+        loginWithGoogleUsecaseProvider.overrideWith(
+          (ref) => mockLoginWithGoogleUsecase,
         ),
       ],
     );
@@ -150,7 +188,7 @@ void main() {
             email: 'admin@example.com',
             role: 'admin',
             password: 'admin123',
-            number: 9998887777,
+            number: '9998887777',
           );
 
           final state = container.read(authViewModelProvider);
@@ -162,7 +200,7 @@ void main() {
                 email: 'admin@example.com',
                 role: 'admin',
                 password: 'admin123',
-                number: 9998887777,
+                number: '9998887777',
               ),
             ),
           ).called(1);

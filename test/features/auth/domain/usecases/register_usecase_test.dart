@@ -91,7 +91,7 @@ void main() {
         email: 'admin@example.com',
         role: 'admin',
         password: 'admin123',
-        number: 9998887777,
+        number: '9998887777',
       );
 
       await usecase.call(params);
@@ -100,7 +100,7 @@ void main() {
       expect(capturedEntity!.name, 'Admin User');
       expect(capturedEntity!.email, 'admin@example.com');
       expect(capturedEntity!.role, 'admin');
-      expect(capturedEntity!.number, 9998887777);
+      expect(capturedEntity!.number, '9998887777');
     });
   });
 
@@ -111,9 +111,9 @@ void main() {
         email: 'a@b.com',
         password: 'p',
         role: 'r',
-        number: 1,
+        number: '1',
       );
-      expect(params.props, ['A', 'a@b.com', 'r', 'p', 1]);
+      expect(params.props, ['A', 'a@b.com', 'r', 'p', '1']);
     });
 
     test('equality works for same values', () {

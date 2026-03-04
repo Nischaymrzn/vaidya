@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vaidya/app/theme/colors.dart';
+import 'package:vaidya/themes/colors.dart';
 
 class SnackbarUtils {
   static void showError(BuildContext context, String message) {

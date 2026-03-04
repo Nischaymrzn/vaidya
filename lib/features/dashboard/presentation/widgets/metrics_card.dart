@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/metric_detail_page.dart';
+import 'package:vaidya/features/vitals/presentation/pages/metric_detail_page.dart';
 import 'package:vaidya/themes/colors.dart';
 
 class MetricsCard extends StatelessWidget {
@@ -9,6 +9,8 @@ class MetricsCard extends StatelessWidget {
   final String value;
   final String unit;
   final String condition;
+  final int scorePercent;
+  final List<double> historyPoints;
 
   const MetricsCard({
     super.key,
@@ -17,6 +19,8 @@ class MetricsCard extends StatelessWidget {
     required this.value,
     required this.unit,
     required this.condition,
+    required this.scorePercent,
+    required this.historyPoints,
   });
 
   Color _getConditionColor() {
@@ -46,6 +50,8 @@ class MetricsCard extends StatelessWidget {
               value: value,
               unit: unit,
               condition: condition,
+              scorePercent: scorePercent,
+              historyPoints: historyPoints,
             ),
           ),
         );
@@ -75,8 +81,8 @@ class MetricsCard extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   name,
-                  style: TextStyle(
-                    fontSize: 17,
+                  style: const TextStyle(
+                    fontSize: 16,
                     color: AppColors.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
@@ -92,18 +98,20 @@ class MetricsCard extends StatelessWidget {
                   RichText(
                     text: TextSpan(
                       text: value,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: "Urbanist",
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Urbanist',
                       ),
                       children: [
                         TextSpan(
                           text: ' $unit',
                           style: TextStyle(
-                            color: AppColors.textSecondary.withAlpha(200),
-                            fontSize: 16,
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.78,
+                            ),
+                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -122,7 +130,7 @@ class MetricsCard extends StatelessWidget {
                     ),
                     child: Text(
                       condition,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,

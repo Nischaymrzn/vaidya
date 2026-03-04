@@ -2,8 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/app/routes/app_routes.dart';
-import 'package:vaidya/core/services/storage/user_session_service.dart';
 import 'package:vaidya/core/widgets/loader.dart';
+import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
+import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:vaidya/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:vaidya/features/onboarding/presentation/pages/onboarding_screen.dart';
 
@@ -25,15 +26,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     await Future.delayed(const Duration(seconds: 3));
     if (!mounted) return;
 
-    // Check if user is already logged in
-    final userSessionService = ref.read(userSessionServiceProvider);
-    final isLoggedIn = userSessionService.isLoggedIn();
+    await ref.read(authViewModelProvider.notifier).getCurrentUser();
+    if (!mounted) return;
 
-    if (isLoggedIn) {
-      // Navigate to Dashboard if user is logged in
+    final authState = ref.read(authViewModelProvider);
+    if (authState.status == AuthStatus.authenticated) {
       AppRoutes.pushReplacement(context, const DashboardScreen());
     } else {
-      // Navigate to Onboarding if user is not logged in
       AppRoutes.pushReplacement(context, const OnboardingScreen());
     }
   }

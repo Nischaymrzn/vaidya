@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vaidya/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/is_google_login_configured_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/login_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/login_with_google_token_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/register_usecase.dart';
+import 'package:vaidya/features/auth/domain/usecases/request_password_reset_usecase.dart';
 import 'package:vaidya/features/auth/domain/usecases/update_profile_usecase.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 
@@ -16,6 +20,10 @@ class AuthViewModel extends Notifier<AuthState> {
   late final GetCurrentUserUsecase _getCurrentUserUsecase;
   late final LogoutUsecase _logoutUsecase;
   late final UpdateProfileUsecase _updateProfileUsecase;
+  late final RequestPasswordResetUsecase _requestPasswordResetUsecase;
+  late final IsGoogleLoginConfiguredUsecase _isGoogleLoginConfiguredUsecase;
+  late final LoginWithGoogleUsecase _loginWithGoogleUsecase;
+  late final LoginWithGoogleTokenUsecase _loginWithGoogleTokenUsecase;
 
   @override
   AuthState build() {
@@ -24,6 +32,16 @@ class AuthViewModel extends Notifier<AuthState> {
     _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
     _updateProfileUsecase = ref.read(updateProfileUsecaseProvider);
+    _requestPasswordResetUsecase = ref.read(
+      requestPasswordResetUsecaseProvider,
+    );
+    _isGoogleLoginConfiguredUsecase = ref.read(
+      isGoogleLoginConfiguredUsecaseProvider,
+    );
+    _loginWithGoogleUsecase = ref.read(loginWithGoogleUsecaseProvider);
+    _loginWithGoogleTokenUsecase = ref.read(
+      loginWithGoogleTokenUsecaseProvider,
+    );
     return const AuthState();
   }
 
@@ -32,7 +50,7 @@ class AuthViewModel extends Notifier<AuthState> {
     required String email,
     String? role,
     required String password,
-    int? number,
+    String? number,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
@@ -71,6 +89,97 @@ class AuthViewModel extends Notifier<AuthState> {
       ),
       (user) =>
           state = state.copyWith(status: AuthStatus.authenticated, user: user),
+    );
+  }
+
+  Future<void> loginWithGoogleToken({required String token}) async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final result = await _loginWithGoogleTokenUsecase(
+      LoginWithGoogleTokenUsecaseParams(token: token),
+    );
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (user) =>
+          state = state.copyWith(status: AuthStatus.authenticated, user: user),
+    );
+  }
+
+  Future<void> loginWithGoogle() async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final configuredResult = await _isGoogleLoginConfiguredUsecase();
+    final isConfigured = configuredResult.fold((failure) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      );
+      return false;
+    }, (configured) => configured);
+
+    if (!isConfigured) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage:
+            'Google login is not configured on server. Please contact admin.',
+      );
+      return;
+    }
+
+    final result = await _loginWithGoogleUsecase();
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (user) =>
+          state = state.copyWith(status: AuthStatus.authenticated, user: user),
+    );
+  }
+
+  Future<bool> isGoogleLoginConfigured() async {
+    final result = await _isGoogleLoginConfiguredUsecase();
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+        return false;
+      },
+      (configured) {
+        if (!configured) {
+          state = state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                'Google login is not configured on server. Please contact admin.',
+          );
+        }
+        return configured;
+      },
+    );
+  }
+
+  Future<void> requestPasswordReset({required String email}) async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final result = await _requestPasswordResetUsecase(
+      RequestPasswordResetUsecaseParams(email: email),
+    );
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: failure.message,
+      ),
+      (_) => state = state.copyWith(
+        status: AuthStatus.passwordResetEmailSent,
+        successMessage: 'Reset link sent. Please check your email.',
+      ),
     );
   }
 

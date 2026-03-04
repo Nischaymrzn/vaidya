@@ -1,35 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vaidya/app/theme/colors.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/assistant.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:vaidya/features/analytics/presentation/pages/analytics_screen.dart';
+import 'package:vaidya/themes/colors.dart';
 import 'package:vaidya/features/dashboard/presentation/pages/home_screen.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/insights.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/profile.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/records_screen.dart';
+import 'package:vaidya/features/intelligence/presentation/pages/vaidya_ai_screen.dart';
+import 'package:vaidya/features/profile/presentation/pages/profile_screen.dart';
+import 'package:vaidya/features/records/presentation/pages/records_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final int initialIndex;
+
+  const DashboardScreen({super.key, this.initialIndex = 0});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
 
   final List<Widget> _screens = const [
     HomeScreen(),
     RecordsScreen(),
-    AssistantScreen(),
-    InsightsScreen(),
+    VaidyaAiScreen(),
+    AnalyticsScreen(),
     ProfileScreen(),
   ];
 
-  Widget _navIcon(String path, Color color) {
-    return SvgPicture.asset(
-      path,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex.clamp(0, _screens.length - 1);
   }
 
   @override
@@ -47,58 +48,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
           currentIndex: _selectedIndex,
           selectedItemColor: AppColors.activeNav,
           unselectedItemColor: AppColors.isNotActiveNav,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
           onTap: (index) => setState(() => _selectedIndex = index),
           items: [
             BottomNavigationBarItem(
-              icon: _navIcon('assets/icons/home.svg', AppColors.isNotActiveNav),
-              activeIcon: _navIcon(
-                'assets/icons/home.svg',
-                AppColors.activeNav,
-              ),
-              label: 'Home',
+              icon: const Icon(LucideIcons.layoutDashboard, size: 22),
+              activeIcon: const Icon(LucideIcons.layoutDashboard, size: 22),
+              label: '',
             ),
             BottomNavigationBarItem(
-              icon: _navIcon(
-                'assets/icons/record.svg',
-                AppColors.isNotActiveNav,
-              ),
-              activeIcon: _navIcon(
-                'assets/icons/record.svg',
-                AppColors.activeNav,
-              ),
-              label: 'Records',
+              icon: const Icon(LucideIcons.folderHeart, size: 22),
+              activeIcon: const Icon(LucideIcons.folderHeart, size: 22),
+              label: '',
             ),
             BottomNavigationBarItem(
-              icon: _navIcon(
-                'assets/icons/assistant.svg',
-                AppColors.isNotActiveNav,
-              ),
-              activeIcon: _navIcon(
-                'assets/icons/assistant.svg',
-                AppColors.activeNav,
-              ),
-              label: 'Assistant',
+              icon: const Icon(LucideIcons.brain, size: 22),
+              activeIcon: const Icon(LucideIcons.brain, size: 22),
+              label: '',
             ),
             BottomNavigationBarItem(
-              icon: _navIcon(
-                'assets/icons/insights.svg',
-                AppColors.isNotActiveNav,
-              ),
-              activeIcon: _navIcon(
-                'assets/icons/insights.svg',
-                AppColors.activeNav,
-              ),
-              label: 'Insights',
+              icon: const Icon(LucideIcons.chartColumnBig, size: 22),
+              activeIcon: const Icon(LucideIcons.chartColumnBig, size: 22),
+              label: '',
             ),
             BottomNavigationBarItem(
-              icon: _navIcon('assets/icons/user.svg', AppColors.isNotActiveNav),
-              activeIcon: _navIcon(
-                'assets/icons/user.svg',
-                AppColors.activeNav,
-              ),
-              label: 'Profile',
+              icon: const Icon(LucideIcons.user, size: 22),
+              activeIcon: const Icon(LucideIcons.user, size: 22),
+              label: '',
             ),
           ],
         ),
@@ -106,3 +83,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+

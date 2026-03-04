@@ -15,7 +15,7 @@ void main() {
     userId: 'user-1',
     name: 'Test User',
     email: 'test@example.com',
-    number: 1234567890,
+    number: '1234567890',
     role: 'user',
   );
 

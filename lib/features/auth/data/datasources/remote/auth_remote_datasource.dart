@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:vaidya/core/api/api_client.dart';
 import 'package:vaidya/core/api/api_endpoints.dart';
 import 'package:vaidya/core/services/storage/token_service.dart';
@@ -22,6 +23,8 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   final ApiClient _apiClient;
   final UserSessionService _userSessionService;
   final TokenService _tokenService;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _googleInitialized = false;
 
   AuthRemoteDatasource({
     required ApiClient apiClient,
@@ -33,35 +36,29 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<AuthApiModel?> getCurrentUser() async {
-    try {
-      if (!_userSessionService.isLoggedIn()) {
-        return null;
-      }
-
-      final userId = _userSessionService.getCurrentUserId();
-      if (userId == null) {
-        return null;
-      }
-
-      final response = await _apiClient.get(ApiEndpoints.userById(userId));
-
-      if (response.data['success'] == true) {
-        final data = response.data['data'] as Map<String, dynamic>;
-        final currentUser = AuthApiModel.fromJson(data);
-        await _userSessionService.saveUserSession(
-          userId: currentUser.id!,
-          email: currentUser.email,
-          name: currentUser.name,
-          role: currentUser.role,
-        );
-
-        return currentUser;
-      }
-
-      return null;
-    } catch (_) {
+    final token = await _tokenService.getToken();
+    if (token == null || token.isEmpty) {
       return null;
     }
+
+    final response = await _apiClient.get(ApiEndpoints.currentUser);
+
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      final currentUser = AuthApiModel.fromJson(data);
+      await _userSessionService.saveUserSession(
+        userId: currentUser.id!,
+        email: currentUser.email,
+        name: currentUser.name,
+        role: currentUser.role,
+        number: currentUser.number,
+        profilePicture: currentUser.profilePicture,
+      );
+
+      return currentUser;
+    }
+
+    return null;
   }
 
   @override
@@ -76,6 +73,10 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
       final userJson = data['user'] as Map<String, dynamic>;
       final user = AuthApiModel.fromJson(userJson);
+      final token = data['accessToken'] as String?;
+      if (token == null || token.isEmpty) {
+        return null;
+      }
 
       await _userSessionService.saveUserSession(
         userId: user.id!,
@@ -84,12 +85,64 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         role: user.role,
         number: user.number,
       );
-      // Save token to TokenService
-      final token = response.data['data']['accessToken'];
-      // Later store token in secure storage
       await _tokenService.saveToken(token);
 
       return user;
+    }
+
+    return null;
+  }
+
+  @override
+  Future<String?> getGoogleAccessToken() async {
+    if (!_googleInitialized) {
+      await _googleSignIn.initialize(
+        serverClientId: ApiEndpoints.googleServerClientId,
+      );
+      _googleInitialized = true;
+    }
+
+    late final GoogleSignInAccount account;
+    try {
+      account = await _googleSignIn.authenticate();
+    } on GoogleSignInException catch (e) {
+      if (e.code == GoogleSignInExceptionCode.canceled) {
+        return null;
+      }
+      throw Exception(e.description ?? 'Google sign in failed');
+    }
+
+    final idToken = account.authentication.idToken;
+    if (idToken == null || idToken.isEmpty) {
+      throw Exception('Google sign in did not return id token');
+    }
+
+    final response = await _apiClient.post(
+      ApiEndpoints.googleMobileLogin,
+      data: {'idToken': idToken},
+    );
+
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      final token = data['accessToken'] as String?;
+      if (token == null || token.isEmpty) {
+        return null;
+      }
+
+      final userJson = data['user'] as Map<String, dynamic>?;
+      if (userJson != null) {
+        final user = AuthApiModel.fromJson(userJson);
+        await _userSessionService.saveUserSession(
+          userId: user.id!,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          number: user.number,
+          profilePicture: user.profilePicture,
+        );
+      }
+
+      return token;
     }
 
     return null;
@@ -103,6 +156,24 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     } catch (e) {
       return false;
     }
+  }
+
+  @override
+  Future<bool> requestPasswordReset(String email) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.requestPasswordReset,
+      data: {'email': email},
+    );
+    return response.data['success'] == true;
+  }
+
+  @override
+  Future<bool> isGoogleLoginConfigured() async {
+    final response = await _apiClient.get(ApiEndpoints.googleLoginStatus);
+    if (response.data['success'] == true) {
+      return response.data['configured'] == true;
+    }
+    return false;
   }
 
   @override

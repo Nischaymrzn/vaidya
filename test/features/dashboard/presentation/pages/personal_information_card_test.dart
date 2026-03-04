@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vaidya/core/services/storage/user_session_service.dart';
 import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
 import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
-import 'package:vaidya/features/dashboard/presentation/pages/personal_information_card.dart';
+import 'package:vaidya/features/profile/presentation/pages/personal_information_screen.dart';
 
 class MockUserSessionService extends Mock implements UserSessionService {}
 
@@ -20,11 +20,23 @@ class MockAuthViewModel extends Notifier<AuthState> implements AuthViewModel {
     required String email,
     String? role,
     required String password,
-    int? number,
+    String? number,
   }) async {}
 
   @override
   Future<void> login({required String email, required String password}) async {}
+
+  @override
+  Future<void> loginWithGoogle() async {}
+
+  @override
+  Future<void> loginWithGoogleToken({required String token}) async {}
+
+  @override
+  Future<bool> isGoogleLoginConfigured() async => false;
+
+  @override
+  Future<void> requestPasswordReset({required String email}) async {}
 
   @override
   Future<void> getCurrentUser() async {}

@@ -19,7 +19,10 @@ abstract interface class IAuthLocalDataSource {
 abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel> register(AuthApiModel user);
   Future<AuthApiModel?> login(String email, String password);
+  Future<String?> getGoogleAccessToken();
   Future<AuthApiModel?> getCurrentUser();
+  Future<bool> requestPasswordReset(String email);
+  Future<bool> isGoogleLoginConfigured();
   Future<bool> logout();
   Future<AuthApiModel?> updateProfile(
     String userId, {
