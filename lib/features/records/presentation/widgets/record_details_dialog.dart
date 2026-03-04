@@ -21,7 +21,7 @@ class RecordDetailsDialog extends StatelessWidget {
       titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
       contentPadding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
       actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
-      title: const Text(
+      title: Text(
         'Record details',
         style: TextStyle(
           fontSize: 20,
@@ -55,7 +55,7 @@ class RecordDetailsDialog extends StatelessWidget {
               if ((record.content ?? '').trim().isNotEmpty)
                 _item('Content', record.content!.trim()),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Attachments',
                 style: TextStyle(
                   fontSize: 14,
@@ -65,7 +65,7 @@ class RecordDetailsDialog extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               if (record.attachments.isEmpty)
-                const Text(
+                Text(
                   'No attachments',
                   style: TextStyle(
                     fontSize: 13,
@@ -77,7 +77,7 @@ class RecordDetailsDialog extends StatelessWidget {
                 ...record.attachments.map(
                   (attachment) => Container(
                     margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: AppColors.border),
@@ -99,7 +99,7 @@ class RecordDetailsDialog extends StatelessWidget {
                                 : attachment.url,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                               color: AppColors.textPrimary,
@@ -144,7 +144,7 @@ class RecordDetailsDialog extends StatelessWidget {
             width: 92,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
@@ -154,7 +154,7 @@ class RecordDetailsDialog extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
