@@ -91,7 +91,7 @@ class _SymptomFormSheetState extends State<SymptomFormSheet> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -103,7 +103,7 @@ class _SymptomFormSheetState extends State<SymptomFormSheet> {
                     onPressed: _submitting
                         ? null
                         : () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                     color: AppColors.textSecondary,
                   ),
                 ],
@@ -226,7 +226,7 @@ class _SymptomFormSheetState extends State<SymptomFormSheet> {
                           : () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.border),
+                        side: BorderSide(color: AppColors.border),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -408,7 +408,7 @@ class _DateField extends StatelessWidget {
       child: Ink(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
         ),
@@ -417,7 +417,7 @@ class _DateField extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -429,7 +429,7 @@ class _DateField extends StatelessWidget {
               text,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -472,7 +472,7 @@ class _SelectField extends StatelessWidget {
               ? null
               : Text(
                   hint!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -502,40 +502,40 @@ InputDecoration _inputDecoration(String label, {String? hint}) {
     labelText: label,
     hintText: hint,
     floatingLabelBehavior: FloatingLabelBehavior.always,
-    labelStyle: const TextStyle(
+    labelStyle: TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 13,
       fontWeight: FontWeight.w600,
       color: AppColors.textPrimary,
     ),
-    floatingLabelStyle: const TextStyle(
+    floatingLabelStyle: TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 13,
       fontWeight: FontWeight.w600,
       color: AppColors.textSecondary,
     ),
-    hintStyle: const TextStyle(
+    hintStyle: TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 14,
       fontWeight: FontWeight.w500,
       color: AppColors.textSecondary,
     ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide(color: AppColors.border),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.primary),
+      borderSide: BorderSide(color: AppColors.primary),
     ),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     filled: true,
-    fillColor: Colors.white,
+    fillColor: AppColors.surfaceSoft,
   );
 }
 
-const _fieldTextStyle = TextStyle(
+final _fieldTextStyle = TextStyle(
   fontFamily: 'Urbanist',
   fontSize: 14,
   fontWeight: FontWeight.w500,
