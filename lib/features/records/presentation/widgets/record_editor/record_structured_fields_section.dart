@@ -21,7 +21,7 @@ class RecordStructuredFieldsSection extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -30,7 +30,7 @@ class RecordStructuredFieldsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Structured fields',
             style: TextStyle(
               fontSize: 12.5,
@@ -86,7 +86,7 @@ class _StructuredFieldInput extends StatelessWidget {
       children: [
         Text(
           field.label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -96,7 +96,7 @@ class _StructuredFieldInput extends StatelessWidget {
         TextFormField(
           initialValue: value,
           onChanged: onChanged,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -104,7 +104,7 @@ class _StructuredFieldInput extends StatelessWidget {
           decoration: InputDecoration(
             isDense: true,
             hintText: field.placeholder,
-            hintStyle: const TextStyle(
+            hintStyle: TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -114,7 +114,7 @@ class _StructuredFieldInput extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
           ),
         ),

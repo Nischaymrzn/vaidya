@@ -103,7 +103,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
       actionsPadding: const EdgeInsets.fromLTRB(12, 0, 12, 10),
       title: Text(
         isEdit ? 'Edit record' : 'Add manual record',
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 20,
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,
@@ -207,7 +207,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
                   const SizedBox(height: 10),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(10),
@@ -215,7 +215,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
                         color: AppColors.primary.withValues(alpha: 0.2),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(
                           Icons.image_outlined,
@@ -280,7 +280,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
       controller: controller,
       validator: validator,
       maxLines: maxLines,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13.5,
         color: AppColors.textPrimary,
         fontWeight: FontWeight.w500,
@@ -296,7 +296,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
     );
@@ -320,7 +320,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
       items: items
@@ -348,7 +348,7 @@ class _RecordFormDialogState extends State<RecordFormDialog> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
       onTap: () async {
