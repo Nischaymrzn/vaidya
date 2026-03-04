@@ -4,21 +4,25 @@ import 'package:vaidya/features/symptoms/data/datasources/symptoms_datasource.da
 import 'package:vaidya/features/symptoms/data/models/symptom_api_model.dart';
 import 'package:vaidya/features/symptoms/data/models/symptom_hive_model.dart';
 
-final symptomsLocalDataSourceProvider = Provider<ISymptomsLocalDataSource>((ref) {
-  return SymptomsLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
+final symptomsLocalDataSourceProvider = Provider<ISymptomsLocalDataSource>((
+  ref,
+) {
+  return SymptomsLocalDataSource(
+    saveService: ref.read(featureCacheServiceProvider),
+  );
 });
 
 class SymptomsLocalDataSource implements ISymptomsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const SymptomsLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const SymptomsLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _itemsKey = 'symptoms_items';
   static const String _summaryKey = 'symptoms_summary';
 
   @override
-  Future<void> cacheSymptoms(List<SymptomApiModel> items) {
+  Future<void> saveSymptoms(List<SymptomApiModel> items) {
     final encoded = items
         .map((item) => SymptomHiveModel.fromApiModel(item).toJson())
         .toList(growable: false);
@@ -26,7 +30,7 @@ class SymptomsLocalDataSource implements ISymptomsLocalDataSource {
   }
 
   @override
-  Future<List<SymptomApiModel>> getCachedSymptoms() async {
+  Future<List<SymptomApiModel>> getSymptoms() async {
     final cached = await _cacheService.readList(_itemsKey);
     return cached
         .map((item) => SymptomHiveModel.fromJson(item).toApiModel())
@@ -34,8 +38,8 @@ class SymptomsLocalDataSource implements ISymptomsLocalDataSource {
   }
 
   @override
-  Future<SymptomApiModel?> getCachedSymptomById(String id) async {
-    final cached = await getCachedSymptoms();
+  Future<SymptomApiModel?> getSymptomById(String id) async {
+    final cached = await getSymptoms();
     for (final item in cached) {
       if (_sameId(item.data, id)) {
         return item;
@@ -52,7 +56,7 @@ class SymptomsLocalDataSource implements ISymptomsLocalDataSource {
       return payload;
     }
 
-    final cached = await getCachedSymptoms();
+    final cached = await getSymptoms();
     final updated = List<SymptomApiModel>.from(cached);
     final index = updated.indexWhere((item) => _sameId(item.data, id));
 
@@ -62,31 +66,31 @@ class SymptomsLocalDataSource implements ISymptomsLocalDataSource {
       updated.insert(0, payload);
     }
 
-    await cacheSymptoms(updated);
+    await saveSymptoms(updated);
     return payload;
   }
 
   @override
   Future<bool> removeSymptomById(String id) async {
-    final cached = await getCachedSymptoms();
+    final cached = await getSymptoms();
     final updated = cached
         .where((item) => !_sameId(item.data, id))
         .toList(growable: false);
     if (updated.length == cached.length) {
       return false;
     }
-    await cacheSymptoms(updated);
+    await saveSymptoms(updated);
     return true;
   }
 
   @override
-  Future<void> cacheSymptomsSummary(Map<String, dynamic> payload) {
-    final model = SymptomsSummaryHiveModel.fromJson(payload);
+  Future<void> saveSymptomsSummary(Map<String, dynamic> data) {
+    final model = SymptomsSummaryHiveModel.fromJson(data);
     return _cacheService.writeMap(_summaryKey, model.toJson());
   }
 
   @override
-  Future<Map<String, dynamic>?> getCachedSymptomsSummary() async {
+  Future<Map<String, dynamic>?> getSymptomsSummary() async {
     final cached = await _cacheService.readMap(_summaryKey);
     if (cached == null) return null;
     return SymptomsSummaryHiveModel.fromJson(cached).toJson();
