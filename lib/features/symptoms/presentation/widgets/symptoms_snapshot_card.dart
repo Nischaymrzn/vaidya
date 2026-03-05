@@ -32,7 +32,7 @@ class SymptomsSnapshotCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Symptom snapshot',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -42,7 +42,7 @@ class SymptomsSnapshotCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'A quick overview of your tracked symptoms.',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -52,80 +52,94 @@ class SymptomsSnapshotCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          GridView.builder(
-            itemCount: cards.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 1.75,
-            ),
-            itemBuilder: (context, index) {
-              final item = cards[index];
-              return Container(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(18),
-                  color: const Color(0xFFF8FAFC),
-                  border: Border.all(
-                    color: AppColors.border.withValues(alpha: .7),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.$1.toUpperCase(),
-                      style: const TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                        letterSpacing: .7,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isTablet = constraints.maxWidth >= 700;
+              final gridDelegate = isTablet
+                  ? const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      mainAxisExtent: 142,
+                    )
+                  : const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: 1.75,
+                    );
+
+              return GridView.builder(
+                itemCount: cards.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: gridDelegate,
+                itemBuilder: (context, index) {
+                  final item = cards[index];
+                  return Container(
+                    padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      color: AppColors.surfaceSoft,
+                      border: Border.all(
+                        color: AppColors.border.withValues(alpha: .7),
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item.$2,
-                      style: const TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        height: 1,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.$1.toUpperCase(),
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                            letterSpacing: .7,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          item.$2,
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 26,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                            height: 1,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          item.$3,
+                          style: TextStyle(
+                            fontFamily: 'Urbanist',
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      item.$3,
-                      style: const TextStyle(
-                        fontFamily: 'Urbanist',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
             },
           ),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(999),
-              color: const Color(0xFFF8FAFC),
+              color: AppColors.surfaceSoft,
               border: Border.all(color: AppColors.border.withValues(alpha: .7)),
             ),
             child: Text(
               hasData
                   ? 'Keep entries consistent to improve symptom trend accuracy.'
                   : 'Start logging symptoms to build your trend history.',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,

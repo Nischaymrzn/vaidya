@@ -16,7 +16,7 @@ class SymptomsSupportCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(24),
@@ -32,17 +32,17 @@ class SymptomsSupportCard extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
+                  color: Color(0xFFFEF3C7),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(
+                child: Icon(
                   LucideIcons.triangleAlert,
                   size: 18,
                   color: Color(0xFFD97706),
                 ),
               ),
-              const SizedBox(width: 10),
-              const Expanded(
+              SizedBox(width: 10),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -70,18 +70,18 @@ class SymptomsSupportCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+            padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              color: const Color(0xFFF8FAFC),
+              color: AppColors.surfaceSoft,
               border: Border.all(color: AppColors.border.withValues(alpha: .8)),
             ),
             child: Text(
               advisoryText,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -90,20 +90,20 @@ class SymptomsSupportCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
               onPressed: onTalkToAi,
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.border),
-                padding: const EdgeInsets.symmetric(vertical: 11),
+                side: BorderSide(color: AppColors.border),
+                padding: EdgeInsets.symmetric(vertical: 11),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Talk to Vaidya.ai',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -119,3 +119,4 @@ class SymptomsSupportCard extends StatelessWidget {
     );
   }
 }
+
