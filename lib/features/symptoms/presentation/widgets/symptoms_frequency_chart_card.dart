@@ -15,7 +15,7 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(24),
@@ -24,7 +24,7 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Most frequent symptoms',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -34,7 +34,7 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
+          Text(
             'Top 5 symptom types from your logs',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -51,12 +51,12 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: const Color(0xFFF8FAFC),
+                color: AppColors.surfaceSoft,
                 border: Border.all(
                   color: AppColors.border.withValues(alpha: .75),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'No symptom trends yet',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -118,7 +118,7 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
                                 item.name,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -138,3 +138,4 @@ class SymptomsFrequencyChartCard extends StatelessWidget {
     );
   }
 }
+

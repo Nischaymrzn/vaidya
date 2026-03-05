@@ -9,9 +9,10 @@ class SymptomsAnomaliesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         color: AppColors.primary,
@@ -89,21 +90,25 @@ class SymptomsAnomaliesCard extends StatelessWidget {
             child: OutlinedButton(
               onPressed: onOpenTracker,
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                backgroundColor: Colors.white,
+                foregroundColor: isDark
+                    ? AppColors.textPrimary
+                    : AppColors.primary,
+                backgroundColor: isDark ? AppColors.card : Colors.white,
                 side: BorderSide.none,
                 padding: const EdgeInsets.symmetric(vertical: 11),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Open anomalies tracker',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: isDark
+                      ? AppColors.textPrimary
+                      : AppColors.primary,
                 ),
               ),
             ),
