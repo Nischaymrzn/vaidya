@@ -79,11 +79,11 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            padding: EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Symptom history',
                   style: TextStyle(
                     fontFamily: 'Urbanist',
@@ -92,17 +92,17 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   '${filtered.length} of ${widget.items.length} records',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
@@ -110,7 +110,7 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                         height: 42,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
-                          color: const Color(0xFFF8FAFC),
+                          color: AppColors.surfaceSoft,
                           border: Border.all(color: AppColors.border),
                         ),
                         child: TextField(
@@ -121,13 +121,13 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                               _page = 1;
                             });
                           },
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary,
                           ),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Search...',
                             isDense: true,
@@ -147,23 +147,23 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Container(
                       height: 42,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: const Color(0xFFF8FAFC),
+                        color: AppColors.surfaceSoft,
                         border: Border.all(color: AppColors.border),
                       ),
                       child: Row(
                         children: [
-                          const Icon(
+                          Icon(
                             LucideIcons.funnel,
                             size: 16,
                             color: AppColors.textSecondary,
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               value: _severity,
@@ -173,7 +173,7 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                                       value: item,
                                       child: Text(
                                         item == 'All' ? 'All severity' : item,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontFamily: 'Urbanist',
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
@@ -200,16 +200,16 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
               ],
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.border),
+          Divider(height: 1, thickness: 1, color: AppColors.border),
           if (widget.loading && widget.items.isEmpty)
-            const SizedBox(
+            SizedBox(
               height: 300,
               child: Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
             )
           else if (filtered.isEmpty)
-            const SizedBox(
+            SizedBox(
               height: 240,
               child: Center(
                 child: Text(
@@ -240,27 +240,27 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
             ),
           if (filtered.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+              padding: EdgeInsets.fromLTRB(16, 10, 16, 12),
               child: Row(
                 children: [
                   Text(
                     'Page $_page of $_totalPages',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   OutlinedButton(
                     onPressed: _page <= 1
                         ? null
                         : () => setState(() => _page = _page - 1),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textSecondary,
-                      side: const BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(
+                      side: BorderSide(color: AppColors.border),
+                      padding: EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 7,
                       ),
@@ -268,7 +268,7 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Prev',
                       style: TextStyle(
                         fontFamily: 'Urbanist',
@@ -277,14 +277,14 @@ class _SymptomsHistoryCardState extends State<SymptomsHistoryCard> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: _page >= _totalPages
                         ? null
                         : () => setState(() => _page = _page + 1),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: AppColors.border),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 7,
@@ -339,11 +339,11 @@ class _DesktopTable extends StatelessWidget {
           children: [
             Container(
               height: 42,
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSoft,
                 border: Border(bottom: BorderSide(color: AppColors.border)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   _HeaderCell('SYMPTOMS', flex: 50, align: TextAlign.left),
                   _HeaderCell('SEVERITY', flex: 16),
@@ -368,7 +368,7 @@ class _DesktopRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
@@ -376,13 +376,13 @@ class _DesktopRow extends StatelessWidget {
           Expanded(
             flex: 50,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 8, 10),
+              padding: EdgeInsets.fromLTRB(10, 10, 8, 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     item.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
@@ -390,12 +390,12 @@ class _DesktopRow extends StatelessWidget {
                     ),
                   ),
                   if ((item.notes ?? '').isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       item.notes!,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -418,7 +418,7 @@ class _DesktopRow extends StatelessWidget {
             flex: 16,
             child: Text(
               item.statusLabel,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -430,7 +430,7 @@ class _DesktopRow extends StatelessWidget {
             flex: 18,
             child: Text(
               _relativeTime(item.relevantDate),
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -458,15 +458,15 @@ class _MobileList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 6),
+      padding: EdgeInsets.fromLTRB(10, 8, 10, 6),
       child: Column(
         children: items
             .map(
               (item) => Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                margin: EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: AppColors.border.withValues(alpha: .8),
@@ -480,10 +480,10 @@ class _MobileList extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 4),
+                            padding: EdgeInsets.only(left: 4),
                             child: Text(
                               item.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -491,7 +491,7 @@ class _MobileList extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Wrap(
                             alignment: WrapAlignment.center,
                             crossAxisAlignment: WrapCrossAlignment.center,
@@ -501,7 +501,7 @@ class _MobileList extends StatelessWidget {
                               _SeverityBadge(text: item.severityLabel),
                               Text(
                                 item.statusLabel,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -511,7 +511,7 @@ class _MobileList extends StatelessWidget {
 
                               Text(
                                 _relativeTime(item.relevantDate),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -521,14 +521,14 @@ class _MobileList extends StatelessWidget {
                             ],
                           ),
                           if ((item.notes ?? '').isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Padding(
-                              padding: const EdgeInsets.only(left: 6),
+                              padding: EdgeInsets.only(left: 6),
                               child: Text(
                                 item.notes!,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Urbanist',
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
@@ -565,7 +565,7 @@ class _ActionMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(
+      icon: Icon(
         LucideIcons.ellipsis,
         size: 18,
         color: AppColors.textSecondary,
@@ -670,7 +670,7 @@ class _HeaderCell extends StatelessWidget {
         child: Text(
           text,
           textAlign: align,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 12,
             fontWeight: FontWeight.w500,
@@ -691,7 +691,7 @@ class _SeverityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (text == null || text!.trim().isEmpty) {
-      return const Text(
+      return Text(
         '-',
         style: TextStyle(
           fontFamily: 'Urbanist',
@@ -751,3 +751,4 @@ String _relativeTime(DateTime? date) {
   }
   return 'Just now';
 }
+
