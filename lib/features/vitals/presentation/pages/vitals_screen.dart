@@ -38,6 +38,8 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final state = ref.watch(vitalsViewModelProvider);
 
     final viewData = VitalsOverviewViewData.fromSources(
@@ -63,25 +65,25 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
     });
 
     final body = state.status == VitalsStatus.loading && !hasData
-        ? const Center(
+        ? Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           )
         : RefreshIndicator(
             onRefresh: _onRefresh,
             color: AppColors.primary,
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+              physics: AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   VitalsOverviewHeader(onAddReading: () => _openEntrySheet()),
                   if (state.status == VitalsStatus.loading && hasData) ...[
-                    const SizedBox(height: 12),
-                    const LinearProgressIndicator(
+                    SizedBox(height: 12),
+                    LinearProgressIndicator(
                       minHeight: 2,
                       color: AppColors.primary,
-                      backgroundColor: Color(0xFFE6EEF9),
+                      backgroundColor: AppColors.primarySoft,
                     ),
                   ],
                   if (state.status == VitalsStatus.error && hasData) ...[
@@ -126,13 +128,13 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
                       return Column(
                         children: [
                           trendCard,
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
                           heartCard,
                         ],
                       );
                     },
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   VitalsLogCard(
                     records: viewData.records,
                     onAddEntry: () => _openEntrySheet(),
@@ -147,7 +149,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      drawer: const AppSideDrawer(
+      drawer: AppSideDrawer(
         currentDestination: AppDrawerDestination.vitals,
       ),
       bottomNavigationBar: AppMainBottomNav(
@@ -159,12 +161,12 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.only(left: 10),
           child: AppDrawerToggleButton(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'Vitals',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -213,7 +215,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
       context: context,
       useSafeArea: true,
       backgroundColor: AppColors.background,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
       ),
       builder: (_) => _RecordDetailsSheet(record: record),
@@ -233,7 +235,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text(
+          title: Text(
             'Delete this entry?',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -241,7 +243,7 @@ class _VitalsScreenState extends ConsumerState<VitalsScreen> {
               color: AppColors.textPrimary,
             ),
           ),
-          content: const Text(
+          content: Text(
             'This will remove the vitals reading permanently.',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -346,21 +348,26 @@ class _ErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFFFEF2F2),
-        border: Border.all(color: const Color(0xFFFCA5A5)),
+        color: isDark ? AppColors.dangerSurface : const Color(0xFFFEF2F2),
+        border: Border.all(
+          color: isDark
+              ? AppColors.error.withValues(alpha: 0.35)
+              : const Color(0xFFFCA5A5),
+        ),
       ),
       child: Text(
         message,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 13,
           fontWeight: FontWeight.w500,
-          color: Color(0xFFB91C1C),
+          color: isDark ? AppColors.error : Color(0xFFB91C1C),
         ),
       ),
     );
@@ -376,14 +383,14 @@ class _RecordDetailsSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+        padding: EdgeInsets.fromLTRB(18, 14, 18, 18),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     'Vitals details',
                     style: TextStyle(
@@ -396,7 +403,7 @@ class _RecordDetailsSheet extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close_rounded),
+                  icon: Icon(Icons.close_rounded),
                   color: AppColors.textSecondary,
                 ),
               ],
@@ -465,7 +472,7 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -473,7 +480,7 @@ class _InfoRow extends StatelessWidget {
             width: 122,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -484,7 +491,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
