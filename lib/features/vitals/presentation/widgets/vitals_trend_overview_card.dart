@@ -17,6 +17,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final heartSpots = _spots((point) => point.heartRate);
     final systolicSpots = _spots((point) => point.systolic);
     final glucoseSpots = _spots((point) => point.glucose);
@@ -48,7 +49,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+        padding: EdgeInsets.fromLTRB(16, 14, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -57,7 +58,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                 final wide = constraints.maxWidth >= 640;
 
                 if (wide) {
-                  return const Row(
+                  return Row(
                     children: [
                       Expanded(
                         child: Text(
@@ -88,7 +89,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                   );
                 }
 
-                return const Column(
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -115,11 +116,11 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             SizedBox(
               height: 210,
               child: trend.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'No trend data yet.',
                         style: TextStyle(
@@ -141,10 +142,12 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                           drawVerticalLine: false,
                           horizontalInterval: ((maxY - minY) / 4).clamp(10, 40),
                           getDrawingHorizontalLine: (value) {
-                            return const FlLine(
-                              color: Color(0xFFDDE6F2),
+                            return FlLine(
+                              color: isDark
+                                  ? AppColors.borderStrong
+                                  : const Color(0xFFDDE6F2),
                               strokeWidth: 1,
-                              dashArray: [4, 4],
+                              dashArray: const [4, 4],
                             );
                           },
                         ),
@@ -156,7 +159,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                           rightTitles: const AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
                           ),
-                          topTitles: const AxisTitles(
+                          topTitles: AxisTitles(
                             sideTitles: SideTitles(showTitles: false),
                           ),
                           bottomTitles: AxisTitles(
@@ -166,18 +169,18 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                               getTitlesWidget: (value, meta) {
                                 final index = value.round();
                                 if (index < 0 || index >= trend.length) {
-                                  return const SizedBox.shrink();
+                                  return SizedBox.shrink();
                                 }
                                 final label = trend[index].label.trim();
                                 if (label.isEmpty) {
-                                  return const SizedBox.shrink();
+                                  return SizedBox.shrink();
                                 }
 
                                 return Padding(
-                                  padding: const EdgeInsets.only(top: 8),
+                                  padding: EdgeInsets.only(top: 8),
                                   child: Text(
                                     label,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontFamily: 'Urbanist',
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
@@ -194,8 +197,8 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                           touchTooltipData: LineTouchTooltipData(
                             fitInsideHorizontally: true,
                             fitInsideVertically: true,
-                            getTooltipColor: (_) => Colors.white,
-                            tooltipPadding: const EdgeInsets.symmetric(
+                            getTooltipColor: (_) => AppColors.card,
+                            tooltipPadding: EdgeInsets.symmetric(
                               horizontal: 8,
                               vertical: 6,
                             ),
@@ -204,7 +207,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
                                   .map((spot) {
                                     return LineTooltipItem(
                                       spot.y.toStringAsFixed(0),
-                                      const TextStyle(
+                                      TextStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
@@ -293,7 +296,7 @@ class VitalsTrendOverviewCard extends StatelessWidget {
       barWidth: width,
       dashArray: dashArray,
       isStrokeCapRound: true,
-      dotData: const FlDotData(show: false),
+      dotData: FlDotData(show: false),
       belowBarData: BarAreaData(
         show: fillOpacity > 0,
         color: AppColors.primary.withValues(alpha: fillOpacity),
@@ -310,7 +313,7 @@ class _LegendRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Wrap(
+    return Wrap(
       spacing: 14,
       runSpacing: 6,
       children: [
@@ -341,10 +344,10 @@ class _LegendDot extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 6),
+        SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -364,7 +367,7 @@ class _TrendStatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -375,7 +378,7 @@ class _TrendStatTile extends StatelessWidget {
         children: [
           Text(
             card.label.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 11,
               letterSpacing: 0.8,
@@ -383,10 +386,10 @@ class _TrendStatTile extends StatelessWidget {
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 5),
           Text(
             card.displayValue,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 20,
               height: 1,
@@ -394,10 +397,10 @@ class _TrendStatTile extends StatelessWidget {
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           Text(
             card.delta,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 12,
               fontWeight: FontWeight.w500,
