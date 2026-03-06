@@ -11,7 +11,7 @@ class VitalsOverviewHeader extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -38,7 +38,7 @@ class VitalsOverviewHeader extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         FilledButton(
           onPressed: onAddReading,
           style: FilledButton.styleFrom(

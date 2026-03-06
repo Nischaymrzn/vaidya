@@ -69,7 +69,7 @@ class _VitalMetricCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Ink(
-          padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+          padding: EdgeInsets.fromLTRB(14, 13, 14, 13),
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(18),
@@ -90,7 +90,7 @@ class _VitalMetricCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       card.label.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 12,
                         letterSpacing: 0.9,
@@ -112,7 +112,7 @@ class _VitalMetricCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 card.displayValue,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 20,
                   height: 1.0,
@@ -125,7 +125,7 @@ class _VitalMetricCard extends StatelessWidget {
                 card.delta,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
