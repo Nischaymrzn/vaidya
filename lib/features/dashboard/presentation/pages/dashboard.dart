@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:vaidya/core/widgets/app_main_bottom_nav.dart';
 import 'package:vaidya/features/analytics/presentation/pages/analytics_screen.dart';
-import 'package:vaidya/themes/colors.dart';
 import 'package:vaidya/features/dashboard/presentation/pages/home_screen.dart';
-import 'package:vaidya/features/intelligence/presentation/pages/vaidya_ai_screen.dart';
+import 'package:vaidya/features/intelligence/presentation/pages/risk_analysis_screen.dart';
 import 'package:vaidya/features/profile/presentation/pages/profile_screen.dart';
 import 'package:vaidya/features/records/presentation/pages/records_screen.dart';
 
@@ -22,7 +21,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final List<Widget> _screens = const [
     HomeScreen(),
     RecordsScreen(),
-    VaidyaAiScreen(),
+    RiskAnalysisScreen(),
     AnalyticsScreen(),
     ProfileScreen(),
   ];
@@ -37,50 +36,42 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.grey, width: 0.5)),
-        ),
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: AppColors.background,
-          elevation: 0,
-          currentIndex: _selectedIndex,
-          selectedItemColor: AppColors.activeNav,
-          unselectedItemColor: AppColors.isNotActiveNav,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          onTap: (index) => setState(() => _selectedIndex = index),
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(LucideIcons.layoutDashboard, size: 22),
-              activeIcon: const Icon(LucideIcons.layoutDashboard, size: 22),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(LucideIcons.folderHeart, size: 22),
-              activeIcon: const Icon(LucideIcons.folderHeart, size: 22),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(LucideIcons.brain, size: 22),
-              activeIcon: const Icon(LucideIcons.brain, size: 22),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(LucideIcons.chartColumnBig, size: 22),
-              activeIcon: const Icon(LucideIcons.chartColumnBig, size: 22),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(LucideIcons.user, size: 22),
-              activeIcon: const Icon(LucideIcons.user, size: 22),
-              label: '',
-            ),
-          ],
-        ),
+      bottomNavigationBar: AppMainBottomNav(
+        activeItem: _itemFromIndex(_selectedIndex),
+        onTap: (item) {
+          setState(() => _selectedIndex = _indexFromItem(item));
+        },
       ),
     );
   }
-}
 
+  MainBottomNavItem _itemFromIndex(int index) {
+    switch (index) {
+      case 1:
+        return MainBottomNavItem.records;
+      case 2:
+        return MainBottomNavItem.intelligence;
+      case 3:
+        return MainBottomNavItem.analytics;
+      case 4:
+        return MainBottomNavItem.profile;
+      default:
+        return MainBottomNavItem.home;
+    }
+  }
+
+  int _indexFromItem(MainBottomNavItem item) {
+    switch (item) {
+      case MainBottomNavItem.home:
+        return 0;
+      case MainBottomNavItem.records:
+        return 1;
+      case MainBottomNavItem.intelligence:
+        return 2;
+      case MainBottomNavItem.analytics:
+        return 3;
+      case MainBottomNavItem.profile:
+        return 4;
+    }
+  }
+}

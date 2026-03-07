@@ -7,29 +7,32 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseTheme = ThemeData.light();
+    final urbanistTheme = ThemeData(
+      brightness: Brightness.light,
+      fontFamily: 'Urbanist',
+    );
+    final appTextTheme = urbanistTheme.textTheme.apply(
+      bodyColor: AppColors.textPrimary,
+      displayColor: AppColors.textPrimary,
+    );
 
     return MaterialApp(
       title: 'Vaidya.ai',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        brightness: Brightness.light,
         fontFamily: 'Urbanist',
-        scaffoldBackgroundColor: AppColors.background,
-        textTheme: baseTheme.textTheme.apply(
-          fontFamily: 'Urbanist',
+        textTheme: appTextTheme,
+        primaryTextTheme: urbanistTheme.primaryTextTheme.apply(
           bodyColor: AppColors.textPrimary,
           displayColor: AppColors.textPrimary,
         ),
-        primaryTextTheme: baseTheme.primaryTextTheme.apply(
-          fontFamily: 'Urbanist',
-        ),
+        scaffoldBackgroundColor: AppColors.background,
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           selectedLabelStyle: TextStyle(
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.w500,
           ),
           unselectedLabelStyle: TextStyle(
-            fontFamily: 'Urbanist',
             fontWeight: FontWeight.w400,
           ),
         ),

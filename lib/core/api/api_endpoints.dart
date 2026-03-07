@@ -1,11 +1,14 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // Base URL - change this for production
-  static const String baseUrl = 'http://10.0.2.2:5000/v1/api';
-  //static const String baseUrl = 'http://10.0.2.2:5000/v1/api';
-  // For Android Emulator use: 'http://10.0.2.2:5000/api/v1'
-  // For Physical Device use your computer's IP: 'http://192.168.x.x:5000/api/v1'
+  // Default is LAN IP for direct `flutter run` on physical device.
+  // Override when needed:
+  // --dart-define=API_BASE_URL=http://<host>:5000/v1/api
+  // Android emulator example: http://10.0.2.2:5000/v1/api
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://192.168.1.2:5000/v1/api',
+  );
 
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
@@ -36,7 +39,6 @@ class ApiEndpoints {
   static const String aiScan = '/ai-scan';
   static const String files = '/files';
 
-  
   // ============ Vitals Endpoints ============
   static const String vitals = '/vitals';
   static const String vitalsSummary = '/vitals/summary';
@@ -77,8 +79,10 @@ class ApiEndpoints {
   static const String familyGroups = '/family-groups';
   static const String familyMyGroup = '/family-groups/me';
   static const String familySummary = '/family-groups/me/summary';
-  static String familyInvite(String groupId) => '/family-groups/$groupId/invitations';
-  static String familyAddMember(String groupId) => '/family-groups/$groupId/members';
+  static String familyInvite(String groupId) =>
+      '/family-groups/$groupId/invitations';
+  static String familyAddMember(String groupId) =>
+      '/family-groups/$groupId/members';
   static String familyUpdateMember(String groupId, String memberId) =>
       '/family-groups/$groupId/members/$memberId';
   static String familyJoin(String token) => '/family-groups/join/$token';
@@ -103,14 +107,8 @@ class ApiEndpoints {
   static const String predictBrainTumor = '/predict/brain-tumor';
   static const String predictTuberculosis = '/predict/tuberculosis';
 
-  // ============ Admin Endpoints ============
-  static const String adminUsersBase = '/admin/users';
-  static String adminUsers({int page = 1, int limit = 10}) =>
-      '$adminUsersBase?page=$page&limit=$limit';
-  static String adminUserById(String id) => '$adminUsersBase/$id';
   // ============ User Endpoints ============
   static const String user = '/users';
   static String userById(String id) => '/users/$id';
   static String updateUser(String id) => '/users/$id';
 }
-

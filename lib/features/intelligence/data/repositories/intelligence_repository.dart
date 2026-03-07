@@ -43,7 +43,7 @@ class IntelligenceRepository implements IIntelligenceRepository {
           maxItems: maxItems,
           force: force,
         );
-        await _localDataSource.cacheInsights(remote.map((e) => e.data).toList(growable: false));
+        await _localDataSource.cacheInsights(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to generate AI insights'));
@@ -54,7 +54,7 @@ class IntelligenceRepository implements IIntelligenceRepository {
 
     final cached = await _localDataSource.getCachedInsights();
     if (cached.isNotEmpty) {
-      return Right(cached.map((e) => AiInsightEntity(id: (e['_id'] ?? e['id'] ?? '').toString(), data: e)).toList(growable: false));
+      return Right(cached.map((e) => e.toEntity()).toList(growable: false));
     }
 
     return const Left(ApiFailure(message: 'No internet connection and no cached AI insights available.'));

@@ -23,6 +23,7 @@ class UserSessionService {
   static const String _keyUserRole = 'user_role';
   static const String _keyUserNumber = 'user_number';
   static const String _keyUserProfilePicture = 'user_profile_picture';
+  static const String _keyUserIsPremium = 'user_is_premium';
 
   UserSessionService({required SharedPreferences prefs}) : _prefs = prefs;
 
@@ -34,6 +35,7 @@ class UserSessionService {
     String? role,
     String? number,
     String? profilePicture,
+    bool? isPremium,
   }) async {
     await _prefs.setBool(_keyIsLoggedIn, true);
     await _prefs.setString(_keyUserId, userId);
@@ -41,6 +43,7 @@ class UserSessionService {
     await _prefs.setString(_keyUserName, name);
     await _prefs.setString(_keyUserRole, role ?? "");
     await _prefs.setString(_keyUserNumber, number ?? "");
+    await _prefs.setBool(_keyUserIsPremium, isPremium ?? false);
     if (profilePicture != null) {
       await _prefs.setString(_keyUserProfilePicture, profilePicture);
     }
@@ -81,6 +84,10 @@ class UserSessionService {
     return _prefs.getString(_keyUserProfilePicture);
   }
 
+  bool getCurrentUserIsPremium() {
+    return _prefs.getBool(_keyUserIsPremium) ?? false;
+  }
+
   // Clear user session (logout)
   Future<void> clearSession() async {
     await _prefs.remove(_keyIsLoggedIn);
@@ -90,5 +97,6 @@ class UserSessionService {
     await _prefs.remove(_keyUserRole);
     await _prefs.remove(_keyUserNumber);
     await _prefs.remove(_keyUserProfilePicture);
+    await _prefs.remove(_keyUserIsPremium);
   }
 }

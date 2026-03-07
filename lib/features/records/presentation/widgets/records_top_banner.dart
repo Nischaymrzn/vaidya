@@ -3,9 +3,14 @@ import 'package:vaidya/core/widgets/app_drawer_toggle_button.dart';
 import 'package:vaidya/themes/colors.dart';
 
 class RecordsTopBanner extends StatelessWidget {
+  final int unreadCount;
   final VoidCallback? onNotificationTap;
 
-  const RecordsTopBanner({super.key, this.onNotificationTap});
+  const RecordsTopBanner({
+    super.key,
+    this.unreadCount = 0,
+    this.onNotificationTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +23,12 @@ class RecordsTopBanner extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 12, 18, 14),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const AppDrawerToggleButton(
                 color: Colors.white,
-                size: 21,
                 padding: EdgeInsets.zero,
               ),
               const SizedBox(width: 10),
@@ -68,19 +72,38 @@ class RecordsTopBanner extends StatelessWidget {
                       size: 22,
                     ),
                   ),
-                  Positioned(
-                    right: -2,
-                    top: -2,
-                    child: Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE53935),
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: AppColors.primary, width: 1),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: -4,
+                      top: -5,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4.5,
+                          vertical: 2,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE53935),
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(
+                            color: AppColors.primary,
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          unreadCount > 99 ? '99+' : '$unreadCount',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ],

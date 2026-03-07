@@ -57,7 +57,7 @@ class MetricsCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(14, 8, 0, 0),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(20),
@@ -70,59 +70,72 @@ class MetricsCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(8),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Color(0xFFE5E7EB),
                     shape: BoxShape.circle,
                   ),
-                  child: SvgPicture.asset(iconPath, height: 20, width: 20),
+                  child: SvgPicture.asset(iconPath, height: 16, width: 16),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
             Padding(
-              padding: const EdgeInsets.only(left: 12),
+              padding: const EdgeInsets.only(left: 2),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      text: value,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'Urbanist',
-                      ),
-                      children: [
-                        TextSpan(
-                          text: ' $unit',
-                          style: TextStyle(
-                            color: AppColors.textSecondary.withValues(
-                              alpha: 0.78,
-                            ),
-                            fontSize: 14,
+                  SizedBox(
+                    width: double.infinity,
+                    child: FittedBox(
+                      alignment: Alignment.centerLeft,
+                      fit: BoxFit.scaleDown,
+                      child: RichText(
+                        text: TextSpan(
+                          text: value,
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: 20,
+                            height: 1.0,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Urbanist',
                           ),
+                          children: [
+                            TextSpan(
+                              text: '  $unit',
+                              style: TextStyle(
+                                color: AppColors.textSecondary.withValues(
+                                  alpha: 0.78,
+                                ),
+                                fontSize: 12,
+                                height: 1.0,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 3),
                   // Condition Badge
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
+                      horizontal: 8,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: _getConditionColor(),

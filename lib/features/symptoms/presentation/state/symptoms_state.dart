@@ -36,10 +36,19 @@ class SymptomsState extends Equatable {
       summary: summary ?? this.summary,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
-      actionMessage: clearActionMessage ? null : actionMessage ?? this.actionMessage,
+      actionMessage: clearActionMessage
+          ? null
+          : actionMessage ?? this.actionMessage,
     );
   }
 
   @override
-  List<Object?> get props => [status, items, summary, isSubmitting, errorMessage, actionMessage];
+  List<Object?> get props => [
+    status,
+    items,
+    summary,
+    isSubmitting,
+    errorMessage,
+    actionMessage,
+  ];
 }

@@ -6,7 +6,6 @@ import 'package:vaidya/core/services/connectivity/network_info.dart';
 import 'package:vaidya/features/dashboard/data/datasources/local/user_data_local_datasource.dart';
 import 'package:vaidya/features/dashboard/data/datasources/remote/user_data_remote_datasource.dart';
 import 'package:vaidya/features/dashboard/data/datasources/user_data_datasource.dart';
-import 'package:vaidya/features/dashboard/data/models/user_data_api_model.dart';
 import 'package:vaidya/features/dashboard/domain/entities/user_data_entity.dart';
 import 'package:vaidya/features/dashboard/domain/repositories/user_data_repository.dart';
 
@@ -36,7 +35,7 @@ class UserDataRepository implements IUserDataRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getUserData();
-        await _localDataSource.cacheUserData(remote.data);
+        await _localDataSource.cacheUserData(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(
@@ -52,8 +51,7 @@ class UserDataRepository implements IUserDataRepository {
 
     final cached = await _localDataSource.getCachedUserData();
     if (cached != null) {
-      final model = UserDataApiModel.fromJson(cached);
-      return Right(model.toEntity());
+      return Right(cached.toEntity());
     }
 
     return const Left(ApiFailure(message: 'No internet connection and no cached user data available.'));
@@ -67,7 +65,7 @@ class UserDataRepository implements IUserDataRepository {
 
     try {
       final remote = await _remoteDataSource.updateUserData(payload);
-      await _localDataSource.cacheUserData(remote.data);
+      await _localDataSource.cacheUserData(remote);
       return Right(remote.toEntity());
     } on DioException catch (e) {
       return Left(

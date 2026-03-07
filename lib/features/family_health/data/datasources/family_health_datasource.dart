@@ -15,8 +15,8 @@ abstract interface class IFamilyHealthRemoteDataSource {
 }
 
 abstract interface class IFamilyHealthLocalDataSource {
-  Future<void> cacheGroup(Map<String, dynamic> payload);
-  Future<Map<String, dynamic>?> getCachedGroup();
-  Future<void> cacheSummary(Map<String, dynamic> payload);
-  Future<Map<String, dynamic>?> getCachedSummary();
+  Future<void> cacheGroup(FamilyGroupApiModel payload);
+  Future<FamilyGroupApiModel?> getCachedGroup();
+  Future<void> cacheSummary(FamilyGroupSummaryApiModel payload);
+  Future<FamilyGroupSummaryApiModel?> getCachedSummary();
 }

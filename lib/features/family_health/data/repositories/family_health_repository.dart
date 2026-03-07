@@ -36,7 +36,7 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getMyGroup();
-        await _localDataSource.cacheGroup(remote.data);
+        await _localDataSource.cacheGroup(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch family group'));
@@ -47,7 +47,7 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
 
     final cached = await _localDataSource.getCachedGroup();
     if (cached != null) {
-      return Right(FamilyGroupApiModel.fromJson(cached).toEntity());
+      return Right(cached.toEntity());
     }
     return const Left(ApiFailure(message: 'No internet connection and no cached family group available.'));
   }
@@ -57,7 +57,7 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getMyGroupSummary();
-        await _localDataSource.cacheSummary(remote.data);
+        await _localDataSource.cacheSummary(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch family summary'));
@@ -68,7 +68,7 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
 
     final cached = await _localDataSource.getCachedSummary();
     if (cached != null) {
-      return Right(FamilyGroupSummaryApiModel.fromJson(cached).toEntity());
+      return Right(cached.toEntity());
     }
     return const Left(ApiFailure(message: 'No internet connection and no cached family summary available.'));
   }
@@ -126,7 +126,7 @@ class FamilyHealthRepository implements IFamilyHealthRepository {
 
     try {
       final result = await run();
-      await _localDataSource.cacheGroup(result.data);
+      await _localDataSource.cacheGroup(result);
       return Right(result.toEntity());
     } on DioException catch (e) {
       return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? fallbackMessage));

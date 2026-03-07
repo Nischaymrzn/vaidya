@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:vaidya/features/records/domain/entities/medical_record_entity.dart';
+import 'package:vaidya/features/records/domain/entities/record_support_entity.dart';
 
 enum RecordsStatus { initial, loading, loaded, error }
 
@@ -23,6 +24,10 @@ class RecordsState extends Equatable {
   final String dateFilter;
   final bool isSubmitting;
   final bool isScanning;
+  final bool isSupportLoading;
+  final List<MedicationEntity> medications;
+  final List<AllergyEntity> allergies;
+  final List<ImmunizationEntity> immunizations;
   final String? errorMessage;
   final String? actionMessage;
 
@@ -44,6 +49,10 @@ class RecordsState extends Equatable {
     this.dateFilter = 'Any time',
     this.isSubmitting = false,
     this.isScanning = false,
+    this.isSupportLoading = false,
+    this.medications = const [],
+    this.allergies = const [],
+    this.immunizations = const [],
     this.errorMessage,
     this.actionMessage,
   });
@@ -66,6 +75,10 @@ class RecordsState extends Equatable {
     String? dateFilter,
     bool? isSubmitting,
     bool? isScanning,
+    bool? isSupportLoading,
+    List<MedicationEntity>? medications,
+    List<AllergyEntity>? allergies,
+    List<ImmunizationEntity>? immunizations,
     String? errorMessage,
     String? actionMessage,
     bool clearSelectedRecord = false,
@@ -76,8 +89,9 @@ class RecordsState extends Equatable {
       status: status ?? this.status,
       activeTab: activeTab ?? this.activeTab,
       records: records ?? this.records,
-      selectedRecord:
-          clearSelectedRecord ? null : selectedRecord ?? this.selectedRecord,
+      selectedRecord: clearSelectedRecord
+          ? null
+          : selectedRecord ?? this.selectedRecord,
       pagination: pagination ?? this.pagination,
       page: page ?? this.page,
       limit: limit ?? this.limit,
@@ -91,6 +105,10 @@ class RecordsState extends Equatable {
       dateFilter: dateFilter ?? this.dateFilter,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isScanning: isScanning ?? this.isScanning,
+      isSupportLoading: isSupportLoading ?? this.isSupportLoading,
+      medications: medications ?? this.medications,
+      allergies: allergies ?? this.allergies,
+      immunizations: immunizations ?? this.immunizations,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
       actionMessage: clearActionMessage
           ? null
@@ -117,8 +135,11 @@ class RecordsState extends Equatable {
     dateFilter,
     isSubmitting,
     isScanning,
+    isSupportLoading,
+    medications,
+    allergies,
+    immunizations,
     errorMessage,
     actionMessage,
   ];
 }
-

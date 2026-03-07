@@ -4,8 +4,11 @@ import 'package:vaidya/app/routes/app_routes.dart';
 import 'package:vaidya/core/widgets/app_side_drawer.dart';
 import 'package:vaidya/core/widgets/notifications_panel.dart';
 import 'package:vaidya/features/dashboard/domain/entities/dashboard_summary_entity.dart';
+import 'package:vaidya/features/dashboard/domain/entities/notification_entity.dart';
 import 'package:vaidya/features/dashboard/presentation/state/dashboard_state.dart';
+import 'package:vaidya/features/dashboard/presentation/state/notifications_state.dart';
 import 'package:vaidya/features/dashboard/presentation/view_model/dashboard_viewmodel.dart';
+import 'package:vaidya/features/dashboard/presentation/view_model/notifications_viewmodel.dart';
 import 'package:vaidya/features/dashboard/presentation/widgets/dashboard_ai_quick_action_card.dart';
 import 'package:vaidya/features/dashboard/presentation/widgets/dashboard_medications_allergies_card.dart';
 import 'package:vaidya/features/dashboard/presentation/widgets/dashboard_symptom_activity_card.dart';
@@ -30,6 +33,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(dashboardViewModelProvider.notifier).getDashboardSummary();
+      ref
+          .read(notificationsViewModelProvider.notifier)
+          .load(forceLoading: true);
     });
   }
 
@@ -42,12 +48,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(dashboardViewModelProvider);
+    final notificationsState = ref.watch(notificationsViewModelProvider);
     final summary = dashboardState.summary;
     final hasSummary = summary != const DashboardSummaryEntity.empty();
+    final unreadCount = notificationsState.items
+        .where((item) => !item.isRead)
+        .length;
 
     ref.listen<DashboardState>(dashboardViewModelProvider, (previous, next) {
       final previousMessage = previous?.errorMessage;
       if (next.errorMessage != null && next.errorMessage != previousMessage) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(
+              content: Text(next.errorMessage!),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+      }
+    });
+
+    ref.listen<NotificationsState>(notificationsViewModelProvider, (
+      previous,
+      next,
+    ) {
+      final previousError = previous?.errorMessage;
+      if (next.errorMessage != null && next.errorMessage != previousError) {
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
@@ -112,8 +139,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
 
     final suggestion = _resolveSuggestion(summary);
-    final notifications = _buildNotifications(summary);
-
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppSideDrawer(
@@ -124,8 +149,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         progress: summary.vaidyaScore != null
             ? '${summary.vaidyaScore!.round()}%'
             : '--',
-        onNotificationTap: () {
-          showNotificationsPanel(context, items: notifications);
+        unreadCount: unreadCount,
+        onNotificationTap: () async {
+          await ref
+              .read(notificationsViewModelProvider.notifier)
+              .load(forceLoading: true);
+          if (!mounted) return;
+          final refreshed = ref.read(notificationsViewModelProvider);
+          final refreshedItems = _buildNotificationItems(refreshed.items);
+          showNotificationsPanel(
+            this.context,
+            items: refreshedItems,
+            isLoading: refreshed.status == NotificationsStatus.loading,
+            onMarkRead: (id) async {
+              return ref
+                  .read(notificationsViewModelProvider.notifier)
+                  .markRead(id);
+            },
+            onMarkAllRead: () async {
+              return ref
+                  .read(notificationsViewModelProvider.notifier)
+                  .markAllRead();
+            },
+          );
         },
       ),
       body: RefreshIndicator(
@@ -204,40 +250,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  List<AppNotificationItem> _buildNotifications(
-    DashboardSummaryEntity summary,
+  List<AppNotificationItem> _buildNotificationItems(
+    List<NotificationEntity> notifications,
   ) {
-    final fromTimeline = summary.timelineItems
-        .take(4)
-        .map((item) {
-          final heading = item.title.toLowerCase().contains('ai')
-              ? 'AI summary ready'
-              : 'Record added';
+    if (notifications.isEmpty) {
+      return const <AppNotificationItem>[];
+    }
 
+    return notifications
+        .map((item) {
           return AppNotificationItem(
-            title: heading,
-            subtitle: item.title.isEmpty
-                ? 'New health update available.'
-                : item.title,
-            dateLabel: item.date.isEmpty ? 'Today' : item.date,
+            id: item.id,
+            title: item.title.isEmpty ? 'Notification' : item.title,
+            subtitle: item.message.isEmpty
+                ? 'You have a new health update.'
+                : item.message,
+            dateLabel: _formatNotificationDate(item.createdAt),
+            read: item.isRead,
           );
         })
         .toList(growable: false);
+  }
 
-    if (fromTimeline.isNotEmpty) return fromTimeline;
-
-    return const [
-      AppNotificationItem(
-        title: 'AI summary ready',
-        subtitle: 'Review AI insights for your latest visit.',
-        dateLabel: 'Today',
-      ),
-      AppNotificationItem(
-        title: 'Record added',
-        subtitle: 'Your recent health record was created successfully.',
-        dateLabel: 'Today',
-      ),
+  String _formatNotificationDate(DateTime? date) {
+    if (date == null) return 'Today';
+    const months = <String>[
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
+    final local = date.toLocal();
+    final month = months[local.month - 1];
+    final day = local.day.toString().padLeft(2, '0');
+    return '$month $day';
   }
 }
 

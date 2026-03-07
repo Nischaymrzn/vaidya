@@ -6,7 +6,6 @@ import 'package:vaidya/core/services/connectivity/network_info.dart';
 import 'package:vaidya/features/profile/data/datasources/local/profile_local_datasource.dart';
 import 'package:vaidya/features/profile/data/datasources/profile_datasource.dart';
 import 'package:vaidya/features/profile/data/datasources/remote/profile_remote_datasource.dart';
-import 'package:vaidya/features/profile/data/models/profile_user_api_model.dart';
 import 'package:vaidya/features/profile/domain/entities/profile_user_entity.dart';
 import 'package:vaidya/features/profile/domain/repositories/profile_repository.dart';
 
@@ -36,7 +35,7 @@ class ProfileRepository implements IProfileRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getUserById(id);
-        await _localDataSource.cacheUser(remote.data);
+        await _localDataSource.cacheUser(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch profile'));
@@ -47,7 +46,7 @@ class ProfileRepository implements IProfileRepository {
 
     final cached = await _localDataSource.getCachedUser();
     if (cached != null) {
-      return Right(ProfileUserApiModel.fromJson(cached).toEntity());
+      return Right(cached.toEntity());
     }
 
     return const Left(ApiFailure(message: 'No internet connection and no cached profile available.'));
@@ -65,7 +64,7 @@ class ProfileRepository implements IProfileRepository {
 
     try {
       final remote = await _remoteDataSource.updateUser(id, payload, imagePath: imagePath);
-      await _localDataSource.cacheUser(remote.data);
+      await _localDataSource.cacheUser(remote);
       return Right(remote.toEntity());
     } on DioException catch (e) {
       return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to update profile'));

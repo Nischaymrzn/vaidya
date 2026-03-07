@@ -6,6 +6,7 @@ import 'package:vaidya/core/services/connectivity/network_info.dart';
 import 'package:vaidya/features/symptoms/data/datasources/symptoms_datasource.dart';
 import 'package:vaidya/features/symptoms/data/datasources/local/symptoms_local_datasource.dart';
 import 'package:vaidya/features/symptoms/data/datasources/remote/symptoms_remote_datasource.dart';
+import 'package:vaidya/features/symptoms/data/models/symptom_api_model.dart';
 import 'package:vaidya/features/symptoms/domain/entities/symptom_entity.dart';
 import 'package:vaidya/features/symptoms/domain/repositories/symptoms_repository.dart';
 
@@ -35,7 +36,7 @@ class SymptomsRepository implements ISymptomsRepository {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getSymptoms();
-        await _localDataSource.cacheSymptoms(remote.map((e) => e.data).toList(growable: false));
+        await _localDataSource.cacheSymptoms(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
         return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch symptoms'));
@@ -46,7 +47,7 @@ class SymptomsRepository implements ISymptomsRepository {
 
     final cached = await _localDataSource.getCachedSymptoms();
     if (cached.isNotEmpty) {
-      return Right(cached.map((item) => SymptomEntity(id: (item['_id'] ?? item['id'] ?? '').toString(), data: item)).toList(growable: false));
+      return Right(cached.map((item) => item.toEntity()).toList(growable: false));
     }
     return const Left(ApiFailure(message: 'No internet connection and no cached data available.'));
   }
@@ -54,10 +55,23 @@ class SymptomsRepository implements ISymptomsRepository {
   @override
   Future<Either<Failure, SymptomEntity>> createSymptom(Map<String, dynamic> payload) async {
     if (!await _networkInfo.isConnected) {
-      return const Left(ApiFailure(message: 'No internet connection.'));
+      final now = DateTime.now().toUtc().toIso8601String();
+      final localId = 'local_${DateTime.now().microsecondsSinceEpoch}';
+      final localPayload = <String, dynamic>{
+        ...payload,
+        '_id': localId,
+        'id': localId,
+        'createdAt': now,
+        'updatedAt': now,
+      };
+      final saved = await _localDataSource.upsertSymptom(
+        SymptomApiModel.fromJson(localPayload),
+      );
+      return Right(saved.toEntity());
     }
     try {
       final created = await _remoteDataSource.createSymptom(payload);
+      await _localDataSource.upsertSymptom(created);
       return Right(created.toEntity());
     } on DioException catch (e) {
       return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to create symptom'));
@@ -69,10 +83,26 @@ class SymptomsRepository implements ISymptomsRepository {
   @override
   Future<Either<Failure, SymptomEntity>> updateSymptom(String id, Map<String, dynamic> payload) async {
     if (!await _networkInfo.isConnected) {
-      return const Left(ApiFailure(message: 'No internet connection.'));
+      final existing =
+          (await _localDataSource.getCachedSymptomById(id))?.data ??
+          <String, dynamic>{};
+      final now = DateTime.now().toUtc().toIso8601String();
+      final merged = <String, dynamic>{
+        ...existing,
+        ...payload,
+        '_id': id,
+        'id': id,
+        'updatedAt': now,
+        'createdAt': existing['createdAt'] ?? now,
+      };
+      final saved = await _localDataSource.upsertSymptom(
+        SymptomApiModel.fromJson(merged),
+      );
+      return Right(saved.toEntity());
     }
     try {
       final updated = await _remoteDataSource.updateSymptom(id, payload);
+      await _localDataSource.upsertSymptom(updated);
       return Right(updated.toEntity());
     } on DioException catch (e) {
       return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to update symptom'));
@@ -84,10 +114,15 @@ class SymptomsRepository implements ISymptomsRepository {
   @override
   Future<Either<Failure, bool>> deleteSymptom(String id) async {
     if (!await _networkInfo.isConnected) {
-      return const Left(ApiFailure(message: 'No internet connection.'));
+      final removed = await _localDataSource.removeSymptomById(id);
+      if (removed) {
+        return const Right(true);
+      }
+      return const Left(ApiFailure(message: 'No internet connection and symptom is not cached.'));
     }
     try {
       await _remoteDataSource.deleteSymptom(id);
+      await _localDataSource.removeSymptomById(id);
       return const Right(true);
     } on DioException catch (e) {
       return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to delete symptom'));

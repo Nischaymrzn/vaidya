@@ -11,7 +11,8 @@ final vitalsRemoteDataSourceProvider = Provider<IVitalsRemoteDataSource>((ref) {
 class VitalsRemoteDataSource implements IVitalsRemoteDataSource {
   final ApiClient _apiClient;
 
-  const VitalsRemoteDataSource({required ApiClient apiClient}) : _apiClient = apiClient;
+  const VitalsRemoteDataSource({required ApiClient apiClient})
+    : _apiClient = apiClient;
 
   @override
   Future<List<VitalApiModel>> getVitals() async {
@@ -27,17 +28,27 @@ class VitalsRemoteDataSource implements IVitalsRemoteDataSource {
   Future<VitalApiModel> createVital(Map<String, dynamic> payload) async {
     final response = await _apiClient.post(ApiEndpoints.vitals, data: payload);
     if (response.data['success'] == true) {
-      final raw = (response.data['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+      final raw =
+          (response.data['data'] as Map<String, dynamic>? ??
+          <String, dynamic>{});
       return VitalApiModel.fromJson(raw);
     }
     throw Exception(response.data['message'] ?? 'Failed to create vital');
   }
 
   @override
-  Future<VitalApiModel> updateVital(String id, Map<String, dynamic> payload) async {
-    final response = await _apiClient.patch(ApiEndpoints.vitalById(id), data: payload);
+  Future<VitalApiModel> updateVital(
+    String id,
+    Map<String, dynamic> payload,
+  ) async {
+    final response = await _apiClient.patch(
+      ApiEndpoints.vitalById(id),
+      data: payload,
+    );
     if (response.data['success'] == true) {
-      final raw = (response.data['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+      final raw =
+          (response.data['data'] as Map<String, dynamic>? ??
+          <String, dynamic>{});
       return VitalApiModel.fromJson(raw);
     }
     throw Exception(response.data['message'] ?? 'Failed to update vital');
@@ -52,14 +63,16 @@ class VitalsRemoteDataSource implements IVitalsRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> getVitalsSummary() async {
-    final endpoint = 'True' == 'True'
-        ? ApiEndpoints.vitalsSummary
-        : ApiEndpoints.vitals;
+    final endpoint = ApiEndpoints.vitalsSummary;
     final response = await _apiClient.get(endpoint);
     if (response.data['success'] == true) {
-      final raw = (response.data['data'] as Map<String, dynamic>? ?? <String, dynamic>{});
+      final raw =
+          (response.data['data'] as Map<String, dynamic>? ??
+          <String, dynamic>{});
       return raw;
     }
-    throw Exception(response.data['message'] ?? 'Failed to fetch vitals summary');
+    throw Exception(
+      response.data['message'] ?? 'Failed to fetch vitals summary',
+    );
   }
 }

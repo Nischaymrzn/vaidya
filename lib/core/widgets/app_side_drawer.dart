@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:vaidya/features/dashboard/presentation/pages/dashboard.dart';
 import 'package:vaidya/features/family_health/presentation/pages/family_health_screen.dart';
-import 'package:vaidya/features/help_center/presentation/pages/help_center_screen.dart';
-import 'package:vaidya/features/intelligence/presentation/pages/risk_analysis_screen.dart';
 import 'package:vaidya/features/intelligence/presentation/pages/vaidya_care_screen.dart';
+import 'package:vaidya/features/intelligence/presentation/pages/vaidya_ai_screen.dart';
 import 'package:vaidya/features/symptoms/presentation/pages/symptoms_screen.dart';
 import 'package:vaidya/features/vitals/presentation/pages/vitals_screen.dart';
 import 'package:vaidya/themes/colors.dart';
@@ -19,7 +18,6 @@ enum AppDrawerDestination {
   riskAnalysis,
   vaidyaCare,
   vaidyaAi,
-  helpCenter,
   profile,
 }
 
@@ -53,9 +51,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
   void _openStandalone(Widget page) {
     final navigator = Navigator.of(context);
     navigator.pop();
-    navigator.push(
-      MaterialPageRoute(builder: (_) => page),
-    );
+    navigator.push(MaterialPageRoute(builder: (_) => page));
   }
 
   Widget _sectionLabel(String label) {
@@ -121,26 +117,39 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
     );
   }
 
-  Widget _subMenuItem({required String label, required VoidCallback onTap}) {
+  Widget _subMenuItem({
+    required String label,
+    required VoidCallback onTap,
+    bool selected = false,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(left: 32, right: 14),
+      padding: const EdgeInsets.only(left: 44, right: 12, top: 1, bottom: 1),
       child: Row(
         children: [
           Container(width: 1, height: 34, color: AppColors.border),
           const SizedBox(width: 12),
           Expanded(
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 7),
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Urbanist',
-                    color: AppColors.textPrimary,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+            child: Material(
+              color: selected ? const Color(0xFFE8F1FF) : Colors.transparent,
+              borderRadius: BorderRadius.circular(10),
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 7,
+                    horizontal: 10,
+                  ),
+                  child: Text(
+                    label,
+                    style: TextStyle(
+                      fontFamily: 'Urbanist',
+                      color: selected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),
@@ -208,7 +217,8 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
               icon: LucideIcons.users,
               label: 'Family Health',
               selected:
-                  widget.currentDestination == AppDrawerDestination.familyHealth,
+                  widget.currentDestination ==
+                  AppDrawerDestination.familyHealth,
               onTap: () {
                 if (widget.currentDestination ==
                     AppDrawerDestination.familyHealth) {
@@ -221,7 +231,8 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             _menuItem(
               icon: LucideIcons.folderHeart,
               label: 'Health Records',
-              selected: widget.currentDestination == AppDrawerDestination.records,
+              selected:
+                  widget.currentDestination == AppDrawerDestination.records,
               onTap: () {
                 if (widget.currentDestination == AppDrawerDestination.records) {
                   Navigator.of(context).pop();
@@ -233,6 +244,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             _menuItem(
               icon: LucideIcons.squareActivity,
               label: 'Health Overview',
+              selected: false,
               trailing: Icon(
                 _healthOverviewExpanded
                     ? LucideIcons.chevronUp
@@ -249,8 +261,11 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             if (_healthOverviewExpanded) ...[
               _subMenuItem(
                 label: 'Vitals',
+                selected:
+                    widget.currentDestination == AppDrawerDestination.vitals,
                 onTap: () {
-                  if (widget.currentDestination == AppDrawerDestination.vitals) {
+                  if (widget.currentDestination ==
+                      AppDrawerDestination.vitals) {
                     Navigator.of(context).pop();
                     return;
                   }
@@ -259,6 +274,8 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
               ),
               _subMenuItem(
                 label: 'Symptoms',
+                selected:
+                    widget.currentDestination == AppDrawerDestination.symptoms,
                 onTap: () {
                   if (widget.currentDestination ==
                       AppDrawerDestination.symptoms) {
@@ -272,9 +289,11 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             _menuItem(
               icon: LucideIcons.chartColumnBig,
               label: 'Analytics',
-              selected: widget.currentDestination == AppDrawerDestination.analytics,
+              selected:
+                  widget.currentDestination == AppDrawerDestination.analytics,
               onTap: () {
-                if (widget.currentDestination == AppDrawerDestination.analytics) {
+                if (widget.currentDestination ==
+                    AppDrawerDestination.analytics) {
                   Navigator.of(context).pop();
                   return;
                 }
@@ -284,10 +303,7 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             _menuItem(
               icon: LucideIcons.brain,
               label: 'Health Intelligence',
-              selected:
-                  widget.currentDestination == AppDrawerDestination.vaidyaAi ||
-                  widget.currentDestination == AppDrawerDestination.riskAnalysis ||
-                  widget.currentDestination == AppDrawerDestination.vaidyaCare,
+              selected: false,
               trailing: Icon(
                 _healthIntelligenceExpanded
                     ? LucideIcons.chevronUp
@@ -304,17 +320,22 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
             if (_healthIntelligenceExpanded) ...[
               _subMenuItem(
                 label: 'Risk Analysis',
+                selected:
+                    widget.currentDestination ==
+                    AppDrawerDestination.riskAnalysis,
                 onTap: () {
                   if (widget.currentDestination ==
                       AppDrawerDestination.riskAnalysis) {
                     Navigator.of(context).pop();
                     return;
                   }
-                  _openStandalone(const RiskAnalysisScreen());
+                  _openDashboardTab(2);
                 },
               ),
               _subMenuItem(
                 label: 'Vaidya Care',
+                selected:
+                    widget.currentDestination == AppDrawerDestination.vaidyaCare,
                 onTap: () {
                   if (widget.currentDestination ==
                       AppDrawerDestination.vaidyaCare) {
@@ -326,36 +347,25 @@ class _AppSideDrawerState extends State<AppSideDrawer> {
               ),
               _subMenuItem(
                 label: 'Vaidya.ai',
+                selected:
+                    widget.currentDestination == AppDrawerDestination.vaidyaAi,
                 onTap: () {
                   if (widget.currentDestination ==
                       AppDrawerDestination.vaidyaAi) {
                     Navigator.of(context).pop();
                     return;
                   }
-                  _openDashboardTab(2);
+                  _openStandalone(const VaidyaAiScreen());
                 },
               ),
             ],
             const SizedBox(height: 16),
             _sectionLabel('OTHERS'),
             _menuItem(
-              icon: LucideIcons.badgeQuestionMark,
-              label: 'Help Center',
-              selected:
-                  widget.currentDestination == AppDrawerDestination.helpCenter,
-              onTap: () {
-                if (widget.currentDestination ==
-                    AppDrawerDestination.helpCenter) {
-                  Navigator.of(context).pop();
-                  return;
-                }
-                _openStandalone(const HelpCenterScreen());
-              },
-            ),
-            _menuItem(
               icon: LucideIcons.user,
               label: 'Profile',
-              selected: widget.currentDestination == AppDrawerDestination.profile,
+              selected:
+                  widget.currentDestination == AppDrawerDestination.profile,
               onTap: () {
                 if (widget.currentDestination == AppDrawerDestination.profile) {
                   Navigator.of(context).pop();
