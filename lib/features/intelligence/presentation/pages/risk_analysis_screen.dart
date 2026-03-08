@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vaidya/core/utils/snackbar_utils.dart';
+import 'package:vaidya/core/widgets/app_button_styles.dart';
 import 'package:vaidya/core/widgets/app_drawer_toggle_button.dart';
 import 'package:vaidya/core/widgets/app_side_drawer.dart';
 import 'package:vaidya/features/intelligence/presentation/models/risk_analysis_view_data.dart';
@@ -159,7 +161,13 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
         assessment: assessment,
         insights: insights,
       );
-      _show('Report downloaded to: $path', false);
+      final fileName = path.split(RegExp(r'[/\\\\]')).last.trim();
+      _show(
+        fileName.isEmpty
+            ? 'Report downloaded successfully.'
+            : 'Report downloaded: $fileName',
+        false,
+      );
     } catch (e) {
       _show('Unable to generate report: $e', true);
     }
@@ -181,6 +189,8 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final riskState = ref.watch(riskAssessmentsViewModelProvider);
     final insightState = ref.watch(healthInsightsViewModelProvider);
     final data = RiskAnalysisViewData.fromSources(
@@ -215,12 +225,12 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.only(left: 10),
           child: AppDrawerToggleButton(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'Risk Analysis',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -231,9 +241,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
         ),
       ),
       body: loading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
+          ? Center(child: CircularProgressIndicator(color: AppColors.primary))
           : RefreshIndicator(
               onRefresh: () => _loadAll(forceLoading: true),
               color: AppColors.primary,
@@ -353,7 +361,9 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                       child: ElevatedButton(
                         onPressed: submitting ? null : _runAnalysis,
                         style: ButtonStyle(
-                          minimumSize: const WidgetStatePropertyAll(Size(0, 40)),
+                          minimumSize: const WidgetStatePropertyAll(
+                            Size(0, 40),
+                          ),
                           shape: WidgetStatePropertyAll(
                             RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
@@ -387,15 +397,18 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                         onPressed: data.analysisReady
                             ? () => _generateReport(riskState, insightState)
                             : null,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.45),
+                        style: AppButtonStyles.pillOutlined(
+                          foreground: Colors.white,
+                          border: Colors.white.withValues(alpha: 0.45),
+                          hoverBackground: Colors.white.withValues(alpha: 0.12),
+                          pressedBackground: Colors.white.withValues(
+                            alpha: 0.18,
                           ),
-                          minimumSize: const Size(0, 40),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(999),
+                          disabledForeground: Colors.white.withValues(
+                            alpha: 0.55,
                           ),
+                          disabledBorder: Colors.white.withValues(alpha: 0.22),
+                          height: 40,
                         ),
                         child: const Text('Download report'),
                       ),
@@ -409,64 +422,79 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
 
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: data.summaryTiles.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 1.9,
-              ),
-              itemBuilder: (_, i) {
-                final t = data.summaryTiles[i];
-                return Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.16),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.label,
-                        style: const TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 11,
-                          color: Color(0xCCFFFFFF),
-                          fontWeight: FontWeight.w600,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final width = constraints.maxWidth;
+                final crossAxisCount = width >= 1120 ? 4 : 2;
+                final gridDelegate = width >= 700
+                    ? SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        mainAxisExtent: crossAxisCount == 4 ? 124 : 148,
+                      )
+                    : const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 10,
+                        mainAxisSpacing: 10,
+                        childAspectRatio: 1.9,
+                      );
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: data.summaryTiles.length,
+                  gridDelegate: gridDelegate,
+                  itemBuilder: (_, i) {
+                    final t = data.summaryTiles[i];
+                    return Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.16),
                         ),
                       ),
-                      const Spacer(),
-                      Text(
-                        t.value,
-                        style: const TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 24,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          height: 1,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t.label,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 11,
+                              color: Color(0xCCFFFFFF),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            t.value,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 24,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              height: 1,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            t.detail,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: 'Urbanist',
+                              fontSize: 12.5,
+                              color: Color(0xCCFFFFFF),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        t.detail,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontFamily: 'Urbanist',
-                          fontSize: 12.5,
-                          color: Color(0xCCFFFFFF),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 );
               },
             ),
@@ -479,17 +507,31 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
   Widget _modulesGrid() {
     return LayoutBuilder(
       builder: (context, c) {
-        final cross = c.maxWidth >= 700 ? 2 : 1;
+        final width = c.maxWidth;
+        final cross = width >= 1320
+            ? 3
+            : width >= 700
+            ? 2
+            : 1;
+        final gridDelegate = cross == 1
+            ? const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 1,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                childAspectRatio: 1.58,
+              )
+            : SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: cross,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                mainAxisExtent: width >= 1000 ? 252 : 272,
+              );
+
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _modules.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: cross,
-            mainAxisSpacing: 10,
-            crossAxisSpacing: 10,
-            childAspectRatio: cross == 1 ? 1.58 : 1.46,
-          ),
+          gridDelegate: gridDelegate,
           itemBuilder: (_, i) {
             final m = _modules[i];
             return _moduleCard(m);
@@ -512,7 +554,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
   ) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
@@ -534,7 +576,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                 width: 34,
                 height: 34,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF3F6FB),
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -547,7 +589,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                   children: [
                     Text(
                       m.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 21 / 1.3,
                         color: AppColors.textPrimary,
@@ -556,7 +598,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                     ),
                     Text(
                       m.status,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 12.5,
                         color: AppColors.textSecondary,
@@ -571,7 +613,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
           const SizedBox(height: 10),
           Text(
             m.desc,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13.2,
               color: AppColors.textSecondary,
@@ -586,7 +628,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 6, right: 6),
                     child: Icon(
                       Icons.circle,
@@ -597,7 +639,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                   Expanded(
                     child: Text(
                       p,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 12.5,
                         color: AppColors.textSecondary,
@@ -676,7 +718,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
                         pts[i].month,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -694,7 +736,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                 isCurved: true,
                 color: AppColors.primary,
                 barWidth: 2.3,
-                dotData: const FlDotData(show: false),
+                dotData: FlDotData(show: false),
                 belowBarData: BarAreaData(
                   show: true,
                   color: AppColors.primary.withValues(alpha: 0.12),
@@ -746,7 +788,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
                         pts[i].label,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -787,10 +829,10 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
             .map(
               (e) => Container(
                 width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                margin: EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -799,7 +841,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                   children: [
                     Text(
                       e.label.toUpperCase(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 11,
                         letterSpacing: 0.7,
@@ -810,7 +852,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                     const SizedBox(height: 3),
                     Text(
                       e.value,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 14,
                         color: AppColors.textPrimary,
@@ -832,7 +874,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
       if (items.isEmpty) {
         return Text(
           empty,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 13,
             color: AppColors.textSecondary,
@@ -865,7 +907,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                         children: [
                           Text(
                             e.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 14,
                               color: AppColors.textPrimary,
@@ -874,7 +916,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                           ),
                           Text(
                             e.description,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 12.5,
                               color: AppColors.textSecondary,
@@ -905,18 +947,22 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
             children: [
               _tinyPill(
                 'Alerts ${data.alertInsights.length}',
-                const Color(0xFFB91C1C),
-                const Color(0xFFFEF2F2),
+                AppColors.isDark ? AppColors.error : const Color(0xFFB91C1C),
+                AppColors.isDark
+                    ? AppColors.dangerSurface
+                    : const Color(0xFFFEF2F2),
               ),
               _tinyPill(
                 'Improve ${data.improveInsights.length}',
-                const Color(0xFF047857),
-                const Color(0xFFECFDF5),
+                AppColors.isDark ? AppColors.success : const Color(0xFF047857),
+                AppColors.isDark
+                    ? AppColors.successSurface
+                    : const Color(0xFFECFDF5),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             'ALERTS',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -933,7 +979,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
             const Color(0xFFEF4444),
           ),
           const SizedBox(height: 10),
-          const Text(
+          Text(
             'IMPROVING HEALTH',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -959,16 +1005,28 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
     Color badgeText;
     switch (data.riskLevel.toLowerCase()) {
       case 'high':
-        badgeBg = const Color(0xFFFEF2F2);
-        badgeText = const Color(0xFFB91C1C);
+        badgeBg = AppColors.isDark
+            ? AppColors.dangerSurface
+            : const Color(0xFFFEF2F2);
+        badgeText = AppColors.isDark
+            ? AppColors.error
+            : const Color(0xFFB91C1C);
         break;
       case 'medium':
-        badgeBg = const Color(0xFFFFFBEB);
-        badgeText = const Color(0xFFB45309);
+        badgeBg = AppColors.isDark
+            ? AppColors.warningSurface
+            : const Color(0xFFFFFBEB);
+        badgeText = AppColors.isDark
+            ? AppColors.warning
+            : const Color(0xFFB45309);
         break;
       default:
-        badgeBg = const Color(0xFFECFDF5);
-        badgeText = const Color(0xFF047857);
+        badgeBg = AppColors.isDark
+            ? AppColors.successSurface
+            : const Color(0xFFECFDF5);
+        badgeText = AppColors.isDark
+            ? AppColors.success
+            : const Color(0xFF047857);
     }
 
     return Column(
@@ -984,7 +1042,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
           null,
           Text(
             data.fullSummary,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -1078,7 +1136,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
       null,
       Text(
         section.content,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 13.5,
           color: AppColors.textSecondary,
@@ -1098,7 +1156,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(18),
@@ -1124,7 +1182,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 18 / 1.12,
                         color: AppColors.textPrimary,
@@ -1135,7 +1193,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 13.5,
                           color: AppColors.textSecondary,
@@ -1162,7 +1220,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 22,
             color: AppColors.textPrimary,
@@ -1172,7 +1230,7 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
         const SizedBox(height: 2),
         Text(
           subtitle,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14,
             color: AppColors.textSecondary,
@@ -1207,17 +1265,11 @@ class _RiskAnalysisScreenState extends ConsumerState<RiskAnalysisScreen> {
     if (!mounted) {
       return;
     }
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(
-            message,
-            style: const TextStyle(fontFamily: 'Urbanist'),
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: error ? const Color(0xFFDC2626) : null,
-        ),
-      );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    if (error) {
+      SnackbarUtils.showError(context, message);
+      return;
+    }
+    SnackbarUtils.showSuccess(context, message);
   }
 }

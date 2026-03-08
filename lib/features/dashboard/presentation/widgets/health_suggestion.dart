@@ -10,11 +10,12 @@ class HealthSuggestion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFE5F0FF),
+        color: isDark ? AppColors.card : const Color(0xFFE5F0FF),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border, width: 1),
       ),
@@ -24,12 +25,12 @@ class HealthSuggestion extends StatelessWidget {
             children: [
               SvgPicture.asset('assets/icons/suggestion.svg', width: 18),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Health Suggestion',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1E3A8A),
+                  color: isDark ? AppColors.textPrimary : Color(0xFF1E3A8A),
                 ),
               ),
             ],
@@ -41,9 +42,11 @@ class HealthSuggestion extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF2F8FF),
+                  color: isDark
+                      ? AppColors.surfaceMuted
+                      : const Color(0xFFF2F8FF),
                   shape: BoxShape.circle,
-                  border: Border.all(color: const Color(0xFFE5E7EB), width: 2),
+                  border: Border.all(color: AppColors.border, width: 2),
                 ),
                 child: SvgPicture.asset(
                   'assets/icons/blood_pressure.svg',
@@ -58,7 +61,7 @@ class HealthSuggestion extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -67,7 +70,7 @@ class HealthSuggestion extends StatelessWidget {
                     Text(
                       desc,
                       softWrap: true,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,

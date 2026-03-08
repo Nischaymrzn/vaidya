@@ -117,6 +117,8 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     ref.listen<IntelligenceState>(intelligenceViewModelProvider, (prev, next) {
       if (next.errorMessage != null &&
           next.errorMessage != prev?.errorMessage) {
@@ -147,12 +149,12 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
         backgroundColor: AppColors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.only(left: 10),
           child: AppDrawerToggleButton(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'Vaidya.ai',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -185,7 +187,6 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
   Widget _buildWelcome() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isWide = constraints.maxWidth >= 640;
         return SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 18),
@@ -197,7 +198,7 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       'How can I help you today?',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -209,7 +210,7 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Text(
+                    Text(
                       'I can help with symptoms, medications, care plans, and wellness guidance',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -233,10 +234,10 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
 
   Widget _buildTranscript() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      padding: EdgeInsets.fromLTRB(16, 14, 16, 10),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.card,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: AppColors.border),
         ),
@@ -260,65 +261,6 @@ class _VaidyaAiScreenState extends ConsumerState<VaidyaAiScreen> {
               isUser: message.isUser,
             );
           },
-        ),
-      ),
-    );
-  }
-}
-
-class _PromptCardData {
-  final String title;
-  final String description;
-
-  const _PromptCardData({required this.title, required this.description});
-}
-
-class _PromptCard extends StatelessWidget {
-  final _PromptCardData card;
-  final VoidCallback onTap;
-
-  const _PromptCard({required this.card, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: const Color(0xFFFCFDFE),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                card.title,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 19,
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                card.description,
-                style: const TextStyle(
-                  fontFamily: 'Urbanist',
-                  fontSize: 14.5,
-                  height: 1.3,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -361,9 +303,9 @@ class _ChatBubble extends StatelessWidget {
               maxWidth: MediaQuery.sizeOf(context).width * 0.79,
             ),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
-                color: isUser ? const Color(0x1A1F7AE0) : Colors.white,
+                color: isUser ? AppColors.primarySoft : AppColors.card,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.border),
                 boxShadow: [
@@ -379,7 +321,7 @@ class _ChatBubble extends StatelessWidget {
                 children: [
                   Text(
                     roleLabel,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.textSecondary,
                       fontSize: 10,
@@ -390,7 +332,7 @@ class _ChatBubble extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     content,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       color: AppColors.textPrimary,
                       fontSize: 14.5,
@@ -428,16 +370,16 @@ class _Composer extends StatelessWidget {
     final hasText = controller.text.trim().isNotEmpty;
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+      padding: EdgeInsets.fromLTRB(16, 8, 16, 12),
       color: AppColors.background,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: AppColors.card,
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(color: const Color(0xFFCBD5E1)),
+              border: Border.all(color: AppColors.borderStrong),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.05),
@@ -458,13 +400,13 @@ class _Composer extends StatelessWidget {
                     onChanged: onTextChanged,
                     minLines: 1,
                     maxLines: 3,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 16,
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: 'Message Vaidya.ai',
                       hintStyle: TextStyle(
                         fontFamily: 'Urbanist',
@@ -482,8 +424,8 @@ class _Composer extends StatelessWidget {
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.primarySoft,
                     foregroundColor: AppColors.primary,
-                    disabledBackgroundColor: const Color(0xFFF1F5F9),
-                    disabledForegroundColor: const Color(0xFF94A3B8),
+                    disabledBackgroundColor: AppColors.surfaceMuted,
+                    disabledForegroundColor: AppColors.textSecondary,
                     minimumSize: const Size(40, 40),
                     maximumSize: const Size(40, 40),
                   ),

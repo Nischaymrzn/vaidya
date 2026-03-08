@@ -93,6 +93,7 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> loginWithGoogleToken({required String token}) async {
+    if (state.status == AuthStatus.loading) return;
     state = state.copyWith(status: AuthStatus.loading);
 
     final result = await _loginWithGoogleTokenUsecase(
@@ -110,18 +111,23 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> loginWithGoogle() async {
+    if (state.status == AuthStatus.loading) return;
     state = state.copyWith(status: AuthStatus.loading);
 
     final configuredResult = await _isGoogleLoginConfiguredUsecase();
-    final isConfigured = configuredResult.fold((failure) {
+    bool? isConfigured;
+    configuredResult.fold((failure) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: failure.message,
       );
-      return false;
-    }, (configured) => configured);
+    }, (configured) => isConfigured = configured);
 
-    if (!isConfigured) {
+    if (isConfigured == null) {
+      return;
+    }
+
+    if (!isConfigured!) {
       state = state.copyWith(
         status: AuthStatus.error,
         errorMessage:

@@ -56,7 +56,7 @@ class RecordsRepository implements IRecordsRepository {
           limit: limit,
           userId: userId,
         );
-        await _recordsLocalDataSource.cacheMedicalRecords(result);
+        await _recordsLocalDataSource.saveMedicalRecords(result);
         return Right(result.toEntity());
       } on DioException catch (e) {
         return Left(_dioFailure(e, 'Failed to fetch records'));
@@ -65,7 +65,7 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await _recordsLocalDataSource.getCachedMedicalRecords();
+    final cached = await _recordsLocalDataSource.getMedicalRecords();
     if (cached != null) {
       return Right(cached.toEntity());
     }
@@ -90,7 +90,7 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await _recordsLocalDataSource.getCachedMedicalRecordById(id);
+    final cached = await _recordsLocalDataSource.getMedicalRecordById(id);
     if (cached != null) {
       return Right(cached.toEntity());
     }
@@ -107,17 +107,22 @@ class RecordsRepository implements IRecordsRepository {
     if (!await _networkInfo.isConnected) {
       try {
         final now = DateTime.now().toUtc().toIso8601String();
-        final localRecord = _buildOfflineMedicalRecord(payload: payload, createdAt: now, updatedAt: now);
-        final saved = await _recordsLocalDataSource.upsertMedicalRecord(localRecord);
-        await _recordsLocalDataSource.enqueuePendingMedicalRecordOperation(
-          <String, dynamic>{
-            'opId': _newLocalId(),
-            'action': _opActionCreate,
-            'recordId': saved.id,
-            'payload': _serializeMedicalRecordPayload(payload),
-            'createdAt': now,
-          },
+        final localRecord = _buildOfflineMedicalRecord(
+          payload: payload,
+          createdAt: now,
+          updatedAt: now,
         );
+        final saved = await _recordsLocalDataSource.upsertMedicalRecord(
+          localRecord,
+        );
+        await _recordsLocalDataSource
+            .enqueuePendingMedicalRecordOperation(<String, dynamic>{
+              'opId': _newLocalId(),
+              'action': _opActionCreate,
+              'recordId': saved.id,
+              'payload': _serializeMedicalRecordPayload(payload),
+              'createdAt': now,
+            });
         return Right(saved.toEntity());
       } catch (e) {
         return Left(_exceptionFailure(e));
@@ -144,7 +149,7 @@ class RecordsRepository implements IRecordsRepository {
   ) async {
     if (!await _networkInfo.isConnected) {
       try {
-        final existing = await _recordsLocalDataSource.getCachedMedicalRecordById(id);
+        final existing = await _recordsLocalDataSource.getMedicalRecordById(id);
         final now = DateTime.now().toUtc().toIso8601String();
         final merged = _buildOfflineMedicalRecord(
           id: id,
@@ -154,15 +159,14 @@ class RecordsRepository implements IRecordsRepository {
           updatedAt: now,
         );
         final saved = await _recordsLocalDataSource.upsertMedicalRecord(merged);
-        await _recordsLocalDataSource.enqueuePendingMedicalRecordOperation(
-          <String, dynamic>{
-            'opId': _newLocalId(),
-            'action': _opActionUpdate,
-            'recordId': id,
-            'payload': _serializeMedicalRecordPayload(payload),
-            'createdAt': now,
-          },
-        );
+        await _recordsLocalDataSource
+            .enqueuePendingMedicalRecordOperation(<String, dynamic>{
+              'opId': _newLocalId(),
+              'action': _opActionUpdate,
+              'recordId': id,
+              'payload': _serializeMedicalRecordPayload(payload),
+              'createdAt': now,
+            });
         return Right(saved.toEntity());
       } catch (e) {
         return Left(_exceptionFailure(e));
@@ -188,14 +192,13 @@ class RecordsRepository implements IRecordsRepository {
     if (!await _networkInfo.isConnected) {
       final removed = await _recordsLocalDataSource.removeMedicalRecordById(id);
       if (removed) {
-        await _recordsLocalDataSource.enqueuePendingMedicalRecordOperation(
-          <String, dynamic>{
-            'opId': _newLocalId(),
-            'action': _opActionDelete,
-            'recordId': id,
-            'createdAt': DateTime.now().toUtc().toIso8601String(),
-          },
-        );
+        await _recordsLocalDataSource
+            .enqueuePendingMedicalRecordOperation(<String, dynamic>{
+              'opId': _newLocalId(),
+              'action': _opActionDelete,
+              'recordId': id,
+              'createdAt': DateTime.now().toUtc().toIso8601String(),
+            });
         return const Right(true);
       }
       return const Left(
@@ -242,8 +245,8 @@ class RecordsRepository implements IRecordsRepository {
       isConnected: await _networkInfo.isConnected,
       remoteLoader: () =>
           _recordsRemoteDataSource.getMedications(userId: userId),
-      cacheWriter: _recordsLocalDataSource.cacheMedications,
-      cacheReader: _recordsLocalDataSource.getCachedMedications,
+      saveWriter: _recordsLocalDataSource.saveMedications,
+      saveReader: _recordsLocalDataSource.getMedications,
       mapper: (item) => item.toEntity(),
       errorMessage: 'Failed to fetch medications',
       offlineMessage:
@@ -264,13 +267,15 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await _recordsLocalDataSource.getCachedMedicationById(id);
+    final cached = await _recordsLocalDataSource.getMedicationById(id);
     if (cached != null) {
       return Right(cached.toEntity());
     }
 
     return const Left(
-      ApiFailure(message: 'No internet connection and medication is not cached.'),
+      ApiFailure(
+        message: 'No internet connection and medication is not cached.',
+      ),
     );
   }
 
@@ -308,8 +313,12 @@ class RecordsRepository implements IRecordsRepository {
   ) async {
     if (!await _networkInfo.isConnected) {
       try {
-        final existing = await _recordsLocalDataSource.getCachedMedicationById(id);
-        final local = _buildOfflineMedication(id: id, payload: payload, existing: existing);
+        final existing = await _recordsLocalDataSource.getMedicationById(id);
+        final local = _buildOfflineMedication(
+          id: id,
+          payload: payload,
+          existing: existing,
+        );
         final saved = await _recordsLocalDataSource.upsertMedication(local);
         return Right(saved.toEntity());
       } catch (e) {
@@ -339,7 +348,9 @@ class RecordsRepository implements IRecordsRepository {
         return const Right(true);
       }
       return const Left(
-        ApiFailure(message: 'No internet connection and medication is not cached.'),
+        ApiFailure(
+          message: 'No internet connection and medication is not cached.',
+        ),
       );
     }
 
@@ -361,8 +372,8 @@ class RecordsRepository implements IRecordsRepository {
     return _readThroughCacheList<AllergyApiModel, AllergyEntity>(
       isConnected: await _networkInfo.isConnected,
       remoteLoader: () => _recordsRemoteDataSource.getAllergies(userId: userId),
-      cacheWriter: _recordsLocalDataSource.cacheAllergies,
-      cacheReader: _recordsLocalDataSource.getCachedAllergies,
+      saveWriter: _recordsLocalDataSource.saveAllergies,
+      saveReader: _recordsLocalDataSource.getAllergies,
       mapper: (item) => item.toEntity(),
       errorMessage: 'Failed to fetch allergies',
       offlineMessage:
@@ -383,7 +394,7 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await _recordsLocalDataSource.getCachedAllergyById(id);
+    final cached = await _recordsLocalDataSource.getAllergyById(id);
     if (cached != null) {
       return Right(cached.toEntity());
     }
@@ -427,8 +438,12 @@ class RecordsRepository implements IRecordsRepository {
   ) async {
     if (!await _networkInfo.isConnected) {
       try {
-        final existing = await _recordsLocalDataSource.getCachedAllergyById(id);
-        final local = _buildOfflineAllergy(id: id, payload: payload, existing: existing);
+        final existing = await _recordsLocalDataSource.getAllergyById(id);
+        final local = _buildOfflineAllergy(
+          id: id,
+          payload: payload,
+          existing: existing,
+        );
         final saved = await _recordsLocalDataSource.upsertAllergy(local);
         return Right(saved.toEntity());
       } catch (e) {
@@ -458,7 +473,9 @@ class RecordsRepository implements IRecordsRepository {
         return const Right(true);
       }
       return const Left(
-        ApiFailure(message: 'No internet connection and allergy is not cached.'),
+        ApiFailure(
+          message: 'No internet connection and allergy is not cached.',
+        ),
       );
     }
 
@@ -481,8 +498,8 @@ class RecordsRepository implements IRecordsRepository {
       isConnected: await _networkInfo.isConnected,
       remoteLoader: () =>
           _recordsRemoteDataSource.getImmunizations(userId: userId),
-      cacheWriter: _recordsLocalDataSource.cacheImmunizations,
-      cacheReader: _recordsLocalDataSource.getCachedImmunizations,
+      saveWriter: _recordsLocalDataSource.saveImmunizations,
+      saveReader: _recordsLocalDataSource.getImmunizations,
       mapper: (item) => item.toEntity(),
       errorMessage: 'Failed to fetch immunizations',
       offlineMessage:
@@ -505,13 +522,15 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await _recordsLocalDataSource.getCachedImmunizationById(id);
+    final cached = await _recordsLocalDataSource.getImmunizationById(id);
     if (cached != null) {
       return Right(cached.toEntity());
     }
 
     return const Left(
-      ApiFailure(message: 'No internet connection and immunization is not cached.'),
+      ApiFailure(
+        message: 'No internet connection and immunization is not cached.',
+      ),
     );
   }
 
@@ -549,8 +568,12 @@ class RecordsRepository implements IRecordsRepository {
   ) async {
     if (!await _networkInfo.isConnected) {
       try {
-        final existing = await _recordsLocalDataSource.getCachedImmunizationById(id);
-        final local = _buildOfflineImmunization(id: id, payload: payload, existing: existing);
+        final existing = await _recordsLocalDataSource.getImmunizationById(id);
+        final local = _buildOfflineImmunization(
+          id: id,
+          payload: payload,
+          existing: existing,
+        );
         final saved = await _recordsLocalDataSource.upsertImmunization(local);
         return Right(saved.toEntity());
       } catch (e) {
@@ -580,7 +603,9 @@ class RecordsRepository implements IRecordsRepository {
         return const Right(true);
       }
       return const Left(
-        ApiFailure(message: 'No internet connection and immunization is not cached.'),
+        ApiFailure(
+          message: 'No internet connection and immunization is not cached.',
+        ),
       );
     }
 
@@ -596,7 +621,8 @@ class RecordsRepository implements IRecordsRepository {
   }
 
   Future<void> _syncPendingMedicalRecordOperations() async {
-    final pending = await _recordsLocalDataSource.getPendingMedicalRecordOperations();
+    final pending = await _recordsLocalDataSource
+        .getPendingMedicalRecordOperations();
     if (pending.isEmpty) return;
 
     final remaining = <Map<String, dynamic>>[];
@@ -605,7 +631,8 @@ class RecordsRepository implements IRecordsRepository {
     for (final operation in pending) {
       final action = operation['action']?.toString() ?? '';
       final originalRecordId = operation['recordId']?.toString() ?? '';
-      final resolvedRecordId = localToRemoteId[originalRecordId] ?? originalRecordId;
+      final resolvedRecordId =
+          localToRemoteId[originalRecordId] ?? originalRecordId;
 
       try {
         if (action == _opActionCreate) {
@@ -621,7 +648,9 @@ class RecordsRepository implements IRecordsRepository {
 
           await _recordsLocalDataSource.upsertMedicalRecord(created);
           if (originalRecordId.isNotEmpty && originalRecordId != created.id) {
-            await _recordsLocalDataSource.removeMedicalRecordById(originalRecordId);
+            await _recordsLocalDataSource.removeMedicalRecordById(
+              originalRecordId,
+            );
             localToRemoteId[originalRecordId] = created.id;
           }
           continue;
@@ -633,7 +662,8 @@ class RecordsRepository implements IRecordsRepository {
             continue;
           }
 
-          if (resolvedRecordId.trim().isEmpty || resolvedRecordId.startsWith('local_')) {
+          if (resolvedRecordId.trim().isEmpty ||
+              resolvedRecordId.startsWith('local_')) {
             remaining.add(operation);
             continue;
           }
@@ -653,12 +683,16 @@ class RecordsRepository implements IRecordsRepository {
           }
 
           if (resolvedRecordId.startsWith('local_')) {
-            await _recordsLocalDataSource.removeMedicalRecordById(resolvedRecordId);
+            await _recordsLocalDataSource.removeMedicalRecordById(
+              resolvedRecordId,
+            );
             continue;
           }
 
           await _recordsRemoteDataSource.deleteMedicalRecord(resolvedRecordId);
-          await _recordsLocalDataSource.removeMedicalRecordById(resolvedRecordId);
+          await _recordsLocalDataSource.removeMedicalRecordById(
+            resolvedRecordId,
+          );
           continue;
         }
       } catch (_) {
@@ -699,14 +733,15 @@ class RecordsRepository implements IRecordsRepository {
   ) {
     final pathsRaw = json['attachmentPaths'];
     final paths = pathsRaw is List
-        ? pathsRaw.map((item) => item.toString()).where((item) => item.trim().isNotEmpty).toList(growable: false)
+        ? pathsRaw
+              .map((item) => item.toString())
+              .where((item) => item.trim().isNotEmpty)
+              .toList(growable: false)
         : const <String>[];
 
     final structuredRaw = json['structuredData'];
     final structured = structuredRaw is Map
-        ? structuredRaw.map(
-            (key, value) => MapEntry(key.toString(), value),
-          )
+        ? structuredRaw.map((key, value) => MapEntry(key.toString(), value))
         : null;
 
     return MedicalRecordUpsertEntity(
@@ -729,8 +764,8 @@ class RecordsRepository implements IRecordsRepository {
   Future<Either<Failure, List<TOut>>> _readThroughCacheList<TIn, TOut>({
     required bool isConnected,
     required Future<List<TIn>> Function() remoteLoader,
-    required Future<void> Function(List<TIn> items) cacheWriter,
-    required Future<List<TIn>> Function() cacheReader,
+    required Future<void> Function(List<TIn> items) saveWriter,
+    required Future<List<TIn>> Function() saveReader,
     required TOut Function(TIn item) mapper,
     required String errorMessage,
     required String offlineMessage,
@@ -738,7 +773,7 @@ class RecordsRepository implements IRecordsRepository {
     if (isConnected) {
       try {
         final remote = await remoteLoader();
-        await cacheWriter(remote);
+        await saveWriter(remote);
         return Right(remote.map(mapper).toList(growable: false));
       } on DioException catch (e) {
         return Left(_dioFailure(e, errorMessage));
@@ -747,7 +782,7 @@ class RecordsRepository implements IRecordsRepository {
       }
     }
 
-    final cached = await cacheReader();
+    final cached = await saveReader();
     if (cached.isNotEmpty) {
       return Right(cached.map(mapper).toList(growable: false));
     }
@@ -765,30 +800,34 @@ class RecordsRepository implements IRecordsRepository {
     final recordId = id ?? existing?.id ?? _newLocalId();
     final userId =
         _userSessionService.getCurrentUserId()?.trim().isNotEmpty == true
-            ? _userSessionService.getCurrentUserId()!.trim()
-            : (existing?.userId.isNotEmpty == true ? existing!.userId : 'local-user');
+        ? _userSessionService.getCurrentUserId()!.trim()
+        : (existing?.userId.isNotEmpty == true
+              ? existing!.userId
+              : 'local-user');
 
     final attachments = payload.attachmentPaths.isNotEmpty
         ? payload.attachmentPaths
-              .map((path) => <String, dynamic>{
-                    'url': path,
-                    'name': path.split(RegExp(r'[/\\]')).last,
-                    'type': '',
-                    'size': 0,
-                  })
-              .toList(growable: false)
-        : existing?.attachments
               .map(
-                (item) => <String, dynamic>{
-                  'url': item.url,
-                  'publicId': item.publicId,
-                  'type': item.type,
-                  'name': item.name,
-                  'size': item.size,
+                (path) => <String, dynamic>{
+                  'url': path,
+                  'name': path.split(RegExp(r'[/\\]')).last,
+                  'type': '',
+                  'size': 0,
                 },
               )
-              .toList(growable: false) ??
-            const <Map<String, dynamic>>[];
+              .toList(growable: false)
+        : existing?.attachments
+                  .map(
+                    (item) => <String, dynamic>{
+                      'url': item.url,
+                      'publicId': item.publicId,
+                      'type': item.type,
+                      'name': item.name,
+                      'size': item.size,
+                    },
+                  )
+                  .toList(growable: false) ??
+              const <Map<String, dynamic>>[];
 
     return MedicalRecordApiModel.fromJson(<String, dynamic>{
       '_id': recordId,
@@ -898,8 +937,10 @@ class RecordsRepository implements IRecordsRepository {
     final medicationId = id ?? existing?.id ?? _newLocalId();
     final userId =
         _userSessionService.getCurrentUserId()?.trim().isNotEmpty == true
-            ? _userSessionService.getCurrentUserId()!.trim()
-            : (existing?.userId.isNotEmpty == true ? existing!.userId : 'local-user');
+        ? _userSessionService.getCurrentUserId()!.trim()
+        : (existing?.userId.isNotEmpty == true
+              ? existing!.userId
+              : 'local-user');
 
     final base = existing?.toJson() ?? <String, dynamic>{};
     base.addAll(_medicationUpsertPayload(payload));
@@ -919,8 +960,10 @@ class RecordsRepository implements IRecordsRepository {
     final allergyId = id ?? existing?.id ?? _newLocalId();
     final userId =
         _userSessionService.getCurrentUserId()?.trim().isNotEmpty == true
-            ? _userSessionService.getCurrentUserId()!.trim()
-            : (existing?.userId.isNotEmpty == true ? existing!.userId : 'local-user');
+        ? _userSessionService.getCurrentUserId()!.trim()
+        : (existing?.userId.isNotEmpty == true
+              ? existing!.userId
+              : 'local-user');
 
     final base = existing?.toJson() ?? <String, dynamic>{};
     base.addAll(_allergyUpsertPayload(payload));
@@ -940,8 +983,10 @@ class RecordsRepository implements IRecordsRepository {
     final immunizationId = id ?? existing?.id ?? _newLocalId();
     final userId =
         _userSessionService.getCurrentUserId()?.trim().isNotEmpty == true
-            ? _userSessionService.getCurrentUserId()!.trim()
-            : (existing?.userId.isNotEmpty == true ? existing!.userId : 'local-user');
+        ? _userSessionService.getCurrentUserId()!.trim()
+        : (existing?.userId.isNotEmpty == true
+              ? existing!.userId
+              : 'local-user');
 
     final base = existing?.toJson() ?? <String, dynamic>{};
     base.addAll(_immunizationUpsertPayload(payload));

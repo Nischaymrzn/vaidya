@@ -13,7 +13,7 @@ class DashboardTimelineCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -22,7 +22,7 @@ class DashboardTimelineCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Timeline',
             style: TextStyle(
               fontSize: 17,
@@ -31,7 +31,7 @@ class DashboardTimelineCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Historical records',
             style: TextStyle(
               fontSize: 13,
@@ -41,7 +41,7 @@ class DashboardTimelineCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           if (visibleItems.isEmpty)
-            const Text(
+            Text(
               'No timeline activity yet. Add records to see history.',
               style: TextStyle(
                 fontSize: 13,
@@ -68,7 +68,7 @@ class DashboardTimelineCard extends StatelessWidget {
                               color: AppColors.primary,
                               width: 2,
                             ),
-                            color: Colors.white,
+                            color: AppColors.card,
                           ),
                         ),
                         if (hasNext)
@@ -88,7 +88,7 @@ class DashboardTimelineCard extends StatelessWidget {
                           children: [
                             Text(
                               item.date,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w700,
@@ -97,7 +97,7 @@ class DashboardTimelineCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               item.title,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 14,
                                 color: AppColors.textPrimary,
                                 fontWeight: FontWeight.w700,
@@ -106,7 +106,7 @@ class DashboardTimelineCard extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               item.meta,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 13,
                                 color: AppColors.textSecondary,
                                 fontWeight: FontWeight.w500,

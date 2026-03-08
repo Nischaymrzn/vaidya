@@ -63,10 +63,7 @@ class AuthRepository implements IAuthRepository {
         return Right(true);
       } on DioException catch (e) {
         return Left(
-          ApiFailure(
-            statusCode: e.response?.statusCode,
-            message: e.response?.data['message'] ?? "Registration failed",
-          ),
+          _apiFailureFromDio(e, fallbackMessage: "Registration failed"),
         );
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
@@ -120,12 +117,7 @@ class AuthRepository implements IAuthRepository {
 
         return const Left(ApiFailure(message: "Invalid credentials"));
       } on DioException catch (e) {
-        return Left(
-          ApiFailure(
-            statusCode: e.response?.statusCode,
-            message: e.response?.data['message'] ?? "Login failed",
-          ),
-        );
+        return Left(_apiFailureFromDio(e, fallbackMessage: "Login failed"));
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
@@ -160,10 +152,7 @@ class AuthRepository implements IAuthRepository {
       return loginWithGoogleToken(token);
     } on DioException catch (e) {
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message: e.response?.data['message'] ?? "Google login failed",
-        ),
+        _apiFailureFromDio(e, fallbackMessage: "Google login failed"),
       );
     } catch (e) {
       final message = e.toString().replaceFirst('Exception: ', '');
@@ -197,10 +186,7 @@ class AuthRepository implements IAuthRepository {
       await _authDataSource.logout();
       await _tokenService.removeToken();
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message: e.response?.data['message'] ?? "Google login failed",
-        ),
+        _apiFailureFromDio(e, fallbackMessage: "Google login failed"),
       );
     } catch (e) {
       await _authDataSource.logout();
@@ -220,11 +206,7 @@ class AuthRepository implements IAuthRepository {
       return Right(configured);
     } on DioException catch (e) {
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message:
-              e.response?.data['message'] ?? "Unable to check Google login",
-        ),
+        _apiFailureFromDio(e, fallbackMessage: "Unable to check Google login"),
       );
     } catch (e) {
       return Left(ApiFailure(message: e.toString()));
@@ -245,11 +227,9 @@ class AuthRepository implements IAuthRepository {
       return const Left(ApiFailure(message: "Failed to send reset email"));
     } on DioException catch (e) {
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message:
-              e.response?.data['message'] ??
-              "Failed to send password reset email",
+        _apiFailureFromDio(
+          e,
+          fallbackMessage: "Failed to send password reset email",
         ),
       );
     } catch (e) {
@@ -267,7 +247,9 @@ class AuthRepository implements IAuthRepository {
         return Right(localCurrentUser.toEntity());
       }
       return const Left(
-        ApiFailure(message: "No internet connection and no local user session."),
+        ApiFailure(
+          message: "No internet connection and no local user session.",
+        ),
       );
     }
 
@@ -305,11 +287,9 @@ class AuthRepository implements IAuthRepository {
       await _authDataSource.logout();
       await _tokenService.removeToken();
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message:
-              e.response?.data['message'] ??
-              "Unable to verify session. Please login again.",
+        _apiFailureFromDio(
+          e,
+          fallbackMessage: "Unable to verify session. Please login again.",
         ),
       );
     } catch (e) {
@@ -372,10 +352,7 @@ class AuthRepository implements IAuthRepository {
       return const Left(ApiFailure(message: "Update profile failed"));
     } on DioException catch (e) {
       return Left(
-        ApiFailure(
-          statusCode: e.response?.statusCode,
-          message: e.response?.data['message'] ?? "Update profile failed",
-        ),
+        _apiFailureFromDio(e, fallbackMessage: "Update profile failed"),
       );
     } catch (e) {
       return Left(ApiFailure(message: e.toString()));
@@ -430,5 +407,42 @@ class AuthRepository implements IAuthRepository {
     }
 
     await _authDataSource.register(localModel);
+  }
+
+  ApiFailure _apiFailureFromDio(
+    DioException exception, {
+    required String fallbackMessage,
+  }) {
+    final statusCode = exception.response?.statusCode;
+    final responseData = exception.response?.data;
+    final message = _extractErrorMessage(responseData) ?? fallbackMessage;
+    return ApiFailure(statusCode: statusCode, message: message);
+  }
+
+  String? _extractErrorMessage(dynamic data) {
+    if (data == null) return null;
+    if (data is String) {
+      final text = data.trim();
+      return text.isEmpty ? null : text;
+    }
+    if (data is Map) {
+      final direct = data['message'];
+      if (direct is String && direct.trim().isNotEmpty) {
+        return direct.trim();
+      }
+      final error = data['error'];
+      if (error is String && error.trim().isNotEmpty) {
+        return error.trim();
+      }
+      final nested = data['data'];
+      if (nested is Map) {
+        final nestedMessage = nested['message'];
+        if (nestedMessage is String && nestedMessage.trim().isNotEmpty) {
+          return nestedMessage.trim();
+        }
+      }
+      return null;
+    }
+    return data.toString().trim().isEmpty ? null : data.toString().trim();
   }
 }

@@ -23,16 +23,17 @@ class MetricsCard extends StatelessWidget {
     required this.historyPoints,
   });
 
-  Color _getConditionColor() {
+  Color _getConditionColor(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     switch (condition.toLowerCase()) {
       case 'normal':
-        return const Color(0xFFBBF7D0);
+        return isDark ? AppColors.successSurface : const Color(0xFFBBF7D0);
       case 'low':
-        return const Color(0xFFFEF3C7);
+        return isDark ? AppColors.warningSurface : const Color(0xFFFEF3C7);
       case 'high':
-        return const Color(0xFFFECDD3);
+        return isDark ? AppColors.dangerSurface : const Color(0xFFFECDD3);
       default:
-        return const Color(0xFFBBF7D0);
+        return isDark ? AppColors.successSurface : const Color(0xFFBBF7D0);
     }
   }
 
@@ -57,11 +58,11 @@ class MetricsCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 8, 0, 0),
+        padding: EdgeInsets.fromLTRB(14, 8, 0, 0),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Color(0xFFE2DCD5), width: 1.25),
+          border: Border.all(color: AppColors.border, width: 1.25),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +74,7 @@ class MetricsCard extends StatelessWidget {
                   padding: const EdgeInsets.all(8),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: Color(0xFFE5E7EB),
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(iconPath, height: 16, width: 16),
@@ -84,7 +85,7 @@ class MetricsCard extends StatelessWidget {
                     name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       color: AppColors.textSecondary,
                       fontWeight: FontWeight.w600,
@@ -107,7 +108,7 @@ class MetricsCard extends StatelessWidget {
                       child: RichText(
                         text: TextSpan(
                           text: value,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: AppColors.textPrimary,
                             fontSize: 20,
                             height: 1.0,
@@ -138,15 +139,15 @@ class MetricsCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: _getConditionColor(),
+                      color: _getConditionColor(context),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       condition,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                   ),

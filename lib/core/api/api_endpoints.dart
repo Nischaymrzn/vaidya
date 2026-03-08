@@ -5,9 +5,14 @@ class ApiEndpoints {
   // Override when needed:
   // --dart-define=API_BASE_URL=http://<host>:5000/v1/api
   // Android emulator example: http://10.0.2.2:5000/v1/api
+  // static const String baseUrl = String.fromEnvironment(
+  //   'API_BASE_URL',
+  //   defaultValue: 'http://192.168.1.2:5000/v1/api',
+  // );
+
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.2:5000/v1/api',
+    defaultValue: 'http://10.0.2.2:5000/v1/api',
   );
 
   static const Duration connectionTimeout = Duration(seconds: 30);
@@ -111,4 +116,8 @@ class ApiEndpoints {
   static const String user = '/users';
   static String userById(String id) => '/users/$id';
   static String updateUser(String id) => '/users/$id';
+
+  // ============ Payment / Premium Endpoints ============
+  static const String paymentStatus = '/payments/status';
+  static const String paymentCheckoutSession = '/payments/checkout-session';
 }

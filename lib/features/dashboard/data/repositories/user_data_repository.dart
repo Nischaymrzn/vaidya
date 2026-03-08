@@ -26,16 +26,16 @@ class UserDataRepository implements IUserDataRepository {
     required IUserDataRemoteDataSource remoteDataSource,
     required IUserDataLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, UserDataEntity>> getUserData() async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getUserData();
-        await _localDataSource.cacheUserData(remote);
+        await _localDataSource.saveUserData(remote);
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(
@@ -45,27 +45,35 @@ class UserDataRepository implements IUserDataRepository {
           ),
         );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedUserData();
+    final cached = await _localDataSource.getUserData();
     if (cached != null) {
       return Right(cached.toEntity());
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached user data available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached user data available.',
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, UserDataEntity>> updateUserData(Map<String, dynamic> payload) async {
+  Future<Either<Failure, UserDataEntity>> updateUserData(
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       return const Left(ApiFailure(message: 'No internet connection.'));
     }
 
     try {
       final remote = await _remoteDataSource.updateUserData(payload);
-      await _localDataSource.cacheUserData(remote);
+      await _localDataSource.saveUserData(remote);
       return Right(remote.toEntity());
     } on DioException catch (e) {
       return Left(
@@ -75,7 +83,9 @@ class UserDataRepository implements IUserDataRepository {
         ),
       );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 }

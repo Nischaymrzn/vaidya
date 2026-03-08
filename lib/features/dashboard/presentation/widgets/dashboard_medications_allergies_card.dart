@@ -19,7 +19,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -28,7 +28,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Medications & Allergies',
             style: TextStyle(
               fontSize: 18,
@@ -37,7 +37,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Most taken medications and key allergies',
             style: TextStyle(
               fontSize: 15,
@@ -46,7 +46,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
+          Text(
             'Effective Medications',
             style: TextStyle(
               fontSize: 14,
@@ -67,7 +67,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.border),
                 ),
@@ -79,7 +79,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                         children: [
                           Text(
                             '${med.name} - ${med.dose}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               color: AppColors.textPrimary,
                               fontWeight: FontWeight.w600,
@@ -88,7 +88,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                           const SizedBox(height: 3),
                           Text(
                             med.meta ?? 'Medication on file',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,
                               fontWeight: FontWeight.w500,
@@ -106,7 +106,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                         color: AppColors.primarySoft,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Effective',
                         style: TextStyle(
                           fontSize: 11,
@@ -119,8 +119,8 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                 ),
               ),
             ),
-          const Divider(height: 22, color: AppColors.border),
-          const Text(
+          Divider(height: 22, color: AppColors.border),
+          Text(
             'Key Allergies',
             style: TextStyle(
               fontSize: 15,
@@ -150,7 +150,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.warning_amber_rounded,
                             size: 14,
                             color: AppColors.primary,
@@ -158,7 +158,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             allergy,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               color: AppColors.textPrimary,
                               fontWeight: FontWeight.w500,
@@ -178,7 +178,7 @@ class DashboardMedicationsAllergiesCard extends StatelessWidget {
   Widget _smallText(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         color: AppColors.textSecondary,
         fontWeight: FontWeight.w500,

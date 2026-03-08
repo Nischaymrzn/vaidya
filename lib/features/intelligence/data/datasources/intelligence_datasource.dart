@@ -14,6 +14,6 @@ abstract interface class IIntelligenceRemoteDataSource {
 }
 
 abstract interface class IIntelligenceLocalDataSource {
-  Future<void> cacheInsights(List<AiInsightApiModel> items);
-  Future<List<AiInsightApiModel>> getCachedInsights();
+  Future<void> saveInsights(List<AiInsightApiModel> items);
+  Future<List<AiInsightApiModel>> getInsights();
 }

@@ -27,33 +27,48 @@ class SymptomsRepository implements ISymptomsRepository {
     required ISymptomsRemoteDataSource remoteDataSource,
     required ISymptomsLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, List<SymptomEntity>>> getSymptoms() async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getSymptoms();
-        await _localDataSource.cacheSymptoms(remote);
+        await _localDataSource.saveSymptoms(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch symptoms'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? 'Failed to fetch symptoms',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedSymptoms();
+    final cached = await _localDataSource.getSymptoms();
     if (cached.isNotEmpty) {
-      return Right(cached.map((item) => item.toEntity()).toList(growable: false));
+      return Right(
+        cached.map((item) => item.toEntity()).toList(growable: false),
+      );
     }
-    return const Left(ApiFailure(message: 'No internet connection and no cached data available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached data available.',
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, SymptomEntity>> createSymptom(Map<String, dynamic> payload) async {
+  Future<Either<Failure, SymptomEntity>> createSymptom(
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       final now = DateTime.now().toUtc().toIso8601String();
       final localId = 'local_${DateTime.now().microsecondsSinceEpoch}';
@@ -74,17 +89,27 @@ class SymptomsRepository implements ISymptomsRepository {
       await _localDataSource.upsertSymptom(created);
       return Right(created.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to create symptom'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to create symptom',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, SymptomEntity>> updateSymptom(String id, Map<String, dynamic> payload) async {
+  Future<Either<Failure, SymptomEntity>> updateSymptom(
+    String id,
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       final existing =
-          (await _localDataSource.getCachedSymptomById(id))?.data ??
+          (await _localDataSource.getSymptomById(id))?.data ??
           <String, dynamic>{};
       final now = DateTime.now().toUtc().toIso8601String();
       final merged = <String, dynamic>{
@@ -105,9 +130,16 @@ class SymptomsRepository implements ISymptomsRepository {
       await _localDataSource.upsertSymptom(updated);
       return Right(updated.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to update symptom'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to update symptom',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -118,16 +150,27 @@ class SymptomsRepository implements ISymptomsRepository {
       if (removed) {
         return const Right(true);
       }
-      return const Left(ApiFailure(message: 'No internet connection and symptom is not cached.'));
+      return const Left(
+        ApiFailure(
+          message: 'No internet connection and symptom is not cached.',
+        ),
+      );
     }
     try {
       await _remoteDataSource.deleteSymptom(id);
       await _localDataSource.removeSymptomById(id);
       return const Right(true);
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to delete symptom'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to delete symptom',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -136,20 +179,31 @@ class SymptomsRepository implements ISymptomsRepository {
     if (await _networkInfo.isConnected) {
       try {
         final summary = await _remoteDataSource.getSymptomsSummary();
-        await _localDataSource.cacheSymptomsSummary(summary);
+        await _localDataSource.saveSymptomsSummary(summary);
         return Right(SymptomsSummaryEntity(data: summary));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch summary'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? 'Failed to fetch summary',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedSymptomsSummary();
+    final cached = await _localDataSource.getSymptomsSummary();
     if (cached != null) {
       return Right(SymptomsSummaryEntity(data: cached));
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached summary available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached summary available.',
+      ),
+    );
   }
 }

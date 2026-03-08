@@ -6,19 +6,23 @@ import 'package:vaidya/features/intelligence/data/models/risk_assessment_hive_mo
 
 final riskAssessmentsLocalDataSourceProvider =
     Provider<IRiskAssessmentsLocalDataSource>((ref) {
-      return RiskAssessmentsLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
+      return RiskAssessmentsLocalDataSource(
+        saveService: ref.read(featureCacheServiceProvider),
+      );
     });
 
-class RiskAssessmentsLocalDataSource implements IRiskAssessmentsLocalDataSource {
+class RiskAssessmentsLocalDataSource
+    implements IRiskAssessmentsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const RiskAssessmentsLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const RiskAssessmentsLocalDataSource({
+    required FeatureCacheService saveService,
+  }) : _cacheService = saveService;
 
   static const String _itemsKey = 'risk_assessments_items';
 
   @override
-  Future<void> cacheAssessments(List<RiskAssessmentApiModel> items) {
+  Future<void> saveAssessments(List<RiskAssessmentApiModel> items) {
     final normalized = items
         .map((item) => RiskAssessmentHiveModel.fromApiModel(item).toJson())
         .toList(growable: false);
@@ -26,7 +30,7 @@ class RiskAssessmentsLocalDataSource implements IRiskAssessmentsLocalDataSource 
   }
 
   @override
-  Future<List<RiskAssessmentApiModel>> getCachedAssessments() async {
+  Future<List<RiskAssessmentApiModel>> getAssessments() async {
     final cached = await _cacheService.readList(_itemsKey);
     return cached
         .map((item) => RiskAssessmentHiveModel.fromJson(item).toApiModel())

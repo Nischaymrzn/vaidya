@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vaidya/themes/colors.dart';
 
 class MyTextFormField extends StatefulWidget {
   const MyTextFormField({
@@ -37,7 +38,10 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       onChanged: widget.onChanged,
       keyboardType: widget.keyboardType,
       obscureText: widget.obscureText ? _isObscured : false,
-      style: TextStyle(fontWeight: FontWeight.w500),
+      style: TextStyle(
+        fontWeight: FontWeight.w500,
+        color: AppColors.textPrimary,
+      ),
 
       validator:
           widget.validator ??
@@ -57,7 +61,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
             ? IconButton(
                 icon: Icon(
                   _isObscured ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
+                  color: AppColors.textSecondary,
                 ),
                 onPressed: () {
                   setState(() {
@@ -76,7 +80,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
 
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(6),
-          borderSide: const BorderSide(color: Colors.black26),
+          borderSide: BorderSide(color: AppColors.border),
         ),
 
         focusedBorder: OutlineInputBorder(

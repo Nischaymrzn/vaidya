@@ -162,7 +162,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                 onTap: () {},
                 child: Container(
                   width: 255,
-                  margin: const EdgeInsets.fromLTRB(12, 64, 12, 0),
+                  margin: EdgeInsets.fromLTRB(12, 64, 12, 0),
                   decoration: BoxDecoration(
                     color: AppColors.card,
                     borderRadius: BorderRadius.circular(16),
@@ -186,7 +186,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text(
+                                  Text(
                                     'Notifications',
                                     style: TextStyle(
                                       fontSize: 14,
@@ -201,7 +201,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                                         : _unreadCount > 0
                                         ? '$_unreadCount unread'
                                         : "You're all caught up.",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 10,
                                       color: AppColors.textSecondary,
                                       fontWeight: FontWeight.w500,
@@ -241,7 +241,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxHeight: 320),
                         child: widget.isLoading
-                            ? const Padding(
+                            ? Padding(
                                 padding: EdgeInsets.all(18),
                                 child: Text(
                                   'Loading notifications...',
@@ -313,7 +313,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                                                   const SizedBox(height: 2),
                                                   Text(
                                                     item.subtitle,
-                                                    style: const TextStyle(
+                                                    style: TextStyle(
                                                       fontSize: 12,
                                                       color: AppColors
                                                           .textSecondary,
@@ -337,7 +337,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                                             else
                                               Text(
                                                 item.dateLabel,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 11,
                                                   color:
                                                       AppColors.textSecondary,
@@ -351,7 +351,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                                   },
                                 ),
                               )
-                            : const Padding(
+                            : Padding(
                                 padding: EdgeInsets.all(18),
                                 child: Text(
                                   'No notifications yet.',
@@ -368,7 +368,7 @@ class _NotificationsOverlayState extends State<_NotificationsOverlay> {
                         padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
                         child: Row(
                           children: [
-                            const Expanded(
+                            Expanded(
                               child: Text(
                                 'View all notifications',
                                 style: TextStyle(

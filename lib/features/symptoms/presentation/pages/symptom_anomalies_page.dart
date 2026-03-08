@@ -48,9 +48,9 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.of(context).pop(),
-          icon: const Icon(LucideIcons.arrowLeft),
+          icon: Icon(LucideIcons.arrowLeft),
         ),
-        title: const Text(
+        title: Text(
           'Health Anomalies',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -61,14 +61,14 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
         ),
       ),
       body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        physics: AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(16, 8, 16, 24),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
+          constraints: BoxConstraints(maxWidth: 720),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Enter your symptoms, and our AI will suggest possible health conditions',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -77,10 +77,10 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                   color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+                padding: EdgeInsets.fromLTRB(14, 14, 14, 14),
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   borderRadius: BorderRadius.circular(18),
@@ -95,7 +95,7 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                           child: TextField(
                             controller: _inputController,
                             onSubmitted: _addSymptom,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -103,40 +103,40 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                             ),
                             decoration: InputDecoration(
                               hintText: 'Breathlessness',
-                              hintStyle: const TextStyle(
+                              hintStyle: TextStyle(
                                 fontFamily: 'Urbanist',
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
                               ),
-                              prefixIcon: const Icon(
+                              prefixIcon: Icon(
                                 LucideIcons.search,
                                 size: 16,
                                 color: AppColors.textSecondary,
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF8FAFC),
+                              fillColor: AppColors.surfaceSoft,
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
+                                borderSide: BorderSide(
                                   color: AppColors.border,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
+                                borderSide: BorderSide(
                                   color: AppColors.primary,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         OutlinedButton(
                           onPressed: () => _addSymptom(_inputController.text),
                           style: OutlinedButton.styleFrom(
                             foregroundColor: AppColors.textSecondary,
-                            side: const BorderSide(color: AppColors.border),
+                            side: BorderSide(color: AppColors.border),
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 13,
@@ -145,7 +145,7 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Add',
                             style: TextStyle(
                               fontFamily: 'Urbanist',
@@ -156,10 +156,10 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       'Add at least $_minSymptoms symptom${_minSymptoms > 1 ? 's' : ''} to improve accuracy.',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -167,19 +167,19 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                       ),
                     ),
                     if (_symptoms.isNotEmpty) ...[
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       Wrap(
                         spacing: 8,
                         runSpacing: 8,
                         children: _symptoms
                             .map((symptom) {
                               return Container(
-                                padding: const EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: 10,
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFE5E7EB),
+                                  color: Color(0xFFE5E7EB),
                                   borderRadius: BorderRadius.circular(999),
                                 ),
                                 child: Row(
@@ -187,17 +187,17 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                                   children: [
                                     Text(
                                       symptom,
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontFamily: 'Urbanist',
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         color: AppColors.textPrimary,
                                       ),
                                     ),
-                                    const SizedBox(width: 4),
+                                    SizedBox(width: 4),
                                     GestureDetector(
                                       onTap: () => _removeSymptom(symptom),
-                                      child: const Icon(
+                                      child: Icon(
                                         Icons.close,
                                         size: 14,
                                         color: AppColors.textSecondary,
@@ -210,7 +210,7 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                             .toList(growable: false),
                       ),
                     ],
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
@@ -222,7 +222,7 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                         style: FilledButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor: const Color(0xFFE2E8F0),
+                          disabledBackgroundColor: AppColors.border,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -232,7 +232,7 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                           state.isSubmitting
                               ? 'Analyzing...'
                               : 'Analyze symptoms',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
@@ -243,8 +243,8 @@ class _SymptomAnomaliesPageState extends ConsumerState<SymptomAnomaliesPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Results',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -393,7 +393,7 @@ class _ResultsSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 2, bottom: 8),
           child: Text(
             'Top predictions',
@@ -411,8 +411,8 @@ class _ResultsSection extends StatelessWidget {
         if (viewData.summary.isNotEmpty)
           Container(
             width: double.infinity,
-            margin: const EdgeInsets.only(top: 2),
-            padding: const EdgeInsets.all(14),
+            margin: EdgeInsets.only(top: 2),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppColors.card,
               borderRadius: BorderRadius.circular(14),
@@ -421,7 +421,7 @@ class _ResultsSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Summary',
                   style: TextStyle(
                     fontFamily: 'Urbanist',
@@ -431,10 +431,10 @@ class _ResultsSection extends StatelessWidget {
                     letterSpacing: .7,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   viewData.summary,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -452,7 +452,7 @@ class _ResultsSection extends StatelessWidget {
   Widget _hintCard(String text) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(22),
+      padding: EdgeInsets.all(22),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -461,7 +461,7 @@ class _ResultsSection extends StatelessWidget {
       child: Text(
         text,
         textAlign: TextAlign.center,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -485,8 +485,8 @@ class _PredictionCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -504,7 +504,7 @@ class _PredictionCard extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               condition.initials,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -512,44 +512,44 @@ class _PredictionCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   condition.disease,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   '${condition.priority}    2 Suggestions',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(999),
                   child: LinearProgressIndicator(
                     value: probability / 100,
                     minHeight: 3.5,
                     color: color,
-                    backgroundColor: const Color(0xFFE5E7EB),
+                    backgroundColor: Color(0xFFE5E7EB),
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 Text(
                   confidenceText,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -570,3 +570,4 @@ class _PredictionCard extends StatelessWidget {
     return const Color(0xFF14B8A6);
   }
 }
+

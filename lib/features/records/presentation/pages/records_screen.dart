@@ -46,6 +46,8 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final state = ref.watch(recordsViewModelProvider);
     final notificationsState = ref.watch(notificationsViewModelProvider);
     final unreadCount = notificationsState.items
@@ -144,7 +146,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
                     const SizedBox(height: 12),
                     if (state.status == RecordsStatus.loading &&
                         state.records.isEmpty)
-                      const SizedBox(
+                      SizedBox(
                         height: 260,
                         child: Center(
                           child: CircularProgressIndicator(
@@ -194,7 +196,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
   Widget _tabBar(RecordsState state) {
     return Container(
       margin: EdgeInsets.zero,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
       child: Row(
@@ -229,7 +231,7 @@ class _RecordsScreenState extends ConsumerState<RecordsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Unable to load records.',
               style: TextStyle(
                 fontSize: 16,

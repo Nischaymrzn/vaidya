@@ -51,20 +51,30 @@ class RecordsOverviewTab extends StatelessWidget {
         LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
-            final cardAspectRatio = width < 360
-                ? 1.55
-                : width < 430
-                ? 1.7
-                : 1.9;
+            final isTablet = width >= 700;
+            final gridDelegate = isTablet
+                ? const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    mainAxisExtent: 146,
+                  )
+                : SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 10,
+                    childAspectRatio: width < 360
+                        ? 1.55
+                        : width < 430
+                        ? 1.7
+                        : 1.9,
+                  );
 
-            return GridView.count(
+            return GridView(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: EdgeInsets.zero,
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: cardAspectRatio,
+              gridDelegate: gridDelegate,
               children: [
                 _OverviewStatItem(
                   data: _OverviewStatData(
@@ -121,13 +131,13 @@ class RecordsOverviewTab extends StatelessWidget {
                   flex: 7,
                   child: _recentRecordsCard(recent, count: recent.length),
                 ),
-                const SizedBox(width: 20),
+                SizedBox(width: 20),
                 Expanded(
                   flex: 3,
                   child: Column(
                     children: [
                       _aiScanCard(),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 12),
                       _aiInsightsCard(insights),
                     ],
                   ),
@@ -156,7 +166,7 @@ class RecordsOverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+            padding: EdgeInsets.fromLTRB(14, 12, 14, 8),
             child: Row(
               children: [
                 Expanded(
@@ -185,7 +195,7 @@ class RecordsOverviewTab extends StatelessWidget {
           if (recent.isNotEmpty)
             Divider(height: 1, color: AppColors.border.withValues(alpha: 0.9)),
           if (recent.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(10),
               child: Text(
                 'No recent medications available.',
@@ -200,8 +210,8 @@ class RecordsOverviewTab extends StatelessWidget {
           else
             ListView.separated(
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 12),
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.only(bottom: 12),
               itemCount: recent.length,
               separatorBuilder: (context, index) => Divider(
                 color: AppColors.border.withValues(alpha: 0.9),
@@ -211,19 +221,16 @@ class RecordsOverviewTab extends StatelessWidget {
               itemBuilder: (context, index) {
                 final record = recent[index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
                         width: 34,
                         height: 34,
-                        padding: const EdgeInsets.all(5),
+                        padding: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF5EDEE),
+                          color: AppColors.surfaceSoft,
                           shape: BoxShape.circle,
                           border: Border.all(color: AppColors.border),
                         ),
@@ -233,7 +240,7 @@ class RecordsOverviewTab extends StatelessWidget {
                               : 'assets/icons/file_1.svg',
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +256,7 @@ class RecordsOverviewTab extends StatelessWidget {
                                 color: AppColors.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            SizedBox(height: 2),
                             Row(
                               children: [
                                 Text(
@@ -261,7 +268,7 @@ class RecordsOverviewTab extends StatelessWidget {
                                     color: AppColors.textSecondary,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
                                     (record.provider?.trim().isNotEmpty ??
@@ -308,7 +315,7 @@ class RecordsOverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+            padding: EdgeInsets.fromLTRB(12, 8, 12, 6),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -321,7 +328,7 @@ class RecordsOverviewTab extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Upload a file to generate a draft record.',
                   style: TextStyle(
@@ -334,12 +341,12 @@ class RecordsOverviewTab extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1),
+          Divider(height: 1),
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
@@ -349,12 +356,12 @@ class RecordsOverviewTab extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.cloud_upload_outlined,
                     color: AppColors.primary,
                     size: 28,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     'Drop files here or click to upload',
                     textAlign: TextAlign.center,
@@ -365,7 +372,7 @@ class RecordsOverviewTab extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     'JPG, PNG, WEBP up to 5 MB.',
                     style: TextStyle(
@@ -375,7 +382,7 @@ class RecordsOverviewTab extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   ElevatedButton(
                     onPressed: onScanTap,
                     style: ElevatedButton.styleFrom(
@@ -386,7 +393,7 @@ class RecordsOverviewTab extends StatelessWidget {
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
-                    child: const Text('Select files'),
+                    child: Text('Select files'),
                   ),
                 ],
               ),
@@ -409,7 +416,7 @@ class RecordsOverviewTab extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
+            padding: EdgeInsets.fromLTRB(12, 8, 12, 6),
             child: Row(
               children: [
                 Expanded(
@@ -425,7 +432,7 @@ class RecordsOverviewTab extends StatelessWidget {
                           color: AppColors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         'Suggestions based on uploaded records only.',
                         style: TextStyle(
@@ -451,14 +458,14 @@ class RecordsOverviewTab extends StatelessWidget {
           ),
           const Divider(height: 1),
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             child: Column(
               children: insights
                   .map(
                     (item) => Container(
                       width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 6),
-                      padding: const EdgeInsets.all(12),
+                      margin: EdgeInsets.only(bottom: 6),
+                      padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         color: item.bgColor,
@@ -481,7 +488,7 @@ class RecordsOverviewTab extends StatelessWidget {
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.symmetric(
+                                padding: EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 3,
                                 ),
@@ -500,7 +507,7 @@ class RecordsOverviewTab extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             item.body,
                             style: TextStyle(
@@ -523,16 +530,46 @@ class RecordsOverviewTab extends StatelessWidget {
   }
 
   List<_InsightItem> _buildInsights(List<MedicalRecordEntity> records) {
+    final infoBg = AppColors.isDark
+        ? AppColors.primary.withValues(alpha: 0.14)
+        : Color(0xFFF3F8FF);
+    final infoBorder = AppColors.isDark
+        ? AppColors.primary.withValues(alpha: 0.35)
+        : Color(0xFFD5E7FF);
+    final infoBadge = AppColors.isDark
+        ? AppColors.primary.withValues(alpha: 0.22)
+        : Color(0xFFE7F1FF);
+    final mediumBg = AppColors.isDark
+        ? AppColors.warningSurface
+        : Color(0xFFFFF8E8);
+    final mediumBorder = AppColors.isDark
+        ? AppColors.warning.withValues(alpha: 0.35)
+        : Color(0xFFF7D69A);
+    final mediumBadge = AppColors.isDark
+        ? AppColors.warning.withValues(alpha: 0.22)
+        : Color(0xFFFFF1CC);
+    final goodBg = AppColors.isDark
+        ? AppColors.successSurface
+        : Color(0xFFEFFAF2);
+    final goodBorder = AppColors.isDark
+        ? AppColors.success.withValues(alpha: 0.35)
+        : Color(0xFFB8E4C3);
+    final goodBadge = AppColors.isDark
+        ? AppColors.success.withValues(alpha: 0.22)
+        : Color(0xFFD8F3DF);
+    final mediumText = AppColors.isDark ? AppColors.warning : Color(0xFF9A6700);
+    final goodText = AppColors.isDark ? AppColors.success : Color(0xFF1B7D38);
+
     if (records.isEmpty) {
-      return const [
+      return [
         _InsightItem(
           title: 'Add initial records',
           body:
               'Upload two records to start provider and date consistency insights.',
           level: 'INFO',
-          bgColor: Color(0xFFF3F8FF),
-          borderColor: Color(0xFFD5E7FF),
-          badgeBg: Color(0xFFE7F1FF),
+          bgColor: infoBg,
+          borderColor: infoBorder,
+          badgeBg: infoBadge,
           badgeText: AppColors.primary,
         ),
         _InsightItem(
@@ -540,9 +577,9 @@ class RecordsOverviewTab extends StatelessWidget {
           body:
               'Use AI scan inbox to extract metadata from files automatically.',
           level: 'INFO',
-          bgColor: Color(0xFFF3F8FF),
-          borderColor: Color(0xFFD5E7FF),
-          badgeBg: Color(0xFFE7F1FF),
+          bgColor: infoBg,
+          borderColor: infoBorder,
+          badgeBg: infoBadge,
           badgeText: AppColors.primary,
         ),
       ];
@@ -564,18 +601,10 @@ class RecordsOverviewTab extends StatelessWidget {
             ? '$missingProvider records are missing provider information.'
             : 'Most records have provider information.',
         level: missingProvider > 0 ? 'MEDIUM' : 'GOOD',
-        bgColor: missingProvider > 0
-            ? const Color(0xFFFFF8E8)
-            : const Color(0xFFEFFAF2),
-        borderColor: missingProvider > 0
-            ? const Color(0xFFF7D69A)
-            : const Color(0xFFB8E4C3),
-        badgeBg: missingProvider > 0
-            ? const Color(0xFFFFF1CC)
-            : const Color(0xFFD8F3DF),
-        badgeText: missingProvider > 0
-            ? const Color(0xFF9A6700)
-            : const Color(0xFF1B7D38),
+        bgColor: missingProvider > 0 ? mediumBg : goodBg,
+        borderColor: missingProvider > 0 ? mediumBorder : goodBorder,
+        badgeBg: missingProvider > 0 ? mediumBadge : goodBadge,
+        badgeText: missingProvider > 0 ? mediumText : goodText,
       ),
       _InsightItem(
         title: missingDate > 0
@@ -585,18 +614,10 @@ class RecordsOverviewTab extends StatelessWidget {
             ? '$missingDate records are missing date fields.'
             : 'Records have valid dates for timeline sorting.',
         level: missingDate > 0 ? 'MEDIUM' : 'GOOD',
-        bgColor: missingDate > 0
-            ? const Color(0xFFFFF8E8)
-            : const Color(0xFFEFFAF2),
-        borderColor: missingDate > 0
-            ? const Color(0xFFF7D69A)
-            : const Color(0xFFB8E4C3),
-        badgeBg: missingDate > 0
-            ? const Color(0xFFFFF1CC)
-            : const Color(0xFFD8F3DF),
-        badgeText: missingDate > 0
-            ? const Color(0xFF9A6700)
-            : const Color(0xFF1B7D38),
+        bgColor: missingDate > 0 ? mediumBg : goodBg,
+        borderColor: missingDate > 0 ? mediumBorder : goodBorder,
+        badgeBg: missingDate > 0 ? mediumBadge : goodBadge,
+        badgeText: missingDate > 0 ? mediumText : goodText,
       ),
     ];
   }
@@ -615,7 +636,7 @@ class _OverviewStatItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -632,7 +653,7 @@ class _OverviewStatItem extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 1),
+          SizedBox(height: 1),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -646,7 +667,7 @@ class _OverviewStatItem extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 1),
+          SizedBox(height: 1),
           Text(
             data.detail,
             maxLines: 1,
@@ -672,15 +693,15 @@ class _RecordActionsMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<RecordMenuAction>(
-      icon: const Icon(Icons.more_horiz, size: 20),
-      color: Colors.white,
+      icon: Icon(Icons.more_horiz, size: 20),
+      color: AppColors.card,
       padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       onSelected: onSelected,
-      itemBuilder: (context) => const [
+      itemBuilder: (context) => [
         PopupMenuItem(
           value: RecordMenuAction.viewRecord,
           child: _MenuLabel(
@@ -733,7 +754,7 @@ class _MenuLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isDelete ? const Color(0xFFE53935) : AppColors.textPrimary;
+    final color = isDelete ? Color(0xFFE53935) : AppColors.textPrimary;
     return Row(
       children: [
         Icon(icon, size: 18, color: color),

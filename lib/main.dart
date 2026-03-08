@@ -9,14 +9,7 @@ import 'package:vaidya/core/services/storage/user_session_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: Colors.white,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   // initialize Hive or other services if needed
   await HiveService().init();
 

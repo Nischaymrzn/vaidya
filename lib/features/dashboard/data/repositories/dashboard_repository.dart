@@ -37,14 +37,17 @@ class DashboardRepository implements IDashboardRepository {
   Future<Either<Failure, DashboardSummaryEntity>> getDashboardSummary() async {
     if (await _networkInfo.isConnected) {
       try {
-        final summaryModel = await _dashboardRemoteDataSource.getDashboardSummary();
-        await _dashboardLocalDataSource.cacheDashboardSummary(summaryModel);
+        final summaryModel = await _dashboardRemoteDataSource
+            .getDashboardSummary();
+        await _dashboardLocalDataSource.saveDashboardSummary(summaryModel);
         return Right(summaryModel.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
             statusCode: e.response?.statusCode,
-            message: e.response?.data['message'] ?? 'Failed to fetch dashboard summary',
+            message:
+                e.response?.data['message'] ??
+                'Failed to fetch dashboard summary',
           ),
         );
       } catch (e) {
@@ -53,14 +56,15 @@ class DashboardRepository implements IDashboardRepository {
       }
     }
 
-    final cached = await _dashboardLocalDataSource.getCachedDashboardSummary();
+    final cached = await _dashboardLocalDataSource.getDashboardSummary();
     if (cached != null) {
       return Right(cached.toEntity());
     }
 
     return const Left(
-      ApiFailure(message: 'No internet connection and no cached dashboard is available.'),
+      ApiFailure(
+        message: 'No internet connection and no cached dashboard is available.',
+      ),
     );
   }
-
 }

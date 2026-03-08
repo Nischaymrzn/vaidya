@@ -83,7 +83,7 @@ class _VitalEntrySheetState extends State<VitalEntrySheet> {
                   Expanded(
                     child: Text(
                       widget.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -93,7 +93,7 @@ class _VitalEntrySheetState extends State<VitalEntrySheet> {
                   ),
                   IconButton(
                     onPressed: _busy ? null : () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close_rounded),
+                    icon: Icon(Icons.close_rounded),
                     color: AppColors.textSecondary,
                   ),
                 ],
@@ -167,7 +167,7 @@ class _VitalEntrySheetState extends State<VitalEntrySheet> {
                             enabled: !_busy,
                             minLines: 2,
                             maxLines: 4,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -191,7 +191,7 @@ class _VitalEntrySheetState extends State<VitalEntrySheet> {
                           : () => Navigator.of(context).pop(),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,
-                        side: const BorderSide(color: AppColors.border),
+                        side: BorderSide(color: AppColors.border),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -367,7 +367,7 @@ class _NumberField extends StatelessWidget {
     return TextField(
       controller: controller,
       keyboardType: TextInputType.numberWithOptions(decimal: decimal),
-      style: const TextStyle(
+      style: TextStyle(
         fontFamily: 'Urbanist',
         fontSize: 14,
         fontWeight: FontWeight.w500,
@@ -399,11 +399,11 @@ class _DateField extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Ink(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.border),
-          color: Colors.white,
+          color: AppColors.surfaceSoft,
         ),
         child: Row(
           children: [
@@ -413,7 +413,7 @@ class _DateField extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -423,7 +423,7 @@ class _DateField extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -433,7 +433,7 @@ class _DateField extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.calendar_month_rounded,
               size: 20,
               color: AppColors.textSecondary,
@@ -449,29 +449,29 @@ InputDecoration _inputDecoration(String label) {
   return InputDecoration(
     labelText: label,
     floatingLabelBehavior: FloatingLabelBehavior.always,
-    labelStyle: const TextStyle(
+    labelStyle: TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 13,
       fontWeight: FontWeight.w600,
       color: AppColors.textPrimary,
     ),
-    floatingLabelStyle: const TextStyle(
+    floatingLabelStyle: TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 13,
       fontWeight: FontWeight.w600,
       color: AppColors.textSecondary,
     ),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide(color: AppColors.border),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.primary),
+      borderSide: BorderSide(color: AppColors.primary),
     ),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
     filled: true,
-    fillColor: Colors.white,
+    fillColor: AppColors.surfaceSoft,
   );
 }

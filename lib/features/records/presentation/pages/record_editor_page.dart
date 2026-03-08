@@ -136,7 +136,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
   @override
   Widget build(BuildContext context) {
     final structuredSpecs =
-        kTypeFieldMap[_recordType] ?? const <RecordFieldSpec>[];
+        kTypeFieldMap[_recordType] ?? <RecordFieldSpec>[];
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -160,7 +160,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Text(
                       _pageDescription,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13.5,
                         color: AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
@@ -260,7 +260,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
     ];
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -348,7 +348,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
     final initialAttachments = widget.initialRecord?.attachments ?? const [];
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -359,7 +359,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Attach files',
                   style: TextStyle(
@@ -383,7 +383,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
           ),
           if (initialAttachments.isNotEmpty) ...[
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Existing attachments',
               style: TextStyle(
                 fontSize: 12.5,
@@ -414,7 +414,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
                             : attachment.name!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w500,
@@ -440,7 +440,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
           ],
           if (_attachmentPaths.isNotEmpty) ...[
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'New attachments',
               style: TextStyle(
                 fontSize: 12.5,
@@ -471,7 +471,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
                         p.basename(path),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12.5,
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w500,
@@ -526,7 +526,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -537,7 +537,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
           controller: controller,
           validator: validator,
           maxLines: maxLines,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -545,7 +545,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
           decoration: InputDecoration(
             isDense: true,
             hintText: hintText,
-            hintStyle: const TextStyle(
+            hintStyle: TextStyle(
               fontSize: 13,
               color: AppColors.textSecondary,
             ),
@@ -555,7 +555,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
           ),
         ),
@@ -576,7 +576,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -586,7 +586,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
         DropdownButtonFormField<String>(
           initialValue: normalized,
           isDense: true,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
@@ -599,7 +599,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
           ),
           items: options
@@ -622,7 +622,7 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Date',
           style: TextStyle(
             fontSize: 13,
@@ -634,21 +634,21 @@ class _RecordEditorPageState extends State<RecordEditorPage> {
         TextFormField(
           controller: _dateController,
           readOnly: true,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13.5,
             color: AppColors.textPrimary,
             fontWeight: FontWeight.w500,
           ),
           decoration: InputDecoration(
             isDense: true,
-            suffixIcon: const Icon(Icons.calendar_today_rounded, size: 16),
+            suffixIcon: Icon(Icons.calendar_today_rounded, size: 16),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: AppColors.border),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: const BorderSide(color: AppColors.primary),
+              borderSide: BorderSide(color: AppColors.primary),
             ),
           ),
           onTap: _pickDate,
@@ -834,7 +834,7 @@ class _ScanSourceCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(10),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -848,7 +848,7 @@ class _ScanSourceCard extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: AppColors.border),
-              color: Colors.white,
+              color: AppColors.surfaceSoft,
             ),
             clipBehavior: Clip.antiAlias,
             child: isImage
@@ -861,7 +861,7 @@ class _ScanSourceCard extends StatelessWidget {
               fileName,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12.5,
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w500,

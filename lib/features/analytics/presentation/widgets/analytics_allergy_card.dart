@@ -59,7 +59,7 @@ class AnalyticsAllergyCard extends StatelessWidget {
         PieChartSectionData(
           value: 1,
           title: '',
-          color: const Color(0xFFCBD5E1),
+          color: AppColors.borderStrong,
           radius: 32,
         ),
       ];
@@ -99,7 +99,7 @@ class _LegendItem extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -123,3 +123,4 @@ Color _colorFor(String name) {
       return const Color(0xFF94A3B8);
   }
 }
+

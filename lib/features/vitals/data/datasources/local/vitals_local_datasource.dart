@@ -5,20 +5,22 @@ import 'package:vaidya/features/vitals/data/models/vital_api_model.dart';
 import 'package:vaidya/features/vitals/data/models/vital_hive_model.dart';
 
 final vitalsLocalDataSourceProvider = Provider<IVitalsLocalDataSource>((ref) {
-  return VitalsLocalDataSource(cacheService: ref.read(featureCacheServiceProvider));
+  return VitalsLocalDataSource(
+    saveService: ref.read(featureCacheServiceProvider),
+  );
 });
 
 class VitalsLocalDataSource implements IVitalsLocalDataSource {
   final FeatureCacheService _cacheService;
 
-  const VitalsLocalDataSource({required FeatureCacheService cacheService})
-      : _cacheService = cacheService;
+  const VitalsLocalDataSource({required FeatureCacheService saveService})
+    : _cacheService = saveService;
 
   static const String _itemsKey = 'vitals_items';
   static const String _summaryKey = 'vitals_summary';
 
   @override
-  Future<void> cacheVitals(List<VitalApiModel> items) {
+  Future<void> saveVitals(List<VitalApiModel> items) {
     final encoded = items
         .map((item) => VitalHiveModel.fromApiModel(item).toJson())
         .toList(growable: false);
@@ -26,7 +28,7 @@ class VitalsLocalDataSource implements IVitalsLocalDataSource {
   }
 
   @override
-  Future<List<VitalApiModel>> getCachedVitals() async {
+  Future<List<VitalApiModel>> getVitals() async {
     final cached = await _cacheService.readList(_itemsKey);
     return cached
         .map((item) => VitalHiveModel.fromJson(item).toApiModel())
@@ -34,8 +36,8 @@ class VitalsLocalDataSource implements IVitalsLocalDataSource {
   }
 
   @override
-  Future<VitalApiModel?> getCachedVitalById(String id) async {
-    final cached = await getCachedVitals();
+  Future<VitalApiModel?> getVitalById(String id) async {
+    final cached = await getVitals();
     for (final item in cached) {
       if (_sameId(item.data, id)) {
         return item;
@@ -52,7 +54,7 @@ class VitalsLocalDataSource implements IVitalsLocalDataSource {
       return payload;
     }
 
-    final cached = await getCachedVitals();
+    final cached = await getVitals();
     final updated = List<VitalApiModel>.from(cached);
     final index = updated.indexWhere((item) => _sameId(item.data, id));
 
@@ -62,31 +64,31 @@ class VitalsLocalDataSource implements IVitalsLocalDataSource {
       updated.insert(0, payload);
     }
 
-    await cacheVitals(updated);
+    await saveVitals(updated);
     return payload;
   }
 
   @override
   Future<bool> removeVitalById(String id) async {
-    final cached = await getCachedVitals();
+    final cached = await getVitals();
     final updated = cached
         .where((item) => !_sameId(item.data, id))
         .toList(growable: false);
     if (updated.length == cached.length) {
       return false;
     }
-    await cacheVitals(updated);
+    await saveVitals(updated);
     return true;
   }
 
   @override
-  Future<void> cacheVitalsSummary(Map<String, dynamic> payload) {
-    final model = VitalsSummaryHiveModel.fromJson(payload);
+  Future<void> saveVitalsSummary(Map<String, dynamic> data) {
+    final model = VitalsSummaryHiveModel.fromJson(data);
     return _cacheService.writeMap(_summaryKey, model.toJson());
   }
 
   @override
-  Future<Map<String, dynamic>?> getCachedVitalsSummary() async {
+  Future<Map<String, dynamic>?> getVitalsSummary() async {
     final cached = await _cacheService.readMap(_summaryKey);
     if (cached == null) return null;
     return VitalsSummaryHiveModel.fromJson(cached).toJson();

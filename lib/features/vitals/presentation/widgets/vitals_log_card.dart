@@ -44,7 +44,7 @@ class _VitalsLogCardState extends State<VitalsLogCard> {
   List<VitalRecordViewData> get _visible {
     final start = (_page - 1) * _pageSize;
     final end = (start + _pageSize).clamp(0, widget.records.length);
-    if (start >= widget.records.length) return const [];
+    if (start >= widget.records.length) return [];
     return widget.records.sublist(start, end);
   }
 
@@ -66,13 +66,13 @@ class _VitalsLogCardState extends State<VitalsLogCard> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
+        padding: EdgeInsets.fromLTRB(16, 14, 16, 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -108,34 +108,34 @@ class _VitalsLogCardState extends State<VitalsLogCard> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(999),
                     ),
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 10,
                     ),
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  child: const Text('Add entry'),
+                  child: Text('Add entry'),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             if (widget.records.isEmpty)
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 32,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceSoft,
                   border: Border.all(color: AppColors.border),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Text(
+                child: Text(
                   'No vitals recorded yet. Add your first reading to see trends.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -167,14 +167,14 @@ class _VitalsLogCardState extends State<VitalsLogCard> {
                   );
                 },
               ),
-            const SizedBox(height: 14),
-            const Divider(height: 1, thickness: 1, color: AppColors.border),
-            const SizedBox(height: 12),
+            SizedBox(height: 14),
+            Divider(height: 1, thickness: 1, color: AppColors.border),
+            SizedBox(height: 12),
             Row(
               children: [
                 Text(
                   'Page $_page of $_totalPages',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -227,12 +227,12 @@ class _DesktopTable extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-            decoration: const BoxDecoration(
-              color: Color(0xFFF8FAFC),
+            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
               borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
             ),
-            child: const _TableRow(
+            child: _TableRow(
               header: true,
               date: 'DATE',
               heart: 'HEART',
@@ -240,13 +240,13 @@ class _DesktopTable extends StatelessWidget {
               glucose: 'GLUCOSE',
             ),
           ),
-          const Divider(height: 1, thickness: 1, color: AppColors.border),
+          Divider(height: 1, thickness: 1, color: AppColors.border),
           ...List.generate(rows.length, (index) {
             final record = rows[index];
             return Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: 6,
                     vertical: 6,
                   ),
@@ -264,7 +264,7 @@ class _DesktopTable extends StatelessWidget {
                   ),
                 ),
                 if (index != rows.length - 1)
-                  const Divider(
+                  Divider(
                     height: 1,
                     thickness: 1,
                     color: AppColors.border,
@@ -297,7 +297,7 @@ class _TableRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final headerStyle = const TextStyle(
+    final headerStyle = TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 11.5,
       fontWeight: FontWeight.w500,
@@ -305,7 +305,7 @@ class _TableRow extends StatelessWidget {
       color: AppColors.textSecondary,
     );
 
-    final valueStyle = const TextStyle(
+    final valueStyle = TextStyle(
       fontFamily: 'Urbanist',
       fontSize: 13.5,
       fontWeight: FontWeight.w500,
@@ -363,8 +363,8 @@ class _PagerButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: enabled ? onPressed : null,
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, 34),
-        padding: const EdgeInsets.symmetric(horizontal: 14),
+        minimumSize: Size(0, 34),
+        padding: EdgeInsets.symmetric(horizontal: 14),
         side: BorderSide(
           color: enabled
               ? AppColors.border
@@ -417,7 +417,7 @@ class _ActionMenu extends StatelessWidget {
         }
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      icon: const Icon(
+      icon: Icon(
         Icons.more_horiz_rounded,
         color: AppColors.textSecondary,
       ),
@@ -467,3 +467,4 @@ String _displayDate(DateTime? date) {
   if (date == null) return '--';
   return DateFormat('MMM d').format(date);
 }
+

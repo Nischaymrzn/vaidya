@@ -21,7 +21,7 @@ class FamilyMembersStrip extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Family members',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -31,7 +31,7 @@ class FamilyMembersStrip extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        const Text(
+        Text(
           'Select a member to review vitals and care guidance.',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -105,7 +105,7 @@ class _MemberCard extends StatelessWidget {
       onTap: onSelect,
       child: Container(
         width: 270,
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.card,
           borderRadius: BorderRadius.circular(16),
@@ -134,7 +134,7 @@ class _MemberCard extends StatelessWidget {
                   backgroundColor: const Color(0xFFE8F1FF),
                   child: Text(
                     member.initials,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -151,7 +151,7 @@ class _MemberCard extends StatelessWidget {
                         member.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Urbanist',
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -163,7 +163,7 @@ class _MemberCard extends StatelessWidget {
                         children: [
                           Text(
                             '$relation · $age yrs',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -172,13 +172,13 @@ class _MemberCard extends StatelessWidget {
                           ),
                           if (summary.isAdmin) ...[
                             const SizedBox(width: 6),
-                            const Icon(
+                            Icon(
                               Icons.edit_outlined,
                               size: 12,
                               color: AppColors.textSecondary,
                             ),
                             const SizedBox(width: 2),
-                            const Text(
+                            Text(
                               'EDIT',
                               style: TextStyle(
                                 fontFamily: 'Urbanist',
@@ -224,7 +224,7 @@ class _MemberCard extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: AppColors.border.withValues(alpha: 0.5),
@@ -233,7 +233,7 @@ class _MemberCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'LAST RECORDED VITALS',
                       style: TextStyle(
                         fontFamily: 'Urbanist',
@@ -246,7 +246,7 @@ class _MemberCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       'BP $bp | HR $hr | Glucose $glucose',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 13.5,
                         fontWeight: FontWeight.w600,
@@ -256,7 +256,7 @@ class _MemberCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'BMI $bmi',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -275,7 +275,7 @@ class _MemberCard extends StatelessWidget {
                   color: AppColors.textSecondary,
                   onTap: onView,
                 ),
-                const Spacer(),
+                Spacer(),
                 _CardTextButton(
                   label: 'Select',
                   color: AppColors.primary,
@@ -320,3 +320,4 @@ class _CardTextButton extends StatelessWidget {
     );
   }
 }
+

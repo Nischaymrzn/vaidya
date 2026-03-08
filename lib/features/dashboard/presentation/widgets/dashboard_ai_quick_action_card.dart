@@ -8,9 +8,10 @@ class DashboardAiQuickActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(16),
@@ -44,8 +45,10 @@ class DashboardAiQuickActionCard extends StatelessWidget {
               onPressed: onTap,
               style: ElevatedButton.styleFrom(
                 elevation: 0,
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.primary,
+                backgroundColor: isDark ? AppColors.card : Colors.white,
+                foregroundColor: isDark
+                    ? AppColors.textPrimary
+                    : AppColors.primary,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),

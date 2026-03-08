@@ -4,75 +4,77 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vaidya/core/services/storage/user_session_service.dart';
-import 'package:vaidya/features/auth/presentation/state/auth_state.dart';
-import 'package:vaidya/features/auth/presentation/view_model/auth_viewmodel.dart';
 import 'package:vaidya/features/profile/presentation/pages/personal_information_screen.dart';
+import 'package:vaidya/features/profile/presentation/state/profile_state.dart';
+import 'package:vaidya/features/profile/presentation/view_model/profile_viewmodel.dart';
 
 class MockUserSessionService extends Mock implements UserSessionService {}
 
-class MockAuthViewModel extends Notifier<AuthState> implements AuthViewModel {
+class MockProfileViewModel extends Notifier<ProfileState>
+    implements ProfileViewModel {
   @override
-  AuthState build() => const AuthState();
+  ProfileState build() => const ProfileState(status: ProfileStatus.loaded);
 
   @override
-  Future<void> register({
-    required String fullName,
-    required String email,
-    String? role,
-    required String password,
-    String? number,
-  }) async {}
+  Future<void> load(String userId, {bool forceLoading = false}) async {}
 
   @override
-  Future<void> login({required String email, required String password}) async {}
+  Future<void> loadPaymentStatus() async {}
 
   @override
-  Future<void> loginWithGoogle() async {}
+  Future<String?> startPremiumCheckout() async => null;
 
   @override
-  Future<void> loginWithGoogleToken({required String token}) async {}
-
-  @override
-  Future<bool> isGoogleLoginConfigured() async => false;
-
-  @override
-  Future<void> requestPasswordReset({required String email}) async {}
-
-  @override
-  Future<void> getCurrentUser() async {}
-
-  @override
-  Future<void> logout() async {}
-
-  @override
-  Future<void> updateProfile({
-    required String userId,
-    String? name,
-    String? email,
-    int? number,
+  Future<bool> update(
+    String userId,
+    Map<String, dynamic> payload, {
     String? imagePath,
-  }) async {}
+  }) async => true;
 
   @override
-  void clearSuccessMessage() {}
+  Future<bool> updatePassword(String userId, String newPassword) async => true;
 
   @override
-  void resetState() {}
+  Future<bool> delete(String userId) async => true;
+
+  @override
+  void clearMessages() {}
+
+  @override
+  void setPremiumStateForTests({
+    required bool isPremium,
+    required String plan,
+  }) {}
 }
 
 void main() {
   late MockUserSessionService mockUserSessionService;
+  late MockProfileViewModel mockProfileViewModel;
 
   setUp(() {
     mockUserSessionService = MockUserSessionService();
+    mockProfileViewModel = MockProfileViewModel();
     SharedPreferences.setMockInitialValues({});
+
+    when(() => mockUserSessionService.getCurrentUserId()).thenReturn('user-1');
+    when(
+      () => mockUserSessionService.getCurrentUserPhoneNumber(),
+    ).thenReturn('');
+    when(() => mockUserSessionService.getCurrentUserEmail()).thenReturn('');
+    when(
+      () => mockUserSessionService.getCurrentUserProfilePicture(),
+    ).thenReturn(null);
+    when(() => mockUserSessionService.getCurrentUserFullName()).thenReturn('');
+    when(
+      () => mockUserSessionService.getCurrentUserIsPremium(),
+    ).thenReturn(false);
   });
 
   Widget createTestWidget() {
     return ProviderScope(
       overrides: [
         userSessionServiceProvider.overrideWithValue(mockUserSessionService),
-        authViewModelProvider.overrideWith(() => MockAuthViewModel()),
+        profileViewModelProvider.overrideWith(() => mockProfileViewModel),
       ],
       child: const MaterialApp(home: PersonalInformationScreen()),
     );

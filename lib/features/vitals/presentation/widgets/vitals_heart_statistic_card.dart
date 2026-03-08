@@ -19,31 +19,38 @@ class VitalsHeartStatisticCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.85)),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFF0F7FF), Colors.white, Colors.white],
+          colors: isDark
+              ? const [
+                  Color(0xFF1A1C22),
+                  Color(0xFF17191E),
+                  Color(0xFF13151A),
+                ]
+              : const [Color(0xFFF0F7FF), Colors.white, Colors.white],
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0x0A1F2937),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
             blurRadius: 8,
             offset: Offset(0, 3),
           ),
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        padding: EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -72,19 +79,21 @@ class VitalsHeartStatisticCard extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: const Icon(Icons.more_horiz_rounded),
+                  icon: Icon(Icons.more_horiz_rounded),
                   color: AppColors.textSecondary,
                   splashRadius: 20,
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Container(
               width: double.infinity,
               height: 264,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.white.withValues(alpha: 0.92),
+                color: isDark
+                    ? AppColors.surfaceSoft.withValues(alpha: 0.92)
+                    : Colors.white.withValues(alpha: 0.92),
                 border: Border.all(
                   color: AppColors.border.withValues(alpha: 0.8),
                 ),
@@ -151,14 +160,14 @@ class VitalsHeartStatisticCard extends StatelessWidget {
                     value: heartStats.avg == null ? '--' : '${heartStats.avg}',
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: _StatsTile(
                     label: 'Minimum',
                     value: heartStats.min == null ? '--' : '${heartStats.min}',
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: _StatsTile(
                     label: 'Maximum',
@@ -168,10 +177,10 @@ class VitalsHeartStatisticCard extends StatelessWidget {
               ],
             ),
             if (heartCard?.updatedAt != null) ...[
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 'Updated ${_relativeTime(heartCard!.updatedAt!)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -219,6 +228,7 @@ class _CalloutTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Positioned(
       left: left,
       right: right,
@@ -227,14 +237,16 @@ class _CalloutTag extends StatelessWidget {
       child: SizedBox(
         width: 96,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+          padding: EdgeInsets.fromLTRB(6, 5, 6, 5),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.95),
+            color: isDark
+                ? AppColors.card.withValues(alpha: 0.95)
+                : Colors.white.withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.border.withValues(alpha: 0.9)),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x120F172A),
+                color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.07),
                 blurRadius: 8,
                 offset: Offset(0, 3),
               ),
@@ -249,19 +261,19 @@ class _CalloutTag extends StatelessWidget {
               Text(
                 label,
                 textAlign: textAlignRight ? TextAlign.right : TextAlign.left,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 8.5,
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 1),
+              SizedBox(height: 1),
               RichText(
                 textAlign: textAlignRight ? TextAlign.right : TextAlign.left,
                 text: TextSpan(
                   text: value,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 15,
                     height: 1.0,
@@ -271,7 +283,7 @@ class _CalloutTag extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: ' $unit',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 8.5,
                         fontWeight: FontWeight.w500,
@@ -382,7 +394,7 @@ class _StatsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(11, 10, 11, 10),
+      padding: EdgeInsets.fromLTRB(11, 10, 11, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.8)),
@@ -393,25 +405,25 @@ class _StatsTile extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
               fontWeight: FontWeight.w500,
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 3),
+          SizedBox(height: 3),
           RichText(
             text: TextSpan(
               text: value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 20,
                 height: 1,
                 fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
-              children: const [
+              children: [
                 TextSpan(
                   text: ' bpm',
                   style: TextStyle(

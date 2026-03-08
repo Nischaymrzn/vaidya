@@ -27,35 +27,48 @@ class VitalsRepository implements IVitalsRepository {
     required IVitalsRemoteDataSource remoteDataSource,
     required IVitalsLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, List<VitalEntity>>> getVitals() async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getVitals();
-        await _localDataSource.cacheVitals(remote);
+        await _localDataSource.saveVitals(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch vitals'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? 'Failed to fetch vitals',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedVitals();
+    final cached = await _localDataSource.getVitals();
     if (cached.isNotEmpty) {
       return Right(
         cached.map((item) => item.toEntity()).toList(growable: false),
       );
     }
-    return const Left(ApiFailure(message: 'No internet connection and no cached data available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached data available.',
+      ),
+    );
   }
 
   @override
-  Future<Either<Failure, VitalEntity>> createVital(Map<String, dynamic> payload) async {
+  Future<Either<Failure, VitalEntity>> createVital(
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       final now = DateTime.now().toUtc().toIso8601String();
       final localId = 'local_${DateTime.now().microsecondsSinceEpoch}';
@@ -76,17 +89,27 @@ class VitalsRepository implements IVitalsRepository {
       await _localDataSource.upsertVital(created);
       return Right(created.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to create vital'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to create vital',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, VitalEntity>> updateVital(String id, Map<String, dynamic> payload) async {
+  Future<Either<Failure, VitalEntity>> updateVital(
+    String id,
+    Map<String, dynamic> payload,
+  ) async {
     if (!await _networkInfo.isConnected) {
       final existing =
-          (await _localDataSource.getCachedVitalById(id))?.data ??
+          (await _localDataSource.getVitalById(id))?.data ??
           <String, dynamic>{};
       final now = DateTime.now().toUtc().toIso8601String();
       final merged = <String, dynamic>{
@@ -107,9 +130,16 @@ class VitalsRepository implements IVitalsRepository {
       await _localDataSource.upsertVital(updated);
       return Right(updated.toEntity());
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to update vital'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to update vital',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -120,16 +150,25 @@ class VitalsRepository implements IVitalsRepository {
       if (removed) {
         return const Right(true);
       }
-      return const Left(ApiFailure(message: 'No internet connection and vital is not cached.'));
+      return const Left(
+        ApiFailure(message: 'No internet connection and vital is not cached.'),
+      );
     }
     try {
       await _remoteDataSource.deleteVital(id);
       await _localDataSource.removeVitalById(id);
       return const Right(true);
     } on DioException catch (e) {
-      return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to delete vital'));
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to delete vital',
+        ),
+      );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -138,20 +177,31 @@ class VitalsRepository implements IVitalsRepository {
     if (await _networkInfo.isConnected) {
       try {
         final summary = await _remoteDataSource.getVitalsSummary();
-        await _localDataSource.cacheVitalsSummary(summary);
+        await _localDataSource.saveVitalsSummary(summary);
         return Right(VitalsSummaryEntity(data: summary));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch summary'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? 'Failed to fetch summary',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedVitalsSummary();
+    final cached = await _localDataSource.getVitalsSummary();
     if (cached != null) {
       return Right(VitalsSummaryEntity(data: cached));
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached summary available.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached summary available.',
+      ),
+    );
   }
 }

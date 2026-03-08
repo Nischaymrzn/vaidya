@@ -41,6 +41,8 @@ class _SymptomsScreenState extends ConsumerState<SymptomsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final state = ref.watch(symptomsViewModelProvider);
     final vm = ref.read(symptomsViewModelProvider.notifier);
 
@@ -69,7 +71,7 @@ class _SymptomsScreenState extends ConsumerState<SymptomsScreen> {
     });
 
     final body = state.status == SymptomsStatus.loading && !hasData
-        ? const Center(
+        ? Center(
             child: CircularProgressIndicator(color: AppColors.primary),
           )
         : RefreshIndicator(
@@ -151,12 +153,12 @@ class _SymptomsScreenState extends ConsumerState<SymptomsScreen> {
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leading: const Padding(
+        leading: Padding(
           padding: EdgeInsets.only(left: 10),
           child: AppDrawerToggleButton(color: AppColors.textPrimary),
         ),
         titleSpacing: 0,
-        title: const Text(
+        title: Text(
           'Symptoms',
           style: TextStyle(
             fontFamily: 'Urbanist',

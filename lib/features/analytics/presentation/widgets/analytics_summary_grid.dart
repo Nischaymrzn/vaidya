@@ -14,19 +14,27 @@ class AnalyticsSummaryGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final childAspectRatio = width >= 900 ? 2.35 : 1.55;
+        final isTablet = width >= 700;
+        final gridDelegate = isTablet
+            ? const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                mainAxisExtent: 150,
+              )
+            : const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.55,
+              );
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.all(10),
           itemCount: 4,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: childAspectRatio,
-          ),
+          gridDelegate: gridDelegate,
           itemBuilder: (context, index) {
             return _SummaryTile(data: cards[index]);
           },
@@ -84,7 +92,7 @@ class _SummaryTile extends StatelessWidget {
       color: AppColors.card,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: AppColors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(14, 12, 12, 10),
@@ -94,7 +102,7 @@ class _SummaryTile extends StatelessWidget {
           children: [
             Text(
               data.label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 12,
                 letterSpacing: 0.7,
@@ -105,7 +113,7 @@ class _SummaryTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '${data.value}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 37 / 1.5,
                 height: 1.0,
@@ -118,7 +126,7 @@ class _SummaryTile extends StatelessWidget {
               data.detail,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 13.5,
                 fontWeight: FontWeight.w500,

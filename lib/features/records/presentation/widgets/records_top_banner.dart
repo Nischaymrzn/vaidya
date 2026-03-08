@@ -16,7 +16,7 @@ class RecordsTopBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
       ),
@@ -86,7 +86,7 @@ class RecordsTopBanner extends StatelessWidget {
                           minHeight: 14,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE53935),
+                          color: Color(0xFFE53935),
                           borderRadius: BorderRadius.circular(99),
                           border: Border.all(
                             color: AppColors.primary,

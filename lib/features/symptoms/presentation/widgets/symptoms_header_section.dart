@@ -14,7 +14,7 @@ class SymptomsHeaderSection extends StatelessWidget {
         final compact = constraints.maxWidth < 620;
         final heading = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Symptom Tracker',
               style: TextStyle(

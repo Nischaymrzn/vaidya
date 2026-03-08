@@ -93,7 +93,7 @@ class _ChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -104,17 +104,17 @@ class _ChartCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 17,
               fontWeight: FontWeight.w600,
               color: AppColors.textPrimary,
             ),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -155,10 +155,10 @@ class _VaidyaScoreChart extends StatelessWidget {
             leftTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            rightTitles: const AxisTitles(
+            rightTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: const AxisTitles(
+            topTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
@@ -198,13 +198,13 @@ class _ScoreLegend extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (summary.members.isEmpty) return const SizedBox.shrink();
+    if (summary.members.isEmpty) return SizedBox.shrink();
     final crossAxisCount = summary.members.length >= 3
         ? 3
         : summary.members.length;
     return GridView.builder(
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       itemCount: summary.members.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: crossAxisCount,
@@ -215,9 +215,9 @@ class _ScoreLegend extends StatelessWidget {
       itemBuilder: (context, index) {
         final m = summary.members[index];
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: AppColors.surfaceSoft,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
           ),
@@ -228,7 +228,7 @@ class _ScoreLegend extends StatelessWidget {
                 m
                     .relationLabel(currentUserId: summary.currentUserId)
                     .toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -240,14 +240,14 @@ class _ScoreLegend extends StatelessWidget {
               ),
               Text(
                 '${m.healthScore ?? '--'}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const Text(
+              Text(
                 'Health score',
                 style: TextStyle(
                   fontFamily: 'Urbanist',
@@ -334,12 +334,12 @@ class _HeartRateChart extends StatelessWidget {
             LineChartBarData(
               spots: spots,
               isCurved: true,
-              color: const Color(0xFF4DA3FF),
+              color: Color(0xFF4DA3FF),
               barWidth: 2.5,
-              dotData: const FlDotData(show: true),
+              dotData: FlDotData(show: true),
               belowBarData: BarAreaData(
                 show: true,
-                color: const Color(0xFF4DA3FF).withValues(alpha: 0.08),
+                color: Color(0xFF4DA3FF).withValues(alpha: 0.08),
               ),
             ),
           ],
@@ -347,16 +347,16 @@ class _HeartRateChart extends StatelessWidget {
       ),
       footer: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'AVERAGE HEART RATE',
               style: TextStyle(
                 fontFamily: 'Urbanist',
@@ -370,14 +370,14 @@ class _HeartRateChart extends StatelessWidget {
               summary.averageHeartRate > 0
                   ? '${summary.averageHeartRate} bpm'
                   : '-- bpm',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
             ),
-            const Text(
+            Text(
               'Based on latest vitals entries.',
               style: TextStyle(
                 fontFamily: 'Urbanist',
@@ -419,26 +419,26 @@ class _VitalsSnapshotChart extends StatelessWidget {
       chart: BarChart(
         BarChartData(
           maxY: maxY,
-          gridData: const FlGridData(show: true, drawVerticalLine: false),
+          gridData: FlGridData(show: true, drawVerticalLine: false),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
-            leftTitles: const AxisTitles(
+            leftTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            rightTitles: const AxisTitles(
+            rightTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: const AxisTitles(
+            topTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 getTitlesWidget: (v, _) => Padding(
-                  padding: const EdgeInsets.only(top: 6),
+                  padding: EdgeInsets.only(top: 6),
                   child: Text(
                     pts[v.toInt()].label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -495,10 +495,10 @@ class _ScoreComparisonChart extends StatelessWidget {
             leftTitles: const AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            rightTitles: const AxisTitles(
+            rightTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
-            topTitles: const AxisTitles(
+            topTitles: AxisTitles(
               sideTitles: SideTitles(showTitles: false),
             ),
             bottomTitles: AxisTitles(
@@ -509,8 +509,8 @@ class _ScoreComparisonChart extends StatelessWidget {
                 getTitlesWidget: (v, _) {
                   if ((v - 0).abs() < 0.001) {
                     return Transform.translate(
-                      offset: const Offset(10, 0),
-                      child: const Padding(
+                      offset: Offset(10, 0),
+                      child: Padding(
                         padding: EdgeInsets.only(top: 6),
                         child: Text(
                           'Member',
@@ -526,8 +526,8 @@ class _ScoreComparisonChart extends StatelessWidget {
                   }
                   if ((v - 1).abs() < 0.001) {
                     return Transform.translate(
-                      offset: const Offset(-10, 0),
-                      child: const Padding(
+                      offset: Offset(-10, 0),
+                      child: Padding(
                         padding: EdgeInsets.only(top: 6),
                         child: Text(
                           'Family Avg',
@@ -541,7 +541,7 @@ class _ScoreComparisonChart extends StatelessWidget {
                       ),
                     );
                   }
-                  return const SizedBox.shrink();
+                  return SizedBox.shrink();
                 },
               ),
             ),
@@ -552,21 +552,21 @@ class _ScoreComparisonChart extends StatelessWidget {
               isCurved: false,
               color: AppColors.primary,
               barWidth: 2.5,
-              dotData: const FlDotData(show: true),
+              dotData: FlDotData(show: true),
             ),
           ],
         ),
       ),
       footer: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
+          color: AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.border.withValues(alpha: 0.6)),
         ),
         child: Text(
           'Family average score: ${summary.averageHealthScore > 0 ? summary.averageHealthScore : '--'}',
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 13,
             fontWeight: FontWeight.w500,
@@ -591,9 +591,9 @@ Widget _memberBottomTitle(
   double horizontalShift = 0,
 }) {
   final rounded = value.round();
-  if ((value - rounded).abs() > 0.001) return const SizedBox.shrink();
+  if ((value - rounded).abs() > 0.001) return SizedBox.shrink();
   if (rounded < 0 || rounded >= summary.members.length) {
-    return const SizedBox.shrink();
+    return SizedBox.shrink();
   }
   return Transform.translate(
     offset: Offset(horizontalShift, 0),
@@ -606,7 +606,7 @@ Widget _memberBottomTitle(
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 11,
             fontWeight: FontWeight.w500,
@@ -623,3 +623,4 @@ class _DataPoint {
   final double value;
   const _DataPoint(this.label, this.value);
 }
+

@@ -12,6 +12,8 @@ class AppMainBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final items = <({MainBottomNavItem item, IconData icon})>[
       (item: MainBottomNavItem.home, icon: LucideIcons.layoutDashboard),
       (item: MainBottomNavItem.records, icon: LucideIcons.folderHeart),
@@ -21,7 +23,7 @@ class AppMainBottomNav extends StatelessWidget {
     ];
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(top: BorderSide(color: AppColors.border, width: 1)),
       ),

@@ -5,6 +5,6 @@ abstract interface class IAnalyticsRemoteDataSource {
 }
 
 abstract interface class IAnalyticsLocalDataSource {
-  Future<void> cacheSummary(AnalyticsSummaryApiModel summary);
-  Future<AnalyticsSummaryApiModel?> getCachedSummary();
+  Future<void> saveSummary(AnalyticsSummaryApiModel summary);
+  Future<AnalyticsSummaryApiModel?> getSummary();
 }

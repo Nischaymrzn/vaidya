@@ -118,7 +118,7 @@ class _EncounterChart extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
                           history[index].month,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontFamily: 'Urbanist',
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
@@ -213,14 +213,14 @@ class _TotalChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
         '$label $count',
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 13,
           fontWeight: FontWeight.w500,
@@ -253,7 +253,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 6),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14,
             fontWeight: FontWeight.w500,

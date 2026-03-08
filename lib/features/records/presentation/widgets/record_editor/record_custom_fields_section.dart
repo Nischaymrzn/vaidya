@@ -21,7 +21,7 @@ class RecordCustomFieldsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(14),
@@ -32,7 +32,7 @@ class RecordCustomFieldsSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Custom fields',
                   style: TextStyle(
@@ -62,7 +62,7 @@ class RecordCustomFieldsSection extends StatelessWidget {
           ),
           if (fields.isEmpty) ...[
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'No custom fields added.',
               style: TextStyle(
                 fontSize: 12.5,
@@ -157,7 +157,7 @@ class _Input extends StatelessWidget {
     return TextFormField(
       initialValue: value,
       onChanged: onChanged,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13.5,
         color: AppColors.textPrimary,
         fontWeight: FontWeight.w500,
@@ -165,7 +165,7 @@ class _Input extends StatelessWidget {
       decoration: InputDecoration(
         isDense: true,
         hintText: hintText,
-        hintStyle: const TextStyle(
+        hintStyle: TextStyle(
           fontSize: 13,
           color: AppColors.textSecondary,
         ),
@@ -175,7 +175,7 @@ class _Input extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: AppColors.primary),
+          borderSide: BorderSide(color: AppColors.primary),
         ),
       ),
     );

@@ -60,6 +60,8 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    AppColors.sync(theme.brightness);
     final state = ref.watch(familyHealthViewModelProvider);
     final dashboardState = ref.watch(dashboardViewModelProvider);
     final recordsState = ref.watch(recordsViewModelProvider);
@@ -124,7 +126,7 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
           ? null
           : AppMainBottomNav(activeItem: null, onTap: _openMainTab),
       body: loading
-          ? const Center(
+          ? Center(
               child: CircularProgressIndicator(color: AppColors.primary),
             )
           : RefreshIndicator(
@@ -308,7 +310,7 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
   Widget _emptyCard(String text) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -316,7 +318,7 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 14,
           fontWeight: FontWeight.w500,
@@ -804,11 +806,11 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
                 icon: const Icon(LucideIcons.link, size: 14),
                 label: Text(
                   busy ? 'Generating...' : 'Generate invite link',
-                  style: const TextStyle(fontFamily: 'Urbanist'),
+                  style: TextStyle(fontFamily: 'Urbanist'),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
+                  side: BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -817,15 +819,15 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
               const SizedBox(height: 12),
               if (link.isNotEmpty) ...[
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                    color: AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: AppColors.border),
                   ),
                   child: SelectableText(
                     link,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Urbanist',
                       fontSize: 12,
                       color: AppColors.textPrimary,
@@ -837,7 +839,7 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
                   exp == '--'
                       ? 'Invite link active for 7 days'
                       : 'Expires on $exp',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Urbanist',
                     fontSize: 12.5,
                     color: AppColors.textSecondary,
@@ -856,7 +858,7 @@ class _FamilyHealthScreenState extends ConsumerState<FamilyHealthScreen> {
                   ),
                 ),
               ] else
-                const Text(
+                Text(
                   'Invite links expire in 7 days by default.',
                   style: TextStyle(
                     fontFamily: 'Urbanist',
@@ -954,7 +956,7 @@ class _MemberTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.card,
         border: Border(bottom: BorderSide(color: AppColors.border)),
       ),
@@ -964,7 +966,7 @@ class _MemberTopBar extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 10, 18, 14),
           child: GestureDetector(
             onTap: onBack,
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
@@ -1001,7 +1003,7 @@ class _NoGroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -1010,7 +1012,7 @@ class _NoGroupCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'No family group found',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -1020,7 +1022,7 @@ class _NoGroupCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Create a new family group or join via invite link.',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -1061,7 +1063,7 @@ class _NoGroupCard extends StatelessWidget {
                     horizontal: 20,
                     vertical: 10,
                   ),
-                  side: const BorderSide(color: AppColors.primary),
+                  side: BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(999),
                   ),
@@ -1079,3 +1081,4 @@ class _NoGroupCard extends StatelessWidget {
     );
   }
 }
+

@@ -10,7 +10,9 @@ import 'package:vaidya/features/dashboard/data/models/notification_api_model.dar
 import 'package:vaidya/features/dashboard/domain/entities/notification_entity.dart';
 import 'package:vaidya/features/dashboard/domain/repositories/notifications_repository.dart';
 
-final notificationsRepositoryProvider = Provider<INotificationsRepository>((ref) {
+final notificationsRepositoryProvider = Provider<INotificationsRepository>((
+  ref,
+) {
   return NotificationsRepository(
     remoteDataSource: ref.read(notificationsRemoteDataSourceProvider),
     localDataSource: ref.read(notificationsLocalDataSourceProvider),
@@ -27,9 +29,9 @@ class NotificationsRepository implements INotificationsRepository {
     required INotificationsRemoteDataSource remoteDataSource,
     required INotificationsLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
   Future<Either<Failure, NotificationsResultEntity>> getNotifications({
@@ -45,27 +47,31 @@ class NotificationsRepository implements INotificationsRepository {
           unreadOnly: unreadOnly,
         );
 
-        await _localDataSource.cacheNotifications(remote.items);
-        await _localDataSource.cachePagination(remote.pagination);
+        await _localDataSource.saveNotifications(remote.items);
+        await _localDataSource.savePagination(remote.pagination);
 
         return Right(remote.toEntity());
       } on DioException catch (e) {
         return Left(
           ApiFailure(
             statusCode: e.response?.statusCode,
-            message: e.response?.data['message'] ?? 'Failed to fetch notifications',
+            message:
+                e.response?.data['message'] ?? 'Failed to fetch notifications',
           ),
         );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cachedItems = await _localDataSource.getCachedNotifications();
-    final cachedPagination = await _localDataSource.getCachedPagination();
+    final cachedItems = await _localDataSource.getNotifications();
+    final cachedPagination = await _localDataSource.getPagination();
 
     if (cachedItems.isNotEmpty) {
-      final pagination = cachedPagination ??
+      final pagination =
+          cachedPagination ??
           const NotificationsPaginationApiModel(
             total: 0,
             page: 1,
@@ -76,13 +82,20 @@ class NotificationsRepository implements INotificationsRepository {
           );
       return Right(
         NotificationsResultEntity(
-          notifications: cachedItems.map((e) => e.toEntity()).toList(growable: false),
+          notifications: cachedItems
+              .map((e) => e.toEntity())
+              .toList(growable: false),
           pagination: pagination.toEntity(),
         ),
       );
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached notifications available.'));
+    return const Left(
+      ApiFailure(
+        message:
+            'No internet connection and no cached notifications available.',
+      ),
+    );
   }
 
   @override
@@ -98,11 +111,15 @@ class NotificationsRepository implements INotificationsRepository {
       return Left(
         ApiFailure(
           statusCode: e.response?.statusCode,
-          message: e.response?.data['message'] ?? 'Failed to mark notification as read',
+          message:
+              e.response?.data['message'] ??
+              'Failed to mark notification as read',
         ),
       );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 
@@ -119,11 +136,15 @@ class NotificationsRepository implements INotificationsRepository {
       return Left(
         ApiFailure(
           statusCode: e.response?.statusCode,
-          message: e.response?.data['message'] ?? 'Failed to mark all notifications as read',
+          message:
+              e.response?.data['message'] ??
+              'Failed to mark all notifications as read',
         ),
       );
     } catch (e) {
-      return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+      return Left(
+        ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+      );
     }
   }
 }

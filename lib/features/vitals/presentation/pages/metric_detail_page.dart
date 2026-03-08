@@ -37,16 +37,16 @@ class MetricDetailPage extends StatelessWidget {
     final hasHistoryData = historySpots.length >= 2;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final donutSize = (screenWidth - 110).clamp(236.0, 270.0);
-    final conditionBg = const Color(0xFFEAF9F0);
-    final conditionBorder = const Color(0xFFC2E8D0);
-    final suggestionBg = const Color(0xFFEAF9F0);
-    final suggestionBorder = const Color(0xFFC2E8D0);
+    final conditionBg = Color(0xFFEAF9F0);
+    final conditionBorder = Color(0xFFC2E8D0);
+    final suggestionBg = Color(0xFFEAF9F0);
+    final suggestionBorder = Color(0xFFC2E8D0);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+          padding: EdgeInsets.fromLTRB(20, 18, 20, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -58,12 +58,12 @@ class MetricDetailPage extends StatelessWidget {
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
-                        shape: const CircleBorder(),
-                        side: const BorderSide(color: Color(0xFF202020)),
+                        shape: CircleBorder(),
+                        side: BorderSide(color: Color(0xFF202020)),
                         padding: EdgeInsets.zero,
-                        minimumSize: const Size(46, 46),
+                        minimumSize: Size(46, 46),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         size: 18,
                         color: AppColors.textPrimary,
@@ -83,24 +83,24 @@ class MetricDetailPage extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () {},
-                    icon: const Icon(Icons.more_horiz, size: 24),
+                    icon: Icon(Icons.more_horiz, size: 24),
                     padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
+                    constraints: BoxConstraints(
                       minWidth: 28,
                       minHeight: 28,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
               Row(
                 children: [
                   SvgPicture.asset(iconPath, width: 20, height: 20),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       metricName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -119,7 +119,7 @@ class MetricDetailPage extends StatelessWidget {
                     ),
                     child: Text(
                       displayCondition,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF2E4B3A),
@@ -128,13 +128,13 @@ class MetricDetailPage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.only(left: 30),
+                padding: EdgeInsets.only(left: 30),
                 child: RichText(
                   text: TextSpan(
                     text: _primaryValue(value),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 38,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -144,7 +144,7 @@ class MetricDetailPage extends StatelessWidget {
                       if (_secondaryValue(value).isNotEmpty)
                         TextSpan(
                           text: '/${_secondaryValue(value)}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.w500,
                             color: AppColors.textSecondary,
@@ -153,7 +153,7 @@ class MetricDetailPage extends StatelessWidget {
                         ),
                       TextSpan(
                         text: ' $unit',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textSecondary,
@@ -185,14 +185,14 @@ class MetricDetailPage extends StatelessWidget {
                               PieChartSectionData(
                                 value: scorePercent.clamp(0, 100).toDouble(),
                                 showTitle: false,
-                                color: const Color(0xFF3387E8),
+                                color: Color(0xFF3387E8),
                                 radius: donutSize * 0.19,
                               ),
                               PieChartSectionData(
                                 value: (100 - scorePercent.clamp(0, 100))
                                     .toDouble(),
                                 showTitle: false,
-                                color: const Color(0xFFECECEC),
+                                color: Color(0xFFECECEC),
                                 radius: donutSize * 0.19,
                               ),
                             ],
@@ -204,16 +204,16 @@ class MetricDetailPage extends StatelessWidget {
                         children: [
                           Text(
                             '$scorePercent %',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 1),
+                          SizedBox(height: 1),
                           Text(
                             scoreLabel,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               letterSpacing: 0.3,
                               fontWeight: FontWeight.w600,
@@ -226,10 +226,10 @@ class MetricDetailPage extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                padding: EdgeInsets.fromLTRB(12, 10, 12, 10),
                 decoration: BoxDecoration(
                   color: suggestionBg,
                   borderRadius: BorderRadius.circular(12),
@@ -238,28 +238,28 @@ class MetricDetailPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.warning_amber_rounded,
                       size: 15,
                       color: AppColors.textPrimary,
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             suggestion.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             suggestion.body,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13.5,
                               height: 1.2,
                               fontWeight: FontWeight.w500,
@@ -272,10 +272,10 @@ class MetricDetailPage extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'History',
                     style: TextStyle(
                       fontSize: 20,
@@ -283,10 +283,10 @@ class MetricDetailPage extends StatelessWidget {
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   GestureDetector(
                     onTap: () {},
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.only(right: 2),
                       child: Text(
                         'View all',
@@ -329,23 +329,23 @@ class MetricDetailPage extends StatelessWidget {
                               isCurved: true,
                               curveSmoothness: 0.24,
                               isStrokeCapRound: true,
-                              color: const Color(0xFF3E94FF),
+                              color: Color(0xFF3E94FF),
                               barWidth: 2.3,
-                              dotData: const FlDotData(show: false),
+                              dotData: FlDotData(show: false),
                             ),
                           ],
                         )
                       : LineChartData(
-                          gridData: const FlGridData(show: false),
-                          titlesData: const FlTitlesData(show: false),
+                          gridData: FlGridData(show: false),
+                          titlesData: FlTitlesData(show: false),
                           borderData: FlBorderData(show: false),
-                          lineBarsData: const [],
-                          betweenBarsData: const [],
+                          lineBarsData: [],
+                          betweenBarsData: [],
                         ),
                 ),
               ),
               if (!hasHistoryData)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 8),
                   child: Text(
                     'No history data available yet.',

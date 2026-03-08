@@ -33,7 +33,7 @@ class FamilyMemberPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.card,
         borderRadius: BorderRadius.circular(16),
@@ -82,10 +82,10 @@ class _MemberHeader extends StatelessWidget {
       children: [
         CircleAvatar(
           radius: 22,
-          backgroundColor: const Color(0xFFE8F1FF),
+          backgroundColor: AppColors.primarySoft,
           child: Text(
             member.initials,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -93,24 +93,24 @@ class _MemberHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 member.displayName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimary,
                 ),
               ),
-              const SizedBox(height: 2),
+              SizedBox(height: 2),
               Text(
                 '${member.relationLabel(currentUserId: currentUserId)} | ${member.age ?? '--'} yrs | Last update ${_formatDate(member.lastUpdated)}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Urbanist',
                   fontSize: 12.5,
                   fontWeight: FontWeight.w500,
@@ -155,7 +155,7 @@ class _MemberDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
+      padding: EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border),
@@ -165,8 +165,8 @@ class _MemberDropdown extends StatelessWidget {
         child: DropdownButton<String>(
           isExpanded: true,
           value: selectedUserId,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 20),
-          style: const TextStyle(
+          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 20),
+          style: TextStyle(
             fontFamily: 'Urbanist',
             fontSize: 14.5,
             fontWeight: FontWeight.w500,
@@ -212,11 +212,11 @@ class _TabBar extends StatelessWidget {
         children: List.generate(_tabs.length, (i) {
           final selected = activeTab == i;
           return Padding(
-            padding: const EdgeInsets.only(right: 6),
+            padding: EdgeInsets.only(right: 6),
             child: GestureDetector(
               onTap: () => onTabChanged(i),
               child: Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 8,
                 ),
@@ -386,9 +386,9 @@ class _InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
       ),
@@ -397,7 +397,7 @@ class _InfoCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 11,
               fontWeight: FontWeight.w600,
@@ -422,13 +422,13 @@ class _KVRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
+      padding: EdgeInsets.only(bottom: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13.5,
               fontWeight: FontWeight.w500,
@@ -437,7 +437,7 @@ class _KVRow extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Urbanist',
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
@@ -456,6 +456,7 @@ class _AlertCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final message = switch (status) {
       FamilyMemberStatus.critical => 'Immediate follow-up recommended.',
       FamilyMemberStatus.warning => 'Monitor vitals in next 24 hours.',
@@ -463,14 +464,20 @@ class _AlertCard extends StatelessWidget {
     };
 
     final alertBg = switch (status) {
-      FamilyMemberStatus.critical => const Color(0xFFFEE2E2),
-      FamilyMemberStatus.warning => const Color(0xFFFFF8E8),
-      FamilyMemberStatus.stable => const Color(0xFFEAF3FF),
+      FamilyMemberStatus.critical => isDark
+          ? AppColors.dangerSurface
+          : Color(0xFFFEE2E2),
+      FamilyMemberStatus.warning => isDark
+          ? AppColors.warningSurface
+          : Color(0xFFFFF8E8),
+      FamilyMemberStatus.stable => isDark
+          ? AppColors.primary.withValues(alpha: 0.16)
+          : Color(0xFFEAF3FF),
     };
 
     final alertFg = switch (status) {
-      FamilyMemberStatus.critical => const Color(0xFFDC2626),
-      FamilyMemberStatus.warning => const Color(0xFF9A6700),
+      FamilyMemberStatus.critical => Color(0xFFDC2626),
+      FamilyMemberStatus.warning => Color(0xFF9A6700),
       FamilyMemberStatus.stable => AppColors.primary,
     };
 
@@ -481,16 +488,16 @@ class _AlertCard extends StatelessWidget {
     };
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'ACTIVE ALERTS',
             style: TextStyle(
               fontFamily: 'Urbanist',
@@ -546,7 +553,7 @@ class _VitalsHistoryTab extends StatelessWidget {
       );
 
     if (items.isEmpty) {
-      return const _PlaceholderCard(text: 'No vitals history recorded yet.');
+      return _PlaceholderCard(text: 'No vitals history recorded yet.');
     }
 
     return Container(
@@ -558,9 +565,9 @@ class _VitalsHistoryTab extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            color: const Color(0xFFF8FAFC),
-            child: const Row(
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            color: AppColors.surfaceSoft,
+            child: Row(
               children: [
                 Expanded(
                   flex: 2,
@@ -630,7 +637,7 @@ class _VitalsHistoryTab extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.border),
+          Divider(height: 1, color: AppColors.border),
           ...items.take(4).map((e) => _VitalsRow(vitals: e)),
         ],
       ),
@@ -645,8 +652,8 @@ class _VitalsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: const BoxDecoration(
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: AppColors.border, width: 0.5)),
       ),
       child: Row(
@@ -655,7 +662,7 @@ class _VitalsRow extends StatelessWidget {
             flex: 2,
             child: Text(
               _formatDate(vitals.recordedAt),
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Urbanist',
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -739,7 +746,7 @@ class _MedicalRecordsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!canView) {
-      return const _PlaceholderCard(
+      return _PlaceholderCard(
         text: 'Medical records are available only to the member.',
       );
     }
@@ -754,13 +761,13 @@ class _MedicalRecordsTab extends StatelessWidget {
       });
     final visible = items.take(2).toList(growable: false);
     if (visible.isEmpty) {
-      return const _PlaceholderCard(text: 'No medical records available yet.');
+      return _PlaceholderCard(text: 'No medical records available yet.');
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Recent Medical Records',
           style: TextStyle(
             fontFamily: 'Urbanist',
@@ -769,7 +776,7 @@ class _MedicalRecordsTab extends StatelessWidget {
             color: AppColors.textPrimary,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: AppColors.card,
@@ -781,7 +788,7 @@ class _MedicalRecordsTab extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemCount: visible.length,
             separatorBuilder: (context, index) =>
-                Divider(color: Colors.grey.shade300, thickness: 1.2, height: 2),
+                Divider(color: AppColors.border, thickness: 1.2, height: 2),
             itemBuilder: (context, index) {
               final record = visible[index];
               return MedicationCard(
@@ -797,11 +804,11 @@ class _MedicalRecordsTab extends StatelessWidget {
             },
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         TextButton(
           onPressed: () => Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (_) => const DashboardScreen(initialIndex: 1),
+              builder: (_) => DashboardScreen(initialIndex: 1),
             ),
             (_) => false,
           ),
@@ -829,7 +836,7 @@ class _AllergiesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!canView) {
-      return const _PlaceholderCard(
+      return _PlaceholderCard(
         text:
             'Allergy details are available only to the member or family admin.',
       );
@@ -843,14 +850,14 @@ class _AllergiesTab extends StatelessWidget {
         .toList(growable: false);
 
     if (visible.isEmpty) {
-      return const _PlaceholderCard(text: 'No allergies recorded.');
+      return _PlaceholderCard(text: 'No allergies recorded.');
     }
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
       ),
@@ -860,7 +867,7 @@ class _AllergiesTab extends StatelessWidget {
         children: visible
             .map(
               (item) => Container(
-                padding: const EdgeInsets.symmetric(
+                padding: EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
@@ -872,15 +879,15 @@ class _AllergiesTab extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.warning_amber_rounded,
                       size: 14,
                       color: AppColors.primary,
                     ),
-                    const SizedBox(width: 5),
+                    SizedBox(width: 5),
                     Text(
                       item,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Urbanist',
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -905,21 +912,21 @@ class _MedicationsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!canView) {
-      return const _PlaceholderCard(
+      return _PlaceholderCard(
         text:
             'Medication details are available only to the member or family admin.',
       );
     }
     final visible = medications.take(3).toList(growable: false);
     if (visible.isEmpty) {
-      return const _PlaceholderCard(text: 'No medications on file.');
+      return _PlaceholderCard(text: 'No medications on file.');
     }
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
       ),
@@ -928,8 +935,8 @@ class _MedicationsTab extends StatelessWidget {
             .map(
               (item) => Container(
                 width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(
+                margin: EdgeInsets.only(bottom: 8),
+                padding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
                 ),
@@ -946,17 +953,17 @@ class _MedicationsTab extends StatelessWidget {
                         children: [
                           Text(
                             '${item.name} - ${item.dose}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 14.5,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 3),
+                          SizedBox(height: 3),
                           Text(
                             item.meta ?? 'Medication on file',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Urbanist',
                               fontSize: 12.5,
                               fontWeight: FontWeight.w500,
@@ -967,7 +974,7 @@ class _MedicationsTab extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 4,
                       ),
@@ -975,7 +982,7 @@ class _MedicationsTab extends StatelessWidget {
                         color: AppColors.primarySoft,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Effective',
                         style: TextStyle(
                           fontFamily: 'Urbanist',
@@ -1003,15 +1010,15 @@ class _PlaceholderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.surfaceSoft,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.border.withValues(alpha: 0.7)),
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Urbanist',
           fontSize: 13.5,
           fontWeight: FontWeight.w500,
@@ -1045,3 +1052,4 @@ String _formatDate(DateTime? d) {
   ];
   return '${months[d.month - 1]} ${d.day.toString().padLeft(2, '0')}, ${d.year}';
 }
+

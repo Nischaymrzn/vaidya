@@ -9,7 +9,9 @@ import 'package:vaidya/features/intelligence/data/datasources/remote/health_insi
 import 'package:vaidya/features/intelligence/domain/entities/health_insight_entity.dart';
 import 'package:vaidya/features/intelligence/domain/repositories/health_insights_repository.dart';
 
-final healthInsightsRepositoryProvider = Provider<IHealthInsightsRepository>((ref) {
+final healthInsightsRepositoryProvider = Provider<IHealthInsightsRepository>((
+  ref,
+) {
   return HealthInsightsRepository(
     remoteDataSource: ref.read(healthInsightsRemoteDataSourceProvider),
     localDataSource: ref.read(healthInsightsLocalDataSourceProvider),
@@ -26,27 +28,40 @@ class HealthInsightsRepository implements IHealthInsightsRepository {
     required IHealthInsightsRemoteDataSource remoteDataSource,
     required IHealthInsightsLocalDataSource localDataSource,
     required NetworkInfo networkInfo,
-  })  : _remoteDataSource = remoteDataSource,
-        _localDataSource = localDataSource,
-        _networkInfo = networkInfo;
+  }) : _remoteDataSource = remoteDataSource,
+       _localDataSource = localDataSource,
+       _networkInfo = networkInfo;
 
   @override
-  Future<Either<Failure, List<HealthInsightEntity>>> getInsights({String? riskId}) async {
+  Future<Either<Failure, List<HealthInsightEntity>>> getInsights({
+    String? riskId,
+  }) async {
     if (await _networkInfo.isConnected) {
       try {
         final remote = await _remoteDataSource.getInsights(riskId: riskId);
-        await _localDataSource.cacheInsights(remote);
+        await _localDataSource.saveInsights(remote);
         return Right(remote.map((e) => e.toEntity()).toList(growable: false));
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch health insights'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ??
+                'Failed to fetch health insights',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedInsights();
+    final cached = await _localDataSource.getInsights();
     if (cached.isNotEmpty) {
-      return Right(cached.map((item) => item.toEntity()).toList(growable: false));
+      return Right(
+        cached.map((item) => item.toEntity()).toList(growable: false),
+      );
     }
 
     return const Right(<HealthInsightEntity>[]);
@@ -59,20 +74,30 @@ class HealthInsightsRepository implements IHealthInsightsRepository {
         final remote = await _remoteDataSource.getInsightById(id);
         return Right(remote.toEntity());
       } on DioException catch (e) {
-        return Left(ApiFailure(statusCode: e.response?.statusCode, message: e.response?.data['message'] ?? 'Failed to fetch health insight'));
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? 'Failed to fetch health insight',
+          ),
+        );
       } catch (e) {
-        return Left(ApiFailure(message: e.toString().replaceFirst('Exception: ', '')));
+        return Left(
+          ApiFailure(message: e.toString().replaceFirst('Exception: ', '')),
+        );
       }
     }
 
-    final cached = await _localDataSource.getCachedInsights();
-    final match = cached
-        .where((item) => item.id == id)
-        .toList(growable: false);
+    final cached = await _localDataSource.getInsights();
+    final match = cached.where((item) => item.id == id).toList(growable: false);
     if (match.isNotEmpty) {
       return Right(match.first.toEntity());
     }
 
-    return const Left(ApiFailure(message: 'No internet connection and no cached health insight found.'));
+    return const Left(
+      ApiFailure(
+        message: 'No internet connection and no cached health insight found.',
+      ),
+    );
   }
 }
